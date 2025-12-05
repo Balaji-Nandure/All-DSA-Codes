@@ -26,36 +26,45 @@ void printAll(int i, vector<int> &a, vector<int> &curr, int &sum, int k) {
 }
 
 // PRINT ONLY ONE SUBSEQUENCE WITH SUM = K
+
 bool printOne(int i, vector<int> &a, vector<int> &ds, int &sum, int k) {
 
     if (i == a.size()) {
+        // if condition is satisfied then return true and stop the function
         if (sum == k) {
             for (int x : ds) cout << x << " ";
             cout << endl;
             return true;  // stop
         }
+        // otherwise return false and continue the function
         return false;
     }
 
     // TAKE
     ds.push_back(a[i]);
     sum += a[i];
+    // if true then immediate return true and stop the function
+    // do this whenewer you are making a function call.
     if (printOne(i + 1, a, ds, sum, k)) {
-        ds.pop_back();
-        sum -= a[i];
+        // stop further recursion calls
         return true;
     }
+
     ds.pop_back();
     sum -= a[i];
 
     // NOT TAKE
+    // do this whenewer you are making a function call.
     if (printOne(i + 1, a, ds, sum, k)) return true;
 
+    // if none of the aboce calls return true, then return false
     return false;
 }
 
 
 // PRINT COUNT OF SUBSEQUENCES WITH SUM = K
+// here no need to maintain the curr vector because we are not printing the subsequences
+// and just maintaining the sum if more than sufficient.
 int countWays(int i, vector<int> &a, int &sum, int k) {
 
     if (i == a.size()) {
