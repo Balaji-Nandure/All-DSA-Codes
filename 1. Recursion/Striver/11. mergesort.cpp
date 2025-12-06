@@ -3,6 +3,7 @@ using namespace std;
 
 
 // Merge function to merge two sorted halves of arr[l..m] and arr[m+1..r]
+// this will merge in ascending order.
 void merge(vector<int>& arr, int l, int m, int r) {
     int n1 = m - l + 1; // size of left
     int n2 = r - m;     // size of right
@@ -10,7 +11,6 @@ void merge(vector<int>& arr, int l, int m, int r) {
     vector<int> left(n1), right(n2);
 
     // Copy data because we are not allowed to change the original array.
-
     for (int i = 0; i < n1; ++i)
         left[i] = arr[l + i];
     for (int j = 0; j < n2; ++j)
@@ -19,7 +19,10 @@ void merge(vector<int>& arr, int l, int m, int r) {
     int i = 0, j = 0, k = l;
     // Merge the temp arrays back into arr[l..r]
     while (i < n1 && j < n2) {
-        if (left[i] <= right[j]) arr[k++] = left[i++];
+        // if (left[i] >= right[j])   // descending order
+        // if (left[i] <= right[j])   // ascending order
+        if (left[i] <= right[j]) 
+            arr[k++] = left[i++];
         else arr[k++] = right[j++];
     }
     // Copy the remaining elements
