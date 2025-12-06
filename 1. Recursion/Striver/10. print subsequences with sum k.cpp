@@ -66,7 +66,8 @@ bool printOne(int i, vector<int> &a, vector<int> &ds, int &sum, int k) {
 // here no need to maintain the curr vector because we are not printing the subsequences
 // and just maintaining the sum if more than sufficient.
 int countWays(int i, vector<int> &a, int &sum, int k) {
-
+    // this can only be done if array contains positive numbers only.
+    if(sum > k) return 0;
     if (i == a.size()) {
         return (sum == k);
     }
@@ -81,7 +82,6 @@ int countWays(int i, vector<int> &a, int &sum, int k) {
 
     return take + not_take;
 }
-
 
 int main() {
 
