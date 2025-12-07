@@ -40,6 +40,8 @@ void printAll_loop(int start, vector<int> &a, vector<int> &curr, int sum, int k)
     for (int i = start; i < (int)a.size(); i++) {
         curr.push_back(a[i]);
         printAll_loop(i + 1, a, curr, sum + a[i], k);
+        // If repetition is allowed, after choosing a[i], allow picking it again by staying at i (don't increment i)
+        // printAll_loop(i, a, curr, sum + a[i], k); // stay at i for repetition
         curr.pop_back();
     }
 }
@@ -98,8 +100,6 @@ bool printOne_loop(int start, vector<int> &a, vector<int> &curr, int sum, int k)
     return false;
 }
 
-
-
 // PRINT COUNT OF SUBSEQUENCES WITH SUM = K
 // here no need to maintain the curr vector because we are not printing the subsequences
 // and just maintaining the sum if more than sufficient.
@@ -135,21 +135,29 @@ int countWays_loop(int start, vector<int> &a, int sum, int k) {
     return ways;
 }
 
-
 int main() {
 
     vector<int> a = {1, 2, 3, 4, 5};
     int k = 5;
 
-    cout << "All subsequences with sum " << k << ":\n";
+    cout << "All subsequences with sum " << k << " (pick/not-pick):\n";
     vector<int> curr;
     int sum = 0;
     printAll(0, a, curr, sum, k);
 
-    cout << "\nAny one subsequence with sum " << k << ":\n";
+    cout << "\nAll subsequences with sum " << k << " (loop):\n";
+    curr.clear();
+    printAll_loop(0, a, curr, 0, k);
+
+    cout << "\nAny one subsequence with sum " << k << " (pick/not-pick):\n";
     curr.clear();
     sum = 0;
     bool found = printOne(0, a, curr, sum, k);
+    if (!found) cout << "None found.\n";
+
+    cout << "\nAny one subsequence with sum " << k << " (loop):\n";
+    curr.clear();
+    found = printOne_loop(0, a, curr, 0, k);
     if (!found) cout << "None found.\n";
 
     cout << "\nCount of subsequences with sum " << k << " (pick/not-pick): ";
@@ -161,5 +169,4 @@ int main() {
 
     return 0;
 }
-
 

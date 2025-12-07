@@ -3,8 +3,7 @@ using namespace std;
 
 // Approach 1: for-loop backtracking
 
-void backtrack(vector<int>& a, int target, int index,
-               vector<int>& curr, vector<vector<int>>& ans) {
+void backtrack(vector<int>& a, int target, int index, vector<int>& curr, vector<vector<int>>& ans) {
     if (target == 0) {
         ans.push_back(curr);
         return;
@@ -22,8 +21,7 @@ void backtrack(vector<int>& a, int target, int index,
 
 // Approach 2: pick / not-pick with duplicate skip in "not pick" branch
 // this mehod is more intuitive and easy to understand.
-void solve(int i, vector<int>& a, int target,
-           vector<int>& curr, vector<vector<int>>& ans) {
+void solve(int i, vector<int>& a, int target, vector<int>& curr, vector<vector<int>>& ans) {
     if (target == 0) {
         ans.push_back(curr);
         return;
