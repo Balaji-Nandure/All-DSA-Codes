@@ -23,15 +23,15 @@ using namespace std;
 // generating all permutations by recursion.
 //  On reaching the end, record the permutation.
 
-void permute_swap(int i, vector<int>& arr, vector<vector<int>>& result) {
-    if (i == arr.size()) {
+void permute_swap(int ind, vector<int>& arr, vector<vector<int>>& result) {
+    if (ind == arr.size()) {
         result.push_back(arr);
         return;
     }
-    for (int j = i; j < arr.size(); j++) {
-        swap(arr[i], arr[j]);
-        permute_swap(i + 1, arr, result);
-        swap(arr[i], arr[j]);
+    for (int i = ind; i < arr.size(); i++) {
+        swap(arr[ind], arr[i]);
+        permute_swap(ind + 1, arr, result);
+        swap(arr[ind], arr[i]);
     }
 }
 
