@@ -1,3 +1,7 @@
+#include <iostream>
+#include <string>
+using namespace std;
+
 /*
 Question: Print the power set (all subsets) of a string (distinct or not), using recursion and backtracking.
 
@@ -11,7 +15,7 @@ Approach:
 */
 
 // Print all subsets (powerset) of input string 'str' using recursion & backtracking
-void powerSet(string &str, int idx, string &curr) {
+void powerSet(const string &str, int idx, string &curr) {
     if (idx == str.length()) {
         cout << "\"" << curr << "\"" << endl;
         return;
@@ -28,7 +32,7 @@ void powerSet(string &str, int idx, string &curr) {
 int main() {
     string str = "abc";
     cout << "All subsets (power set) of \"" << str << "\":" << endl;
-    string curr = "";
+    string curr;
     powerSet(str, 0, curr);
     return 0;
 }
