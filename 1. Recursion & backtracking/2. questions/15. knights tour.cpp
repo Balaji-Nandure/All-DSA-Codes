@@ -81,16 +81,7 @@ int main() {
     cout << "Starting from position (0, 0)" << endl;
     cout << endl;
 
-    // Standard backtracking approach
-    cout << "=== Standard Backtracking Approach ===" << endl;
-
     bool found = knightTourExists(n, 0, 0);
-
-    if (found) {
-        cout << "Solution exists!" << endl;
-    } else {
-        cout << "No solution found." << endl;
-    }
-
+    cout << found << endl;
     return 0;
 }
