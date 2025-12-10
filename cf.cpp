@@ -22,7 +22,5 @@ void pid(int n) {
 }
 
 signed main() {
-    while(true){
-        int n = 10;
-    }
+    
 }
