@@ -22,5 +22,12 @@ void pid(int n) {
 }
 
 signed main() {
-    
+    // Do some CPU heavy work: Calculate the sum of squares from 1 to a large N in a loop
+    // Infinite CPU-heavy work: keep calculating sum of squares in an endless loop
+    long long sum = 0;
+    while (true) {
+        for (int i = 1; i <= 100000000; ++i) {
+            sum += i * i;
+        }
+    }
 }
