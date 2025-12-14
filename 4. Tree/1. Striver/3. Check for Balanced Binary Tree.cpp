@@ -1,5 +1,5 @@
 /*
- * Problem: Check for Balanced Binary Tree
+ * Problem: Check for Balanced Binary Tree (LeetCode 110)
  *
  * A binary tree is height-balanced if for every node,
  * |height(left) - height(right)| <= 1.
@@ -12,57 +12,33 @@
  * Space: O(h) recursion stack
  */
 
-#include <bits/stdc++.h>
-using namespace std;
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int heightOrUnbalanced(TreeNode* root) {
+        if (!root) return 0;
 
-struct Node {
-    int data;
-    Node* left;
-    Node* right;
+        int lh = heightOrUnbalanced(root->left);
+        if (lh == -1) return -1;
 
-    Node(int val) {
-        data = val;
-        left = right = nullptr;
+        int rh = heightOrUnbalanced(root->right);
+        if (rh == -1) return -1;
+
+        if (abs(lh - rh) > 1) return -1;
+        return 1 + max(lh, rh);
+    }
+    
+    bool isBalanced(TreeNode* root) {
+        return heightOrUnbalanced(root) != -1;
     }
 };
-
-int heightOrUnbalanced(Node* root) {
-    if (!root) return 0;
-
-    int lh = heightOrUnbalanced(root->left);
-    if (lh == -1) return -1; // new line
-
-    int rh = heightOrUnbalanced(root->right);
-    if (rh == -1) return -1; // new line
-
-    if (abs(lh - rh) > 1) return -1; // new line
-    return 1 + max(lh, rh); 
-}
-
-bool isBalanced(Node* root) {
-    return heightOrUnbalanced(root) != -1;
-}
-
-int main() {
-    // Balanced example:
-    //        1
-    //      /   \
-    //     2     3
-    //      \
-    //       5
-    Node* root = new Node(1);
-    root->left = new Node(2);
-    root->right = new Node(3);
-    root->left->right = new Node(5);
-
-    cout << "Balanced? " << (isBalanced(root) ? "Yes" : "No") << "\n";
-
-    // Make it unbalanced by adding a deeper chain on one side:
-    // 2 -> right -> 5 -> right -> 6 -> right -> 7
-    root->left->right->right = new Node(6);
-    root->left->right->right->right = new Node(7);
-
-    cout << "Balanced after adding nodes? " << (isBalanced(root) ? "Yes" : "No") << "\n";
-
-    return 0;
-}
