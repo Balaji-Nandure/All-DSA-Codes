@@ -21,53 +21,53 @@ Explanation: The number represented by this linked list is 189, and 189 * 2 = 37
  * };
  */
 
-class Solution {
-public:
-    ListNode* doubleIt(ListNode* head) {
-        // Reverse the list to process from least significant to most significant
-        ListNode* prev = nullptr;
-        ListNode* current = head;
-        
-        while (current != nullptr) {
-            ListNode* next = current->next;
-            current->next = prev;
-            prev = current;
-            current = next;
-        }
-        
-        // Now prev is the head of reversed list (least significant digit first)
-        head = prev;
-        current = head;
-        int carry = 0;
-        
-        // Double each digit and handle carry
-        while (current != nullptr) {
-            int doubled = current->val * 2 + carry;
-            current->val = doubled % 10;
-            carry = doubled / 10;
-            
-            // If this is the last node and we have carry, create a new node
-            if (current->next == nullptr && carry > 0) {
-                current->next = new ListNode(carry);
-                carry = 0;
+ class Solution {
+    public:
+        ListNode* doubleIt(ListNode* head) {
+            // Step 1: Reverse the list
+            ListNode* prev = nullptr;
+            ListNode* curr = head;
+    
+            while (curr) {
+                ListNode* next = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = next;
             }
-            
-            current = current->next;
+            head = prev;
+    
+            // Step 2: Double with carry
+            curr = head;
+            int carry = 0;
+    
+            while (curr) {
+                int sum = curr->val * 2 + carry;
+                curr->val = sum % 10;
+                carry = sum / 10;
+                prev = curr;
+                curr = curr->next;
+            }
+    
+            // Step 3: Handle leftover carry
+            if (carry > 0) {
+                prev->next = new ListNode(carry);
+            }
+    
+            // Step 4: Reverse the list back
+            curr = head;
+            prev = nullptr;
+            while (curr) {
+                ListNode* next = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = next;
+            }
+    
+            return prev;
         }
-        
-        // Reverse the list back
-        prev = nullptr;
-        current = head;
-        while (current != nullptr) {
-            ListNode* next = current->next;
-            current->next = prev;
-            prev = current;
-            current = next;
-        }
-        
-        return prev;
-    }
-};
+    };
+    
+    
 
 // Approach 2: Recursive (Process from right to left)
 class Solution2 {
