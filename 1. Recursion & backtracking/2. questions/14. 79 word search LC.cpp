@@ -1,6 +1,9 @@
 /*
- * Problem: 79. Word Search
+ * Problem: Word Search
  * 
+ * LeetCode 79: Word Search
+ * GeeksforGeeks: https://www.geeksforgeeks.org/word-search-in-2d-grid/
+ *
  * Given an m x n grid of characters board and a string word, return true if word exists in the grid.
  * 
  * The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are 

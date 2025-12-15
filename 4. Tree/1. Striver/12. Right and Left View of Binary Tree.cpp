@@ -2,7 +2,7 @@
  * Problem: Right View and Left View of Binary Tree
  * 
  * Right View (LeetCode 199): Binary Tree Right Side View
- * Left View: Binary Tree Left Side View (similar concept, not on LeetCode)
+ * Left View (GeeksforGeeks): https://www.geeksforgeeks.org/print-left-view-binary-tree/
  *
  * Right View: Given the root of a binary tree, imagine yourself standing on the
  * right side of it, return the values of the nodes you can see ordered from top to bottom.

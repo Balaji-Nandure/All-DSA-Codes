@@ -8,8 +8,12 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: House Robber 1
-You are a professional robber planning to rob houses along a street. Each house has a 
+ * Problem: House Robber
+ *
+ * LeetCode 198: House Robber
+ * GeeksforGeeks: https://www.geeksforgeeks.org/find-maximum-possible-stolen-value-houses/
+ *
+ * You are a professional robber planning to rob houses along a street. Each house has a 
 certain amount of money stashed, the only constraint stopping you from robbing each of 
 them is that adjacent houses have security systems connected and it will automatically 
 contact the police if two adjacent houses were broken into on the same night.

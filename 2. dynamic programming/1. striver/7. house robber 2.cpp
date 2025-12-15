@@ -8,8 +8,12 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: House Robber 2 (Circular Arrangement)
-Given an array of integers representing money in each house arranged in a circle,
+ * Problem: House Robber II
+ *
+ * LeetCode 213: House Robber II
+ * GeeksforGeeks: https://www.geeksforgeeks.org/maximum-sum-in-circular-array-such-that-no-two-elements-are-adjacent/
+ *
+ * Given an array of integers representing money in each house arranged in a circle,
 find the maximum sum we can obtain by robbing houses such that:
 - No two adjacent houses can be robbed
 - First and last houses are adjacent (circular constraint)

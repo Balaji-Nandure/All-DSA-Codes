@@ -1,6 +1,9 @@
 /*
  * Problem: Maximum Depth / Height of a Binary Tree
  *
+ * LeetCode 104: Maximum Depth of Binary Tree
+ * GeeksforGeeks: https://www.geeksforgeeks.org/write-a-c-program-to-find-the-maximum-depth-or-height-of-a-tree/
+ *
  * Depth (or height) of a binary tree = number of nodes on the longest path
  * from the root down to a leaf node.
  *

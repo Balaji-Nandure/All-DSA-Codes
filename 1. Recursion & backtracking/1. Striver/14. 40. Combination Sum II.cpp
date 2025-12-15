@@ -1,3 +1,10 @@
+/*
+ * Problem: Combination Sum II
+ * 
+ * LeetCode 40: Combination Sum II
+ * GeeksforGeeks: https://www.geeksforgeeks.org/combination-sum-ii/
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 

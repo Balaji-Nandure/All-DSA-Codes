@@ -1,7 +1,11 @@
 
 /*
-Problem: Triangle (Minimum Path Sum in Triangular Array)
-Given a triangular array/list 'TRIANGLE', return the minimum path sum to reach from 
+ * Problem: Triangle (Minimum Path Sum in Triangular Array)
+ *
+ * LeetCode 120: Triangle
+ * GeeksforGeeks: https://www.geeksforgeeks.org/minimum-sum-path-triangle/
+ *
+ * Given a triangular array/list 'TRIANGLE', return the minimum path sum to reach from 
 the top to the bottom row.
 
 The triangle array will have N rows and the i-th row (where 0 <= i < N) will have i + 1 elements.

@@ -8,8 +8,12 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: Minimum Falling Path Sum
-Given an n x n matrix of integers, find the minimum sum of any falling path through matrix.
+ * Problem: Minimum Falling Path Sum
+ *
+ * LeetCode 931: Minimum Falling Path Sum
+ * GeeksforGeeks: https://www.geeksforgeeks.org/minimum-cost-path-dp-6/
+ *
+ * Given an n x n matrix of integers, find the minimum sum of any falling path through matrix.
 
 A falling path starts at any element in the first row and chooses the element in the next row 
 that is either directly below or diagonally left/right. Specifically, the next element from 

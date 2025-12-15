@@ -1,6 +1,9 @@
 /*
- * Problem: Palindrome Linked List (LeetCode 234)
- * 
+ * Problem: Palindrome Linked List
+ *
+ * LeetCode 234: Palindrome Linked List
+ * GeeksforGeeks: https://www.geeksforgeeks.org/function-to-check-if-a-singly-linked-list-is-palindrome/
+ *
  * Given the head of a singly linked list, return true if it is a palindrome 
  * or false otherwise.
  * 

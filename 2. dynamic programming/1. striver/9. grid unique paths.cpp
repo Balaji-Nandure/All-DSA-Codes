@@ -8,8 +8,12 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: Grid Unique Paths
-There is a robot on an m x n grid. The robot is initially located at the top-left corner 
+ * Problem: Grid Unique Paths
+ * 
+ * LeetCode 62: Unique Paths
+ * GeeksforGeeks: https://www.geeksforgeeks.org/count-possible-paths-top-left-bottom-right-nxm-matrix/
+ *
+ * There is a robot on an m x n grid. The robot is initially located at the top-left corner 
 (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). 
 The robot can only move either down or right at any point in time.
 

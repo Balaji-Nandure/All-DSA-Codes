@@ -1,6 +1,9 @@
 /*
- * Problem: 90. Subsets II
+ * Problem: Subsets II
  * 
+ * LeetCode 90: Subsets II
+ * GeeksforGeeks: https://www.geeksforgeeks.org/find-subsets-containing-each-element-given-array/
+ *
  * Given an integer array nums that may contain duplicates, return all possible subsets (the power set).
  * The solution set must not contain duplicate subsets. Return the solution in any order.
  * 

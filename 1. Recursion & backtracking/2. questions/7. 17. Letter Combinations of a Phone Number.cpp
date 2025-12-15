@@ -1,3 +1,10 @@
+/*
+ * Problem: Letter Combinations of a Phone Number
+ * 
+ * LeetCode 17: Letter Combinations of a Phone Number
+ * GeeksforGeeks: https://www.geeksforgeeks.org/iterative-letter-combinations-of-a-phone-number/
+ */
+
 #include <iostream>
 #include <vector>
 #include <string>

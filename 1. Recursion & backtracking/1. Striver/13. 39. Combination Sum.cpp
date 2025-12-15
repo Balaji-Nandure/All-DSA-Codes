@@ -1,3 +1,10 @@
+/*
+ * Problem: Combination Sum
+ * 
+ * LeetCode 39: Combination Sum
+ * GeeksforGeeks: https://www.geeksforgeeks.org/combinational-sum/
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 

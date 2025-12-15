@@ -1,3 +1,10 @@
+/*
+ * Problem: Climbing Stairs
+ *
+ * LeetCode 70: Climbing Stairs
+ * GeeksforGeeks: https://www.geeksforgeeks.org/count-ways-reach-nth-stair/
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 

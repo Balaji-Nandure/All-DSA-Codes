@@ -1,6 +1,9 @@
 /*
- * Problem: Remove Nth Node From End of List (LeetCode 19)
- * 
+ * Problem: Remove Nth Node From End of List
+ *
+ * LeetCode 19: Remove Nth Node From End of List
+ * GeeksforGeeks: https://www.geeksforgeeks.org/nth-node-from-the-end-of-a-linked-list/
+ *
  * Given the head of a linked list, remove the nth node from the end of the list 
  * and return its head.
  * 

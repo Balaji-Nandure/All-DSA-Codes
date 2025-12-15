@@ -1,7 +1,10 @@
 /*
-Question: Generate All Combinations of Balanced Parentheses
-
-Given an integer n, return all combinations of n pairs of balanced parentheses.
+ * Problem: Generate Parentheses
+ *
+ * LeetCode 22: Generate Parentheses
+ * GeeksforGeeks: https://www.geeksforgeeks.org/print-all-combinations-of-balanced-parentheses/
+ *
+ * Given an integer n, return all combinations of n pairs of balanced parentheses.
 For example: n = 3
 Output: ["((()))","(()())","(())()","()(())","()()()"]
 

@@ -1,6 +1,9 @@
 /*
- * Problem: 131. Palindrome Partitioning
+ * Problem: Palindrome Partitioning
  * 
+ * LeetCode 131: Palindrome Partitioning
+ * GeeksforGeeks: https://www.geeksforgeeks.org/palindrome-partitioning-dp-17/
+ *
  * Given a string s, partition s such that every substring of the partition is a palindrome.
  * Return all possible palindrome partitioning of s.
  * 
