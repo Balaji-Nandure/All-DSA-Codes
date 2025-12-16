@@ -11,7 +11,7 @@ const int INF = LLONG_MAX >> 1;
  * Problem: Minimum Falling Path Sum
  *
  * LeetCode 931: Minimum Falling Path Sum
- * GeeksforGeeks: https://www.geeksforgeeks.org/minimum-cost-path-dp-6/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/minimum-cost-path/0
  *
  * Given an n x n matrix of integers, find the minimum sum of any falling path through matrix.
 

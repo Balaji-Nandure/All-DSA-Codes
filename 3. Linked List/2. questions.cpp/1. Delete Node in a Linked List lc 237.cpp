@@ -2,7 +2,7 @@
  * Problem: Delete Node in a Linked List
  *
  * LeetCode 237: Delete Node in a Linked List
- * GeeksforGeeks: https://www.geeksforgeeks.org/delete-a-node-in-a-doubly-linked-list/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/delete-a-node-in-single-linked-list/1
  *
  * There is a singly-linked list head and we want to delete a node node in it.
 You are given the node to be deleted node. You will not be given access to the first node of head.

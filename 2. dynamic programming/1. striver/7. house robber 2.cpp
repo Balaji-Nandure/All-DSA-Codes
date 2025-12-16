@@ -11,7 +11,7 @@ const int INF = LLONG_MAX >> 1;
  * Problem: House Robber II
  *
  * LeetCode 213: House Robber II
- * GeeksforGeeks: https://www.geeksforgeeks.org/maximum-sum-in-circular-array-such-that-no-two-elements-are-adjacent/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/stickler-theif/0
  *
  * Given an array of integers representing money in each house arranged in a circle,
 find the maximum sum we can obtain by robbing houses such that:

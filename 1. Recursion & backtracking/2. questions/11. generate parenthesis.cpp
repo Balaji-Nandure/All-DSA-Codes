@@ -2,7 +2,7 @@
  * Problem: Generate Parentheses
  *
  * LeetCode 22: Generate Parentheses
- * GeeksforGeeks: https://www.geeksforgeeks.org/print-all-combinations-of-balanced-parentheses/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/generate-all-possible-parentheses/1
  *
  * Given an integer n, return all combinations of n pairs of balanced parentheses.
 For example: n = 3

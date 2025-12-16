@@ -2,7 +2,7 @@
  * Problem: Palindrome Partitioning
  * 
  * LeetCode 131: Palindrome Partitioning
- * GeeksforGeeks: https://www.geeksforgeeks.org/palindrome-partitioning-dp-17/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/palindromic-patitioning4845/1
  *
  * Given a string s, partition s such that every substring of the partition is a palindrome.
  * Return all possible palindrome partitioning of s.

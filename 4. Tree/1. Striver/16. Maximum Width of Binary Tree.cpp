@@ -38,16 +38,7 @@
  * - Assign index to each node (root = 0, left = 2*parent+1, right = 2*parent+2)
  * - For each level, calculate width = last_index - first_index + 1
  * - Track maximum width across all levels
- *
- * Approach 2: DFS with Indexing
- * - Use DFS to traverse and assign indices
- * - Track first index at each level
- * - Calculate width when visiting nodes
- *
- * Approach 3: BFS with Position Tracking
- * - Store position (level, position) for each node
- * - Calculate width using min and max positions at each level
- *
+ 
  * Time: O(n) - visit each node once
  * Space: O(n) - queue/stack storage
  */

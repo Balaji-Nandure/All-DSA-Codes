@@ -2,7 +2,7 @@
  * Problem: Print Root to Node Path in Binary Tree
  * 
  * LeetCode 257: Binary Tree Paths (print all root-to-leaf paths)
- * GeeksforGeeks (Root to Node): https://www.geeksforgeeks.org/print-path-root-given-node-binary-tree/
+ * GeeksforGeeks Practice (Root to Node): https://practice.geeksforgeeks.org/problems/root-to-leaf-paths/1
  *
  * Problem 1: Find path from root to a specific target node
  *

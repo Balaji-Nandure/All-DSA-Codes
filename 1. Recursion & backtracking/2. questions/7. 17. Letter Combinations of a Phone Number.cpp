@@ -2,7 +2,7 @@
  * Problem: Letter Combinations of a Phone Number
  * 
  * LeetCode 17: Letter Combinations of a Phone Number
- * GeeksforGeeks: https://www.geeksforgeeks.org/iterative-letter-combinations-of-a-phone-number/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/possible-words-from-phone-digits/0
  */
 
 #include <iostream>

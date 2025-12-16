@@ -11,7 +11,7 @@ const int INF = LLONG_MAX >> 1;
  * Problem: House Robber
  *
  * LeetCode 198: House Robber
- * GeeksforGeeks: https://www.geeksforgeeks.org/find-maximum-possible-stolen-value-houses/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/stickler-theif/0
  *
  * You are a professional robber planning to rob houses along a street. Each house has a 
 certain amount of money stashed, the only constraint stopping you from robbing each of 

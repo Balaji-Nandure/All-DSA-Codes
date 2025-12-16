@@ -11,7 +11,7 @@ const int INF = LLONG_MAX >> 1;
  * Problem: Minimum Path Sum
  * 
  * LeetCode 64: Minimum Path Sum
- * GeeksforGeeks: https://www.geeksforgeeks.org/min-cost-path-dp-6/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/minimum-cost-path/0
  *
  * Given a m x n grid filled with non-negative numbers, find a path from top-left to 
 bottom-right which minimizes the sum of all numbers along its path.

@@ -3,7 +3,7 @@
  * Problem: Triangle (Minimum Path Sum in Triangular Array)
  *
  * LeetCode 120: Triangle
- * GeeksforGeeks: https://www.geeksforgeeks.org/minimum-sum-path-triangle/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/triangle-path-sum/0
  *
  * Given a triangular array/list 'TRIANGLE', return the minimum path sum to reach from 
 the top to the bottom row.

@@ -2,7 +2,7 @@
  * Problem: Climbing Stairs
  *
  * LeetCode 70: Climbing Stairs
- * GeeksforGeeks: https://www.geeksforgeeks.org/count-ways-reach-nth-stair/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/count-ways-to-reach-the-nth-stair/0
  */
 
 #include <bits/stdc++.h>

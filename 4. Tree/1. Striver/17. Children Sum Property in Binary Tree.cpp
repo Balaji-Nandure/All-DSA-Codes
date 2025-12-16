@@ -1,8 +1,7 @@
 /*
  * Problem: Children Sum Property in Binary Tree
  *
- * GeeksforGeeks: https://www.geeksforgeeks.org/check-for-children-sum-property-in-a-binary-tree/
- * GeeksforGeeks (Convert): https://www.geeksforgeeks.org/convert-an-arbitrary-binary-tree-to-a-tree-that-holds-children-sum-property/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/children-sum-parent/1
  *
  * Problem 1: Check if tree follows Children Sum Property
  * A tree follows Children Sum Property if for every node, the value of the node
@@ -119,42 +118,6 @@ public:
     }
 };
 
-// Solution 3: Convert tree to follow Children Sum Property (Bottom-up with increment only)
-class ConvertChildrenSumPropertyIncrementOnlySolution {
-public:
-    void convertToChildrenSumProperty(TreeNode* root) {
-        if (!root) return;
-        
-        int childSum = 0;
-        if (root->left) childSum += root->left->val;
-        if (root->right) childSum += root->right->val;
-        
-        // If children sum is greater than parent, increment parent
-        if (childSum > root->val) {
-            root->val = childSum;
-        }
-        // If parent is greater than children sum, increment children
-        else if (root->val > childSum) {
-            if (root->left) root->left->val = root->val;
-            if (root->right) root->right->val = root->val;
-        }
-        
-        // Recursively process children
-        convertToChildrenSumProperty(root->left);
-        convertToChildrenSumProperty(root->right);
-        
-        // After processing children, update current node again
-        childSum = 0;
-        if (root->left) childSum += root->left->val;
-        if (root->right) childSum += root->right->val;
-        
-        // If children were updated, update parent
-        if (root->left || root->right) {
-            root->val = childSum;
-        }
-    }
-};
-
 // Solution 4: Convert with proper bottom-up approach (Recommended)
 class ConvertChildrenSumPropertyBottomUpSolution {
 public:
@@ -187,6 +150,9 @@ public:
     }
     
 private:
+    // This helper function recursively increments the leftmost child (or right child if left does not exist) 
+    // by the given increment value. It is used to "push down" excess value from a parent node 
+    // to its descendants so that the children sum property holds after a value update at the parent.
     void incrementSubtree(TreeNode* node, int increment) {
         if (!node) return;
         
@@ -196,38 +162,6 @@ private:
         } else if (node->right) {
             node->right->val += increment;
             incrementSubtree(node->right, increment);
-        }
-    }
-};
-
-// Solution 5: Simple conversion (increment children if needed)
-class SimpleConvertChildrenSumPropertySolution {
-public:
-    void convertToChildrenSumProperty(TreeNode* root) {
-        if (!root || (!root->left && !root->right)) {
-            return; // Leaf node or null
-        }
-        
-        // Recursively process children first
-        convertToChildrenSumProperty(root->left);
-        convertToChildrenSumProperty(root->right);
-        
-        int childSum = 0;
-        if (root->left) childSum += root->left->val;
-        if (root->right) childSum += root->right->val;
-        
-        // If children sum is greater, update parent
-        if (childSum > root->val) {
-            root->val = childSum;
-        }
-        // If parent is greater, increment children equally
-        else if (root->val > childSum) {
-            int diff = root->val - childSum;
-            if (root->left) {
-                root->left->val += diff;
-            } else if (root->right) {
-                root->right->val += diff;
-            }
         }
     }
 };

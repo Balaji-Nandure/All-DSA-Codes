@@ -1,7 +1,7 @@
 /*
  * Problem: Rat in a Maze
  *
- * GeeksforGeeks: https://www.geeksforgeeks.org/rat-in-a-maze-backtracking-2/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/rat-in-a-maze-problem/1
  *
  * Consider a rat placed at position (0, 0) in an n x n square matrix maze[][].
  * The rat's goal is to reach the destination at position (n-1, n-1).

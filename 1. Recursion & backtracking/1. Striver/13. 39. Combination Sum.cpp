@@ -2,7 +2,7 @@
  * Problem: Combination Sum
  * 
  * LeetCode 39: Combination Sum
- * GeeksforGeeks: https://www.geeksforgeeks.org/combinational-sum/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/combination-sum/0
  */
 
 #include <bits/stdc++.h>

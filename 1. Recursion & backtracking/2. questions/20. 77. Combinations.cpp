@@ -2,7 +2,7 @@
  * Problem: Combinations
  *
  * LeetCode 77: Combinations
- * GeeksforGeeks: https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/combinations/0
  *
  * Given two integers n and k, return all possible combinations of k numbers out of the range [1, n].
  * You may return the answer in any order.

@@ -1,7 +1,7 @@
 /*
  * Problem: Top View of Binary Tree
  *
- * GeeksforGeeks: https://www.geeksforgeeks.org/print-nodes-top-view-binary-tree/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/top-view-of-binary-tree/1
  *
  * Given the root of a binary tree, return the top view of the tree.
  * The top view of a binary tree is the set of nodes visible when the tree

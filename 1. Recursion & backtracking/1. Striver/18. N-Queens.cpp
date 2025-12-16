@@ -2,7 +2,7 @@
  * Problem: N-Queens
  * 
  * LeetCode 51: N-Queens
- * GeeksforGeeks: https://www.geeksforgeeks.org/n-queen-problem-backtracking-3/
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/n-queen-problem/0
  *
  * The n-queens puzzle is the problem of placing n queens on an n x n chessboard
  * such that no two queens attack each other.
