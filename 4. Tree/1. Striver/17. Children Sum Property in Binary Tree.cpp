@@ -58,6 +58,38 @@
 #include <algorithm>
 using namespace std;
 
+// Solution 0: Optimal Solution - Convert to Children Sum Property (O(n) time, O(h) space)
+class OptimalConvertChildrenSumPropertySolution {
+public:
+    void changeTree(TreeNode* root) {
+        if (root == nullptr) return;
+
+        // DOWN: Ensure children are at least as large as parent (push parent value down if needed)
+        int child = 0;
+        if (root->left)  child += root->left->val;
+        if (root->right) child += root->right->val;
+
+        if (child >= root->val) {
+            // If children sum greater/equal, update parent
+            root->val = child;
+        } else {
+            // Otherwise, push parent value down to children
+            if (root->left) root->left->val = root->val;
+            else if (root->right) root->right->val = root->val;
+        }
+
+        // Recursively process children
+        changeTree(root->left);
+        changeTree(root->right);
+
+        // UP: After processing children, set current node to sum of (possibly updated) children
+        int tot = 0;
+        if (root->left)  tot += root->left->val;
+        if (root->right) tot += root->right->val;
+        if (root->left || root->right) root->val = tot;
+    }
+};
+
 // Solution 1: Check if tree follows Children Sum Property (Recursive)
 class CheckChildrenSumPropertySolution {
 public:
