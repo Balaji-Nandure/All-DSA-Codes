@@ -8,31 +8,35 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: Maximum Sum of Non-Adjacent Elements (House Robber)
-Given an array of integers, find the maximum sum we can obtain by picking elements
-such that no two picked elements are adjacent.
+ * Problem: Maximum Sum of Non-Adjacent Elements (House Robber)
+ *
+ * LeetCode 198: House Robber
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/stickler-theif/0
+ *
+ * Find maximum sum by picking elements such that no two are adjacent.
+ *
+ * Choices at each index:
+ * - Pick: arr[i] + maxSum(i-2) (skip previous)
+ * - Not Pick: maxSum(i-1) (can pick previous)
+ *
+ * Example: arr = [2, 1, 4, 9]
+ * Pick: 2, 9 -> Sum = 11 (maximum)
+ *
+ * Time: O(n) with DP
+ * Space: O(n) with DP, O(1) space optimized
+ */
 
-- We can either pick an element or skip it
-- If we pick arr[i], we cannot pick arr[i-1]
-- If we skip arr[i], we can pick arr[i-1]
-
-Example:
-arr = [2, 1, 4, 9]
-Pick: 2, 9 (skip 1 and 4) -> Sum = 11
-Or: 1, 9 -> Sum = 10
-Or: 2, 4 -> Sum = 6
-Maximum = 11
-*/
-
-// recursive approach
+// Recursive approach
 int maxSumNonAdjacent(int idx, vector<int> &arr){
-    if(idx < 0) return 0; // base case: no elements left
-    if(idx == 0) return arr[0]; // only one element, must pick it
+    // Base case: no elements left
+    if(idx < 0) return 0;
+    // Base case: only one element, must pick it
+    if(idx == 0) return arr[0];
     
     // Two choices:
-    // 1. Pick current element: arr[idx] + maxSum(idx-2) (skip previous)
-    // 2. Skip current element: maxSum(idx-1) (can pick previous)
+    // 1. Pick current: arr[idx] + maxSum(idx-2) (skip previous)
     int pick = arr[idx] + maxSumNonAdjacent(idx - 2, arr);
+    // 2. Not pick: maxSum(idx-1) (can pick previous)
     int notPick = maxSumNonAdjacent(idx - 1, arr);
     
     return max(pick, notPick);
@@ -79,37 +83,41 @@ int maxSumNonAdjacent_loop_reverse(int start, vector<int> &arr) {
 }
 
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int maxSumNonAdjacentMemoization(int idx, vector<int> &arr, vector<int> &dp){
+    // Base cases
     if(idx < 0) return 0;
     if(idx == 0) return arr[0];
+    // Return cached result
     if(dp[idx] != -1) return dp[idx];
     
+    // Compute and store result
     int pick = arr[idx] + maxSumNonAdjacentMemoization(idx - 2, arr, dp);
     int notPick = maxSumNonAdjacentMemoization(idx - 1, arr, dp);
     
     return dp[idx] = max(pick, notPick);
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int maxSumNonAdjacentTabulation(int n, vector<int> &arr){
     if(n == 0) return 0;
     if(n == 1) return arr[0];
     
     vector<int> dp(n, 0);
-    dp[0] = arr[0];
-    dp[1] = max(arr[0], arr[1]); // can pick either first or second
+    dp[0] = arr[0]; // Base case
+    dp[1] = max(arr[0], arr[1]); // Can pick either first or second
     
+    // Fill dp array
     for(int i = 2; i < n; i++){
-        int pick = arr[i] + dp[i - 2];
-        int notPick = dp[i - 1];
+        int pick = arr[i] + dp[i - 2]; // Pick current, skip previous
+        int notPick = dp[i - 1]; // Skip current, can pick previous
         dp[i] = max(pick, notPick);
     }
     
     return dp[n - 1];
 }
 
-// space optimization approach
+// Space optimization (only need last 2 values)
 int maxSumNonAdjacentSpaceOptimization(int n, vector<int> &arr){
     if(n == 0) return 0;
     if(n == 1) return arr[0];
@@ -118,9 +126,10 @@ int maxSumNonAdjacentSpaceOptimization(int n, vector<int> &arr){
     int prev1 = max(arr[0], arr[1]); // dp[1]
     
     for(int i = 2; i < n; i++){
-        int pick = arr[i] + prev2;
-        int notPick = prev1;
+        int pick = arr[i] + prev2; // Pick current
+        int notPick = prev1; // Skip current
         int curr = max(pick, notPick);
+        // Update for next iteration
         prev2 = prev1;
         prev1 = curr;
     }

@@ -33,31 +33,50 @@ struct Node {
     }
 };
 
-// Traverse left boundary (excluding leaf)
+/*
+ * Problem: Boundary Traversal of Binary Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/boundary-traversal-of-binary-tree/1
+ *
+ * Print boundary nodes in anti-clockwise: left boundary -> leaves -> right boundary (reverse).
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
+// Traverse left boundary (top to bottom, excluding leaf)
 void leftBoundary(Node* root, vector<int>& result) {
+    // Base case: null or leaf node (skip)
     if (!root || (!root->left && !root->right)) return;
+    // Add current node
     result.push_back(root->data);
+    // Prefer left child, else right child
     if (root->left) leftBoundary(root->left, result);
     else leftBoundary(root->right, result);
 }
 
-// Traverse all leaf nodes
+// Traverse all leaf nodes (left to right)
 void leafNodes(Node* root, vector<int>& result) {
     if (!root) return;
+    // Leaf node: add to result
     if (!root->left && !root->right) {
         result.push_back(root->data);
         return;
     }
+    // Recurse left then right (inorder for leaves)
     leafNodes(root->left, result);
     leafNodes(root->right, result);
 }
 
-// Traverse right boundary (excluding leaf, in reverse)
+// Traverse right boundary (bottom to top, excluding leaf)
 void rightBoundary(Node* root, vector<int>& result) {
+    // Base case: null or leaf node (skip)
     if (!root || (!root->left && !root->right)) return;
+    // Recurse first (prefer right, else left)
     if (root->right) rightBoundary(root->right, result);
     else rightBoundary(root->left, result);
-    result.push_back(root->data); // Add after recursion for reverse order
+    // Add after recursion for reverse order (bottom to top)
+    result.push_back(root->data);
 }
 
 vector<int> boundaryTraversal(Node* root) {

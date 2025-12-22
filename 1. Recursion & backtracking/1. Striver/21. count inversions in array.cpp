@@ -1,17 +1,18 @@
 /*
  * Problem: Count Inversions in an Array
  *
- * Inversion Count: For an array, inversion count indicates how far (or close)
- * the array is from being sorted. If array is already sorted then the
- * inversion count is 0. If array is sorted in reverse order that inversion
- * count is the maximum. Formally, two elements a[i] and a[j] form an inversion 
- * if a[i] > a[j] and i < j.
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/inversion-of-array/0
+ *
+ * Inversion: Two elements a[i] and a[j] form an inversion if a[i] > a[j] and i < j.
+ * Count total number of inversions in the array.
+ *
+ * Time: O(n log n) - using merge sort approach
+ * Space: O(n) - for temporary arrays
  */
 
 class Solution {
 private:
-    // Merge function for merge sort; merges arr[l..m] and arr[m+1..r]
-    // while counting inversions.
+    // Merge function: merges arr[l..m] and arr[m+1..r] while counting inversions
     int merge(vector<int> &arr, int l, int m, int r) {
         int n1 = m - l + 1;    // Size of left subarray
         int n2 = r - m;        // Size of right subarray
@@ -19,53 +20,51 @@ private:
         // Create temporary arrays
         vector<int> left(n1), right(n2);
 
-        // Copy data to temporary arrays left[] and right[]
+        // Copy data to temporary arrays
         for (int i = 0; i < n1; ++i) 
             left[i] = arr[l + i];
         for (int i = 0; i < n2; ++i) 
             right[i] = arr[m + 1 + i];
 
-        int inversions = 0;    // Number of inversions found in this merge step
-        int i = 0, j = 0, k = l; // i - index for left[], j - index for right[], k - index for arr[]
+        int inversions = 0;    // Count inversions in this merge
+        int i = 0, j = 0, k = l; // Indices for left[], right[], and arr[]
 
-        // Merge the two subarrays back into arr[l..r]
+        // Merge while counting inversions
         while (i < n1 && j < n2) {
-            // If current element of left[] is <= right[], no inversion
+            // If left[i] <= right[j], no inversion
             if (left[i] <= right[j]) {
                 arr[k++] = left[i++];
             } else {
-                // left[i] > right[j] means all the remaining elements in left[]
-                // will form an inversion with right[j]
+                // left[i] > right[j]: all remaining elements in left[] 
+                // form inversions with right[j]
                 arr[k++] = right[j++];
-                inversions += (n1 - i); // Number of remaining elements in left[]
+                inversions += (n1 - i); // Count all remaining in left[]
             }
         }
 
-        // Copy any remaining elements of left[], if any
+        // Copy remaining elements of left[]
         while (i < n1) 
             arr[k++] = left[i++];
 
-        // Copy any remaining elements of right[], if any
+        // Copy remaining elements of right[]
         while (j < n2) 
             arr[k++] = right[j++];
 
-        // Return number of inversions counted in this merge step
-        return inversions;
+        return inversions; // Return inversions counted in this merge
     }
 
-    // Recursive mergeSort function that sorts the subarray arr[l..r]
-    // and returns the inversion count
+    // Merge Sort: recursively sort and count inversions
     int mergeSort(vector<int> &arr, int l, int r) {
         int inversions = 0;
         if (l < r) {
-            // Find the midpoint to divide the array into two halves
+            // Find midpoint to divide array
             int m = l + (r - l) / 2;
 
             // Count inversions in left half
             inversions += mergeSort(arr, l, m);
             // Count inversions in right half
             inversions += mergeSort(arr, m + 1, r);
-            // Count split inversions during merge
+            // Count split inversions (between left and right halves)
             inversions += merge(arr, l, m, r);
         }
         return inversions;

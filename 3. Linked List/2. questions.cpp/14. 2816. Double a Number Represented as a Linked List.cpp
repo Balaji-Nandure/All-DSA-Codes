@@ -23,11 +23,22 @@ Explanation: The number represented by this linked list is 189, and 189 * 2 = 37
 
  class Solution {
     public:
+/*
+ * Problem: Double a Number Represented as a Linked List
+ *
+ * LeetCode 2816: Double a Number Represented as a Linked List
+ *
+ * Double the number represented by linked list (most significant digit first).
+ * Example: [1,8,9] (189) -> [3,7,8] (378)
+ *
+ * Time: O(n) - reverse, double, reverse back
+ * Space: O(1) for iterative, O(n) for recursive
+ */
+
         ListNode* doubleIt(ListNode* head) {
-            // Step 1: Reverse the list
+            // Step 1: Reverse list to process from least significant digit
             ListNode* prev = nullptr;
             ListNode* curr = head;
-    
             while (curr) {
                 ListNode* next = curr->next;
                 curr->next = prev;
@@ -36,24 +47,23 @@ Explanation: The number represented by this linked list is 189, and 189 * 2 = 37
             }
             head = prev;
     
-            // Step 2: Double with carry
+            // Step 2: Double each digit with carry propagation
             curr = head;
             int carry = 0;
-    
             while (curr) {
                 int sum = curr->val * 2 + carry;
-                curr->val = sum % 10;
-                carry = sum / 10;
+                curr->val = sum % 10; // Current digit
+                carry = sum / 10; // New carry
                 prev = curr;
                 curr = curr->next;
             }
     
-            // Step 3: Handle leftover carry
+            // Step 3: Handle leftover carry (new most significant digit)
             if (carry > 0) {
                 prev->next = new ListNode(carry);
             }
     
-            // Step 4: Reverse the list back
+            // Step 4: Reverse back to original order
             curr = head;
             prev = nullptr;
             while (curr) {
@@ -63,7 +73,7 @@ Explanation: The number represented by this linked list is 189, and 189 * 2 = 37
                 curr = next;
             }
     
-            return prev;
+            return prev; // New head
         }
     };
     

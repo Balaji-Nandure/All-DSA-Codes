@@ -61,17 +61,31 @@
 // Solution 1: Recursive Approach
 class RecursiveSolution {
 public:
+/*
+ * Problem: Insert into Binary Search Tree
+ *
+ * LeetCode 701: Insert into a Binary Search Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/insert-a-node-in-a-bst/1
+ *
+ * Insert value into BST maintaining BST property.
+ * Always insert at leaf position.
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
+
+    // Recursive: Find insertion point and create new node
     TreeNode* insertIntoBST(TreeNode* root, int val) {
-        // Base case: if tree is empty, create new node
+        // Base case: empty tree, create new node
         if (root == NULL) {
             return new TreeNode(val);
         }
         
-        // If val is less than root, insert in left subtree
+        // BST property: val < root -> insert in left subtree
         if (val < root->val) {
             root->left = insertIntoBST(root->left, val);
         } else {
-            // If val is greater than root, insert in right subtree
+            // BST property: val > root -> insert in right subtree
             root->right = insertIntoBST(root->right, val);
         }
         

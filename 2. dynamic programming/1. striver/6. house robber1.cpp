@@ -32,51 +32,57 @@ Or: 7, 3 -> Sum = 10
 Maximum = 12
 */
 
-// recursive approach
+// Recursive approach
 int houseRobber1(int idx, vector<int> &nums){
-    if(idx < 0) return 0; // base case: no houses left
-    if(idx == 0) return nums[0]; // only one house, must rob it
+    // Base case: no houses left
+    if(idx < 0) return 0;
+    // Base case: only one house, must rob it
+    if(idx == 0) return nums[0];
     
     // Two choices:
-    // 1. Rob current house: nums[idx] + houseRobber1(idx-2) (skip previous)
-    // 2. Skip current house: houseRobber1(idx-1) (can rob previous)
+    // 1. Rob current: nums[idx] + maxSum(idx-2) (skip previous)
     int rob = nums[idx] + houseRobber1(idx - 2, nums);
+    // 2. Skip current: maxSum(idx-1) (can rob previous)
     int notRob = houseRobber1(idx - 1, nums);
     
     return max(rob, notRob);
 }
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int houseRobber1Memoization(int idx, vector<int> &nums, vector<int> &dp){
+    // Base cases
     if(idx < 0) return 0;
     if(idx == 0) return nums[0];
+    // Return cached result
     if(dp[idx] != -1) return dp[idx];
     
+    // Compute and store result
     int rob = nums[idx] + houseRobber1Memoization(idx - 2, nums, dp);
     int notRob = houseRobber1Memoization(idx - 1, nums, dp);
     
     return dp[idx] = max(rob, notRob);
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int houseRobber1Tabulation(int n, vector<int> &nums){
     if(n == 0) return 0;
     if(n == 1) return nums[0];
     
     vector<int> dp(n, 0);
-    dp[0] = nums[0];
-    dp[1] = max(nums[0], nums[1]); // can rob either first or second house
+    dp[0] = nums[0]; // Base case
+    dp[1] = max(nums[0], nums[1]); // Can rob either first or second
     
+    // Fill dp array
     for(int i = 2; i < n; i++){
-        int rob = nums[i] + dp[i - 2];
-        int notRob = dp[i - 1];
+        int rob = nums[i] + dp[i - 2]; // Rob current, skip previous
+        int notRob = dp[i - 1]; // Skip current, can rob previous
         dp[i] = max(rob, notRob);
     }
     
     return dp[n - 1];
 }
 
-// space optimization approach
+// Space optimization (only need last 2 values)
 int houseRobber1SpaceOptimization(int n, vector<int> &nums){
     if(n == 0) return 0;
     if(n == 1) return nums[0];
@@ -85,9 +91,10 @@ int houseRobber1SpaceOptimization(int n, vector<int> &nums){
     int prev1 = max(nums[0], nums[1]); // dp[1]
     
     for(int i = 2; i < n; i++){
-        int rob = nums[i] + prev2;
-        int notRob = prev1;
+        int rob = nums[i] + prev2; // Rob current
+        int notRob = prev1; // Skip current
         int curr = max(rob, notRob);
+        // Update for next iteration
         prev2 = prev1;
         prev1 = curr;
     }

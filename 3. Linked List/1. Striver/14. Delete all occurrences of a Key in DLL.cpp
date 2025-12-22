@@ -65,10 +65,21 @@ void printDoublyLinkedListReverse(DNode* tail) {
     cout << endl;
 }
 
-// ========== METHOD 1: Delete All Occurrences (Using Dummy Node) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Delete all occurrences of a Key in Doubly Linked List
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/delete-all-occurrences-of-a-given-key-in-a-doubly-linked-list/1
+ *
+ * Delete all nodes with given key from doubly linked list.
+ * Example: DLL: 2<->2<->10<->8<->4<->2<->5<->2, key=2 -> 10<->8<->4<->5
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
+// Method 1: Using Dummy Node (Optimal)
 DNode* deleteAllOccurrences(DNode* head, int key) {
-    // Add a dummy node at the beginning to simplify deletion, especially for head nodes.
+    // Dummy node simplifies deletion at head
     DNode* dummy = new DNode(-1);
     dummy->next = head;
     if (head) head->prev = dummy;
@@ -76,21 +87,21 @@ DNode* deleteAllOccurrences(DNode* head, int key) {
     DNode* curr = dummy->next;
     while (curr) {
         if (curr->data == key) {
-            DNode* nextNode = curr->next;
-            // Remove curr from DLL
-            curr->prev->next = curr->next;
+            DNode* nextNode = curr->next; // Save next before deletion
+            // Remove curr from DLL: update prev and next pointers
+            curr->prev->next = curr->next; // Bypass curr from prev side
             if (curr->next) {
-                curr->next->prev = curr->prev;
+                curr->next->prev = curr->prev; // Bypass curr from next side
             }
             delete curr;
-            curr = nextNode;
+            curr = nextNode; // Move to next node
         } else {
-            curr = curr->next;
+            curr = curr->next; // Move forward
         }
     }
-    // Get new head and cleanup dummy node
+    // Get new head and cleanup dummy
     DNode* newHead = dummy->next;
-    if (newHead) newHead->prev = nullptr;
+    if (newHead) newHead->prev = nullptr; // Remove dummy's link
     delete dummy;
     return newHead;
 }

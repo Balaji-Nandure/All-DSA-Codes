@@ -1,36 +1,34 @@
 /*
  * Problem: Subset Sums
  * 
- * Given a list(Arr) of N integers, print sums of all subsets in it.
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/subset-sums2234/1
+ *
+ * Given a list of N integers, print sums of all subsets.
  * Output should be printed in increasing order of sums.
  * 
- * Example:
- * Input: N = 2, Arr = [2, 3]
+ * Example: Arr = [2, 3]
  * Output: 0 2 3 5
- * Explanation:
- * - When no elements are taken, the Sum = 0.
- * - When only 2 is taken, the Sum = 2.
- * - When only 3 is taken, the Sum = 3.
- * - When elements 2 and 3 are taken, the Sum = 2 + 3 = 5.
+ * (empty subset: 0, {2}: 2, {3}: 3, {2,3}: 5)
+ *
+ * Time: O(2^n) - generate all 2^n subsets
+ * Space: O(n) - recursion stack depth
  */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// -------------------------------------------------------
-// METHOD 1: Pick / Not Pick
-// -------------------------------------------------------
+// Method 1: Pick / Not Pick approach
 void findSubsetSums(int i, vector<int>& arr, int sum, vector<int>& result) {
-    // Base case: reached end of array
+    // Base case: processed all elements, add current sum
     if (i == (int)arr.size()) {
         result.push_back(sum);
         return;
     }
 
-    // PICK: include arr[i] in the sum
+    // PICK: Include arr[i] in subset sum
     findSubsetSums(i + 1, arr, sum + arr[i], result);
 
-    // NOT PICK: don't include arr[i] in the sum
+    // NOT PICK: Exclude arr[i] from subset sum
     findSubsetSums(i + 1, arr, sum, result);
 }
 
@@ -41,23 +39,18 @@ vector<int> subsetSums_pickNotPick(vector<int>& arr) {
     return result;
 }
 
-// -------------------------------------------------------
-// METHOD 2: Loop Method
-// -------------------------------------------------------
+// Method 2: Loop-based approach
 void findSubsetSums_loop(int start, vector<int>& arr, int sum, vector<int>& result) {
-    // Add current sum to result
-    // here we are adding the sum to the result before the base case because we want to add the sum of the empty subset.
+    // Add current sum (represents subset from start to end)
+    // This captures empty subset when start = 0, sum = 0
     result.push_back(sum);
     
-    // Base case: reached end
-    // even if we comment this base case, it will still work
-    // dry run the code to understand why it works.
-    // if (start == (int)arr.size()) {
-    //     return;
-    // }
+    // Base case: processed all elements
+    // Note: Even without this check, loop condition handles it
 
-    // Try all elements from start to end
+    // Try each element from start position
     for (int i = start; i < (int)arr.size(); i++) {
+        // Recursively find sums including arr[i]
         findSubsetSums_loop(i + 1, arr, sum + arr[i], result);
     }
 }

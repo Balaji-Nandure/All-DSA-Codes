@@ -21,20 +21,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Backtracking approach to find all non-decreasing subsequences
+// Backtracking to find all non-decreasing subsequences (loop-based)
 void backtrack(int start, vector<int>& nums, vector<int>& curr, 
                set<vector<int>>& result) {
+    // Add current subsequence if it has at least 2 elements
     if (curr.size() >= 2) {
         result.insert(curr);
     }
+    // Base case: processed all elements
     if (start == (int)nums.size()) {
         return;
     }
+    // Try each element from start position
     for (int end = start; end < (int)nums.size(); end++) {
+        // Only add if it maintains non-decreasing order
         if (curr.empty() || nums[end] >= curr.back()) {
             curr.push_back(nums[end]);
             backtrack(end + 1, nums, curr, result);
-            curr.pop_back();
+            curr.pop_back(); // Backtrack
         }
     }
 }
@@ -47,20 +51,22 @@ vector<vector<int>> findSubsequences(vector<int>& nums) {
     return vector<vector<int>>(result.begin(), result.end());
 }
 
-// "Pick and not pick" approach to find all non-decreasing subsequences
+// Pick and Not Pick approach to find all non-decreasing subsequences
 void pickNotPick(int idx, vector<int>& nums, vector<int>& curr, set<vector<int>>& result) {
+    // Base case: processed all elements
     if (idx == (int)nums.size()) {
+        // Add subsequence if it has at least 2 elements
         if (curr.size() >= 2)
             result.insert(curr);
         return;
     }
-    // Pick the current element if it forms a non-decreasing subsequence
+    // PICK: Include nums[idx] if it maintains non-decreasing order
     if (curr.empty() || nums[idx] >= curr.back()) {
         curr.push_back(nums[idx]);
         pickNotPick(idx + 1, nums, curr, result);
-        curr.pop_back();
+        curr.pop_back(); // Backtrack
     }
-    // Not pick, but skip duplicate not-pick calls for the same value as previous if previous was not picked
+    // NOT PICK: Skip current element
     pickNotPick(idx + 1, nums, curr, result);
 }
 

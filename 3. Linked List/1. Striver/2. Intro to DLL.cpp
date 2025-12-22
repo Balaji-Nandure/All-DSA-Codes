@@ -1,14 +1,26 @@
+/*
+ * Problem: Introduction to Doubly Linked List
+ *
+ * Basic operations on doubly linked list:
+ * - Insert/Delete at head, tail, position
+ * - Traverse forward and backward
+ * - Search operations
+ *
+ * Time: O(n) for most operations
+ * Space: O(1) for operations, O(n) for storage
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
 // Node class represents a node in a doubly linked list
 class DNode {
 public:
-    int data;
-    DNode* next;
-    DNode* prev;
+    int data;     // Data value
+    DNode* next;  // Pointer to next node
+    DNode* prev;  // Pointer to previous node
 
-    // Constructor with data, next, prev
+    // Constructor with data, next, and prev pointers
     DNode(int data, DNode* next = nullptr, DNode* prev = nullptr) {
         this->data = data;
         this->next = next;

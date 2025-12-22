@@ -78,9 +78,19 @@ void printMultiLevelList(Node* head) {
     cout << endl;
 }
 
-// ========== METHOD 1: Merge One by One (Iterative) ==========
-// Time Complexity: O(N * M), Space Complexity: O(1)
+/*
+ * Problem: Flattening a Linked List
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/flattening-a-linked-list/1
+ *
+ * Flatten a multi-level sorted linked list into single sorted list.
+ * Each node has next (horizontal) and bottom (vertical) pointers.
+ *
+ * Time: O(N * M) - where N is horizontal nodes, M is average vertical length
+ * Space: O(1)
+ */
 
+// Merge two sorted lists (using bottom pointer)
 Node* mergeIterative(Node* a, Node* b) {
     if (!a) return b;
     if (!b) return a;
@@ -88,9 +98,10 @@ Node* mergeIterative(Node* a, Node* b) {
     Node* dummy = new Node(0);
     Node* tail = dummy;
     
+    // Merge while both lists have nodes
     while (a && b) {
         if (a->data <= b->data) {
-            tail->bottom = a;
+            tail->bottom = a; // Attach smaller node
             a = a->bottom;
         } else {
             tail->bottom = b;
@@ -99,6 +110,7 @@ Node* mergeIterative(Node* a, Node* b) {
         tail = tail->bottom;
     }
     
+    // Attach remaining nodes
     if (a) tail->bottom = a;
     if (b) tail->bottom = b;
     
@@ -107,13 +119,14 @@ Node* mergeIterative(Node* a, Node* b) {
     return result;
 }
 
+// Flatten by merging lists one by one
 Node* flattenOneByOne(Node* root) {
     if (!root || !root->next) return root;
     
-    Node* result = root;
+    Node* result = root; // Start with first list
     Node* curr = root->next;
     
-    // Merge each subsequent list with the result
+    // Merge each subsequent list with result
     while (curr) {
         result = mergeIterative(result, curr);
         curr = curr->next;

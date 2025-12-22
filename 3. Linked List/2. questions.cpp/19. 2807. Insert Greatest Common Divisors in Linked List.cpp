@@ -43,46 +43,42 @@ private:
     }
     
 public:
+/*
+ * Problem: Insert Greatest Common Divisors in Linked List
+ *
+ * LeetCode 2807: Insert Greatest Common Divisors in Linked List
+ *
+ * Insert GCD node between every pair of adjacent nodes.
+ * Example: [18,6,10,3] -> [18,6,6,2,10,1,3] (GCD(18,6)=6, GCD(6,10)=2, GCD(10,3)=1)
+ *
+ * Time: O(n * log(min(a,b))) - n nodes, GCD calculation
+ * Space: O(1) - excluding new nodes created
+ */
+
     ListNode* insertGreatestCommonDivisors(ListNode* head) {
-        // Step 1:
-        // Handle edge case: if list has less than 2 nodes, no insertion needed
+        // Edge case: need at least 2 nodes to insert between
         if (head == nullptr || head->next == nullptr) {
             return head;
         }
         
-        // Step 2:
-        // curr -> current node we are examining
-        // We need to insert nodes between curr and curr->next
         ListNode* curr = head;
         
-        // Step 3:
-        // Traverse the list and insert GCD nodes between consecutive pairs
+        // Traverse and insert GCD nodes between consecutive pairs
         while (curr != nullptr && curr->next != nullptr) {
-            // Step 3a:
-            // Calculate GCD of current node and next node values
-            // int gcdValue = gcd(curr->val, curr->next->val);
-
-            // inbuilt gcd function
+            // Calculate GCD of current and next node values
             int gcdValue = __gcd(curr->val, curr->next->val);
             
-            // Step 3b:
-            // Create a new node with the GCD value
+            // Create new node with GCD value
             ListNode* newNode = new ListNode(gcdValue);
             
-            // Step 3c:
-            // Insert the new node between curr and curr->next
-            // Connect: curr -> newNode -> curr->next
+            // Insert between curr and curr->next
             newNode->next = curr->next;
             curr->next = newNode;
             
-            // Step 3d:
-            // Move curr to the node after the inserted node
-            // This is the original curr->next (now curr->next->next)
+            // Move to node after inserted node (skip inserted node)
             curr = newNode->next;
         }
         
-        // Step 4:
-        // Return the modified head
         return head;
     }
 };

@@ -30,14 +30,34 @@
 
 class Solution {
 public:
+/*
+ * Problem: Count Complete Tree Nodes
+ *
+ * LeetCode 222: Count Complete Tree Nodes
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/count-nodes-of-complete-binary-tree/1
+ *
+ * Count nodes in complete binary tree efficiently.
+ * If left and right heights are equal, tree is perfect: 2^h - 1 nodes.
+ *
+ * Time: O((log n)^2) - height calculation + recursion
+ * Space: O(log n) - recursion stack
+ */
+
     int countNodes(TreeNode* root) {
         if(root == NULL) return 0;
+        
+        // Calculate left and right heights
         int lh = findHeightLeft(root);
         int rh = findHeightRight(root);
+        
+        // If heights equal, tree is perfect: 2^h - 1 nodes
         if(lh == rh) return (1<<lh) - 1;
+        
+        // Otherwise, recursively count left and right subtrees
         return 1 + countNodes(root->left) + countNodes(root->right);
     }
     
+    // Find height by going left only
     int findHeightLeft(TreeNode* node) {
         int hght = 0;
         while(node) {
@@ -47,6 +67,7 @@ public:
         return hght;
     }
     
+    // Find height by going right only
     int findHeightRight(TreeNode* node) {
         int hght = 0;
         while(node) {

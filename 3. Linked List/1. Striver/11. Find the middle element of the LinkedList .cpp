@@ -64,22 +64,34 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// ========== METHOD 1: Two-Pointer (Slow and Fast) - Optimal ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Middle of the Linked List
+ *
+ * LeetCode 876: Middle of the Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/finding-middle-element-in-a-linked-list/1
+ *
+ * Find the middle node of a linked list. If two middle nodes, return second one.
+ * Example: [1,2,3,4,5] -> middle is 3, [1,2,3,4,5,6] -> middle is 4
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
+// Method 1: Two-Pointer (Slow and Fast) - Optimal
 Node* middleNode(Node* head) {
     if (!head) return nullptr;
     
-    Node* slow = head;
-    Node* fast = head;
+    Node* slow = head; // Moves 1 step at a time
+    Node* fast = head; // Moves 2 steps at a time
     
-    // Move fast pointer 2 steps and slow pointer 1 step
-    // When fast reaches end, slow will be at middle
+    // When fast reaches end, slow is at middle
+    // For even length, fast->next becomes null, slow is at second middle
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
     }
     
-    return slow;
+    return slow; // Middle node
 }
 
 // ========== METHOD 2: Find Length First ==========

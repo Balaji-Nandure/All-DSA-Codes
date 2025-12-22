@@ -72,8 +72,20 @@ int getLength(Node* head) {
     return length;
 }
 
-// ========== METHOD 1: Iterative Approach (Optimal) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Reverse Nodes in k-Group
+ *
+ * LeetCode 25: Reverse Nodes in k-Group
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/reverse-a-linked-list-in-groups-of-given-size/1
+ *
+ * Reverse nodes of linked list k at a time. If remaining nodes < k, leave them as is.
+ * Example: [1,2,3,4,5], k=2 -> [2,1,4,3,5]
+ *
+ * Time: O(n) - single pass
+ * Space: O(n/k) - recursion stack depth
+ */
+
+// Method 1: Recursive Approach
 Node* reverseKGroup(Node* head, int k) {
     if (!head || k == 1) return head;
     
@@ -87,17 +99,17 @@ Node* reverseKGroup(Node* head, int k) {
     
     // If we have k nodes, reverse them
     if (count == k) {
-        // Reverse first k nodes
+        // Reverse first k nodes using standard reverse technique
         Node* prev = nullptr;
         Node* curr = head;
         Node* next = nullptr;
         
         // Reverse k nodes
         for (int i = 0; i < k; i++) {
-            next = curr->next;
-            curr->next = prev;
-            prev = curr;
-            curr = next;
+            next = curr->next; // Save next
+            curr->next = prev; // Reverse link
+            prev = curr; // Move prev forward
+            curr = next; // Move curr forward
         }
         
         // Recursively reverse next k groups
@@ -108,7 +120,7 @@ Node* reverseKGroup(Node* head, int k) {
         return prev;
     }
     
-    // If less than k nodes, return as is
+    // If less than k nodes, return as is (don't reverse)
     return head;
 }
 

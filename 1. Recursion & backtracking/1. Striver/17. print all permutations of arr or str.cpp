@@ -1,46 +1,46 @@
 /*
  * Problem: Print All Permutations of Array or String
  * 
- * Given an array or string, print all possible permutations.
+ * LeetCode 46: Permutations
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/permutations-of-a-given-string/0
+ *
+ * Generate all possible permutations of an array or string.
  * 
- * Example 1:
- * Input: arr = [1, 2, 3]
- * Output: 
- * [1,2,3] [1,3,2] [2,1,3] [2,3,1] [3,1,2] [3,2,1]
- * 
- * Example 2:
- * Input: str = "ABC"
- * Output:
- * ABC ACB BAC BCA CAB CBA
+ * Example: arr = [1, 2, 3]
+ * Output: [1,2,3] [1,3,2] [2,1,3] [2,3,1] [3,1,2] [3,2,1]
+ *
+ * Time: O(n! * n) - n! permutations, each copied in O(n)
+ * Space: O(n) - recursion stack depth
  */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-
-// METHOD 1: Swap Method (for both array and string)
-// Hypothesis: At each step, fix one position and swap it with all possible remaining elements, 
-// generating all permutations by recursion.
-//  On reaching the end, record the permutation.
-
+// Method 1: Swap-based approach
+// Fix position 'ind', swap with all remaining positions, recurse
 void permute_swap(int ind, vector<int>& arr, vector<vector<int>>& result) {
+    // Base case: fixed all positions, add current permutation
     if (ind == arr.size()) {
         result.push_back(arr);
         return;
     }
+    // Try each element at position 'ind' by swapping
     for (int i = ind; i < arr.size(); i++) {
+        // Swap arr[ind] with arr[i] to try arr[i] at position ind
         swap(arr[ind], arr[i]);
+        // Recurse to fix next position
         permute_swap(ind + 1, arr, result);
+        // Backtrack: restore original order
         swap(arr[ind], arr[i]);
     }
 }
 
-// METHOD 2: Using next_permutation (STL method for reference)
-
+// Method 2: Using STL next_permutation (for reference)
 vector<vector<int>> permute_stl(vector<int>& arr) {
     vector<vector<int>> result;
-    sort(arr.begin(), arr.end()); // sort first
+    sort(arr.begin(), arr.end()); // Must sort first for next_permutation
     
+    // Generate all permutations using STL
     do {
         result.push_back(arr);
     } while (next_permutation(arr.begin(), arr.end()));

@@ -106,26 +106,38 @@ void createCycle(Node* head, int pos) {
     }
 }
 
-// ========== METHOD 1: Floyd's Cycle Detection (Tortoise and Hare) - Optimal ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Linked List Cycle
+ *
+ * LeetCode 141: Linked List Cycle
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/detect-loop-in-linked-list/1
+ *
+ * Detect if a linked list has a cycle.
+ * Example: [3,2,0,-4] with cycle -> true
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
+// Method 1: Floyd's Cycle Detection (Tortoise and Hare) - Optimal
 bool hasCycle(Node* head) {
     if (!head || !head->next) return false;
     
-    Node* slow = head;
-    Node* fast = head;
+    Node* slow = head; // Tortoise: moves 1 step
+    Node* fast = head; // Hare: moves 2 steps
     
-    // Move slow pointer 1 step and fast pointer 2 steps
-    // If there's a cycle, they will eventually meet
+    // If cycle exists, fast will eventually catch slow
+    // If no cycle, fast will reach null
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
         
         if (slow == fast) {
-            return true;  // Cycle detected
+            return true; // Cycle detected (pointers met)
         }
     }
     
-    return false;  // No cycle
+    return false; // No cycle (fast reached null)
 }
 
 // ========== METHOD 2: Using HashSet ==========

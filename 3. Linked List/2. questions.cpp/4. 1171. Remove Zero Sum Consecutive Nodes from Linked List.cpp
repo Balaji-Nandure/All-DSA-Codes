@@ -25,42 +25,53 @@ Explanation: We remove the sequence [2,-3] which sums to 0, leaving [1,3,1] or [
 
 class Solution {
 public:
+/*
+ * Problem: Remove Zero Sum Consecutive Nodes from Linked List
+ *
+ * LeetCode 1171: Remove Zero Sum Consecutive Nodes from Linked List
+ *
+ * Remove all consecutive sequences that sum to zero.
+ * Example: [1,2,-3,3,1] -> [3,1] (removed [2,-3])
+ *
+ * Time: O(n) - single pass
+ * Space: O(n) - hashmap for prefix sums
+ */
+
     ListNode* removeZeroSumSublists(ListNode* head) {
-        // Create a dummy node to handle edge cases
+        // Dummy node handles edge cases (removing from head)
         ListNode* dummy = new ListNode(0);
         dummy->next = head;
         
-        // Map to store prefix sum and corresponding node
+        // Map: prefix sum -> last node with that prefix sum
         unordered_map<int, ListNode*> prefixSum;
         
         int sum = 0;
-        prefixSum[0] = dummy;
+        prefixSum[0] = dummy; // Initialize with dummy
         
         ListNode* current = head;
         
-        // First pass: Build prefix sum map
+        // Build prefix sum map and remove zero-sum subarrays
         while (current != nullptr) {
             sum += current->val;
             
-            // If we've seen this prefix sum before, it means the subarray
-            // between the previous occurrence and current sums to zero
+            // If prefix sum seen before, subarray between them sums to zero
             if (prefixSum.count(sum)) {
-                // Remove all nodes between the previous occurrence and current
+                // Remove nodes from prev occurrence to current
                 ListNode* prev = prefixSum[sum];
                 ListNode* toDelete = prev->next;
                 int tempSum = sum;
                 
-                // Remove intermediate prefix sums from map
+                // Clean up intermediate prefix sums from map
                 while (toDelete != current) {
                     tempSum += toDelete->val;
                     prefixSum.erase(tempSum);
                     toDelete = toDelete->next;
                 }
                 
-                // Skip the zero-sum subarray
+                // Skip zero-sum subarray
                 prev->next = current->next;
             } else {
-                // Store the prefix sum and current node
+                // Store prefix sum and current node
                 prefixSum[sum] = current;
             }
             

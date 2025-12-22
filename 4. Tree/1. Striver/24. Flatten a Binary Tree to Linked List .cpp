@@ -43,28 +43,41 @@ using namespace std;
 // This approach uses O(1) space by re-wiring the tree "in-place" using rightmost nodes of left subtrees.
 class MorrisLikeSolution {
 public:
+/*
+ * Problem: Flatten Binary Tree to Linked List
+ *
+ * LeetCode 114: Flatten Binary Tree to Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/flatten-binary-tree-to-linked-list/1
+ *
+ * Flatten tree to linked list in preorder: use right pointer, left = NULL.
+ * Example: [1,2,3,4,5,6] -> 1->2->3->4->5->6
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(1) for Morris-like, O(h) for recursive
+ */
+
+    // Morris-like approach: O(1) space
     void flatten(TreeNode* root) {
-        TreeNode* current = root; // Start from the root
+        TreeNode* current = root;
 
         while (current != NULL) {
-            // If current node has a left child, need to re-wire
+            // If left child exists, need to rewire
             if (current->left != NULL) {
-                // Find the rightmost node of the left subtree (predecessor)
+                // Find rightmost node in left subtree (predecessor)
                 TreeNode* predecessor = current->left;
-                // Keep going right within the left subtree
                 while (predecessor->right != NULL) {
                     predecessor = predecessor->right;
                 }
 
-                // Attach the right subtree of current node to right of its predecessor
+                // Attach right subtree to predecessor's right
                 predecessor->right = current->right;
 
                 // Move left subtree to right
                 current->right = current->left;
-                current->left = NULL; // Set left pointer to NULL per requirements
+                current->left = NULL; // Set left to NULL
             }
 
-            // Move to the next right node (i.e., in-preorder)
+            // Move to next node (in preorder)
             current = current->right;
         }
     }

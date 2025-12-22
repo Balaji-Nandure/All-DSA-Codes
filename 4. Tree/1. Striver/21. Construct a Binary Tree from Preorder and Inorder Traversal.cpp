@@ -68,22 +68,36 @@ public:
     }
     
 private:
+/*
+ * Problem: Construct Binary Tree from Preorder and Inorder Traversal
+ *
+ * LeetCode 105: Construct Binary Tree from Preorder and Inorder Traversal
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/construct-tree-1/1
+ *
+ * Build binary tree from preorder and inorder traversals.
+ * Preorder gives root, inorder splits left and right subtrees.
+ *
+ * Time: O(n) with hash map, O(n^2) without
+ * Space: O(n) - hash map and recursion stack
+ */
+
     TreeNode* build(vector<int>& preorder, vector<int>& inorder, 
                    int inStart, int inEnd, int& preIndex,
                    unordered_map<int, int>& inorderMap) {
+        // Base case: invalid range
         if (inStart > inEnd) return nullptr;
         
-        // Current root is the next element in preorder
+        // Root is next element in preorder
         int rootVal = preorder[preIndex++];
         TreeNode* root = new TreeNode(rootVal);
         
-        // Find root position in inorder
+        // Find root position in inorder (O(1) with map)
         int rootIndex = inorderMap[rootVal];
         
-        // Build left subtree (elements before root in inorder)
+        // Build left subtree: elements before root in inorder
         root->left = build(preorder, inorder, inStart, rootIndex - 1, preIndex, inorderMap);
         
-        // Build right subtree (elements after root in inorder)
+        // Build right subtree: elements after root in inorder
         root->right = build(preorder, inorder, rootIndex + 1, inEnd, preIndex, inorderMap);
         
         return root;

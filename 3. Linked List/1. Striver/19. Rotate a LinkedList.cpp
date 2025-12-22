@@ -64,12 +64,24 @@ int getLength(Node* head) {
     return length;
 }
 
-// ========== METHOD 1: Connect Tail to Head and Break (Optimal) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Rotate List
+ *
+ * LeetCode 61: Rotate List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/rotate-a-linked-list/1
+ *
+ * Rotate linked list to the right by k places.
+ * Example: [1,2,3,4,5], k=2 -> [4,5,1,2,3]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
+// Method 1: Connect Tail to Head and Break (Optimal)
 Node* rotateRight(Node* head, int k) {
     if (!head || !head->next || k == 0) return head;
     
-    // Step 1: Find length and tail
+    // Step 1: Find length and tail in one pass
     int length = 1;
     Node* tail = head;
     while (tail->next) {
@@ -79,20 +91,21 @@ Node* rotateRight(Node* head, int k) {
     
     // Step 2: Normalize k (handle k > length)
     k = k % length;
-    if (k == 0) return head;  // No rotation needed
+    if (k == 0) return head; // No rotation needed
     
-    // Step 3: Make list circular
+    // Step 3: Make list circular (connect tail to head)
     tail->next = head;
     
-    // Step 4: Find the new tail (length - k - 1 steps from head)
+    // Step 4: Find new tail (length - k - 1 steps from head)
+    // New head will be at (length - k) position
     Node* newTail = head;
     for (int i = 0; i < length - k - 1; i++) {
         newTail = newTail->next;
     }
     
-    // Step 5: Break the cycle and return new head
-    Node* newHead = newTail->next;
-    newTail->next = nullptr;
+    // Step 5: Break cycle and return new head
+    Node* newHead = newTail->next; // New head
+    newTail->next = nullptr; // Break cycle
     
     return newHead;
 }

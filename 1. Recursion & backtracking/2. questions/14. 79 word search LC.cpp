@@ -25,31 +25,30 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// DFS/backtracking function to search for word in the board
+// DFS/backtracking to search for word starting at (i, j)
 bool dfs(int i, int j, int idx, vector<vector<char>>& board, string& word) {
-    // Base case: if all characters matched
+    // Base case: matched all characters of word
     if (idx == (int)word.size()) 
         return true;
 
     int m = board.size();
     int n = board[0].size();
 
-    // Out of bounds
+    // Check bounds
     if (i < 0 || j < 0 || i >= m || j >= n)
         return false;
-    // If cell doesn't match or is already used
+    // Check if current cell matches current character
     if (board[i][j] != word[idx])
         return false;
 
-    // Mark this cell as used
+    // Mark cell as visited (temporarily)
     char saved = board[i][j];
-    board[i][j] = '#';
+    board[i][j] = '#'; // Mark as used
 
-    // Try all 4 directions manually: LEFT, RIGHT, UP, DOWN
-
-    // LEFT  (i, j-1)
+    // Try all 4 directions: LEFT, RIGHT, UP, DOWN
+    // LEFT (i, j-1)
     if (dfs(i, j - 1, idx + 1, board, word)) {
-        board[i][j] = saved;   // Backtrack
+        board[i][j] = saved; // Backtrack
         return true;
     }
     // RIGHT (i, j+1)
@@ -57,36 +56,38 @@ bool dfs(int i, int j, int idx, vector<vector<char>>& board, string& word) {
         board[i][j] = saved;
         return true;
     }
-    // UP    (i-1, j)
+    // UP (i-1, j)
     if (dfs(i - 1, j, idx + 1, board, word)) {
         board[i][j] = saved;
         return true;
     }
-    // DOWN  (i+1, j)
+    // DOWN (i+1, j)
     if (dfs(i + 1, j, idx + 1, board, word)) {
         board[i][j] = saved;
         return true;
     }
 
-    // Backtrack: restore cell
+    // None of the directions worked, backtrack
     board[i][j] = saved;
     return false;
 }
 
-// Main function to check if word exists in board
+// Main function: check if word exists in board
 bool exist(vector<vector<char>>& board, string word) {
     int m = board.size();
     int n = board[0].size();
+    // Try starting from each cell that matches first character
     for (int i = 0; i < m; i++) {
         for (int j = 0; j < n; j++) {
             if (board[i][j] == word[0]) {
+                // Start DFS from this cell
                 if (dfs(i, j, 0, board, word)) {
                     return true;
                 }
             }
         }
     }
-    return false;
+    return false; // Word not found
 }
 
 int main() {

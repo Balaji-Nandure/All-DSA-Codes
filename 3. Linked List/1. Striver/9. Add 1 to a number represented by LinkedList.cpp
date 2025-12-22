@@ -85,29 +85,41 @@ Node* reverseList(Node* head) {
     return prev;
 }
 
-// ========== METHOD 1: Reverse, Add, Reverse Back ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Add 1 to a number represented by Linked List
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/add-1-to-a-number-represented-as-linked-list/1
+ *
+ * Add 1 to a number represented as linked list (digits in normal order).
+ * Example: [1,2,3] + 1 = [1,2,4], [9,9,9] + 1 = [1,0,0,0]
+ *
+ * Time: O(n) - three passes
+ * Space: O(1)
+ */
+
+// Method 1: Reverse, Add, Reverse Back
 Node* addOneReverse(Node* head) {
     if (!head) return new Node(1);
     
-    // Step 1: Reverse the list
+    // Step 1: Reverse list to process from least significant digit
     head = reverseList(head);
     
-    // Step 2: Add 1
+    // Step 2: Add 1 starting from least significant digit
     Node* curr = head;
-    int carry = 1;  // Start with 1 to add
+    int carry = 1; // Start with 1 to add
     
-    // && is used to check if the current node is not null and the carry is greater than 0
+    // Process while nodes exist and carry remains
     while (curr && carry > 0) {
         int sum = curr->data + carry;
-        curr->data = sum % 10;
-        carry = sum / 10;
+        curr->data = sum % 10; // Current digit
+        carry = sum / 10; // New carry
         curr = curr->next;
     }
     
-    // Step 3: Reverse back
+    // Step 3: Reverse back to original order
     head = reverseList(head);
 
+    // If carry remains, create new head node
     if(carry > 0){
         Node* newHead = new Node(carry);
         newHead->next = head;
@@ -117,23 +129,26 @@ Node* addOneReverse(Node* head) {
     return head;
 }
 
-// ========== METHOD 2: Recursive Approach ==========
-// Time Complexity: O(n), Space Complexity: O(n) due to recursion
+// Method 2: Recursive Approach (O(n) space)
+// Process from right to left using recursion
 int addOneRecursive(Node* head) {
-    if (!head) return 1;  // Return 1 to add
+    // Base case: reached end, return 1 to add
+    if (!head) return 1;
     
+    // Recursively process next node, get carry
     int carry = addOneRecursive(head->next);
     
+    // Add carry to current node
     int sum = head->data + carry;
-    head->data = sum % 10;
+    head->data = sum % 10; // Update current digit
     
-    return sum / 10;  // Return carry
+    return sum / 10; // Return carry for previous node
 }
 
 Node* addOneRecursiveWrapper(Node* head) {
     int carry = addOneRecursive(head);
     
-    // If there's a carry left, create a new head node
+    // If carry remains, create new head
     if (carry > 0) {
         Node* newHead = new Node(carry);
         newHead->next = head;
@@ -143,16 +158,15 @@ Node* addOneRecursiveWrapper(Node* head) {
     return head;
 }
 
-// ========== METHOD 3: Find Rightmost Non-9 Digit ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+// Method 3: Find Rightmost Non-9 Digit (Optimal - single pass)
+// Key insight: Only rightmost non-9 digit needs increment, all 9s become 0s
 Node* addOneOptimal(Node* head) {
     if (!head) return new Node(1);
     
-    // Step 1: Find the rightmost non-9 digit
+    // Step 1: Find rightmost non-9 digit
     Node* lastNonNine = nullptr;
     Node* curr = head;
-    
-    // Traverse to find the rightmost non-9 node
+    // Track last node that is not 9
     while (curr) {
         if (curr->data != 9) {
             lastNonNine = curr;
@@ -160,26 +174,24 @@ Node* addOneOptimal(Node* head) {
         curr = curr->next;
     }
     
-    // Step 2: If all digits are 9, we need a new head
+    // Step 2: If all digits are 9, need new head
     if (!lastNonNine) {
-        // All digits are 9, create new head with 1
+        // All digits are 9: create new head with 1
         Node* newHead = new Node(1);
         newHead->next = head;
-        
-        // Set all nodes to 0
+        // Set all existing nodes to 0
         curr = head;
         while (curr) {
             curr->data = 0;
             curr = curr->next;
         }
-        
         return newHead;
     }
     
-    // Step 3: Increment the rightmost non-9 digit
+    // Step 3: Increment rightmost non-9 digit
     lastNonNine->data++;
     
-    // Step 4: Set all digits after it to 0
+    // Step 4: Set all digits after it to 0 (they were 9s)
     curr = lastNonNine->next;
     while (curr) {
         curr->data = 0;

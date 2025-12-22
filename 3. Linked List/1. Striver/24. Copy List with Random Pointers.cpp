@@ -39,32 +39,44 @@ public:
     }
 };
 
-// ========== METHOD 1: Using HashMap (Optimal for clarity) ==========
-// Time Complexity: O(n), Space Complexity: O(n)
+/*
+ * Problem: Copy List with Random Pointer
+ *
+ * LeetCode 138: Copy List with Random Pointer
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/clone-a-linked-list-with-next-and-random-pointer/1
+ *
+ * Create a deep copy of linked list with random pointers.
+ * Each node has next and random pointers that need to be copied.
+ *
+ * Time: O(n) - two passes
+ * Space: O(n) for hashmap, O(1) for interleaving method
+ */
+
+// Method 1: Using HashMap (Optimal for clarity)
 Node* copyRandomList(Node* head) {
     if (!head) return nullptr;
     
     // Map original nodes to their copies
     unordered_map<Node*, Node*> nodeMap;
     
-    // First pass: Create all nodes and map them
+    // First pass: Create all new nodes and map original to copy
     Node* curr = head;
     while (curr) {
         nodeMap[curr] = new Node(curr->val);
         curr = curr->next;
     }
     
-    // Second pass: Set next and random pointers
+    // Second pass: Set next and random pointers using the map
     curr = head;
     while (curr) {
         Node* copy = nodeMap[curr];
         
-        // Set next pointer
+        // Set next pointer (map original->next to copy->next)
         if (curr->next) {
             copy->next = nodeMap[curr->next];
         }
         
-        // Set random pointer
+        // Set random pointer (map original->random to copy->random)
         if (curr->random) {
             copy->random = nodeMap[curr->random];
         }
@@ -72,11 +84,11 @@ Node* copyRandomList(Node* head) {
         curr = curr->next;
     }
     
-    return nodeMap[head];
+    return nodeMap[head]; // Return head of copied list
 }
 
-// ========== METHOD 2: Interleaving Nodes (Optimal Space) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+// Method 2: Interleaving Nodes (Optimal Space - O(1))
+// Insert copy nodes between original nodes, set pointers, then separate
 Node* copyRandomListInterleaving(Node* head) {
     if (!head) return nullptr;
     
@@ -84,29 +96,30 @@ Node* copyRandomListInterleaving(Node* head) {
     Node* curr = head;
     while (curr) {
         Node* copy = new Node(curr->val);
-        copy->next = curr->next;
-        curr->next = copy;
-        curr = copy->next;
+        copy->next = curr->next; // Copy points to next original
+        curr->next = copy; // Original points to copy
+        curr = copy->next; // Move to next original
     }
     
     // Step 2: Set random pointers for copies
+    // copy->random = original->random->next (the copy of original->random)
     curr = head;
     while (curr) {
         if (curr->random) {
-            curr->next->random = curr->random->next;
+            curr->next->random = curr->random->next; // Copy's random = copy of original's random
         }
-        curr = curr->next->next;
+        curr = curr->next->next; // Skip copy, move to next original
     }
     
     // Step 3: Separate original and copy lists
     Node* original = head;
-    Node* copyHead = head->next;
+    Node* copyHead = head->next; // Save head of copy list
     Node* copy = copyHead;
     
     while (original) {
-        original->next = original->next->next;
+        original->next = original->next->next; // Restore original links
         if (copy->next) {
-            copy->next = copy->next->next;
+            copy->next = copy->next->next; // Connect copy links
         }
         original = original->next;
         copy = copy->next;

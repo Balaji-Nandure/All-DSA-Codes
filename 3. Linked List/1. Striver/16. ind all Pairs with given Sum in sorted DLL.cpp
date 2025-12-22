@@ -77,8 +77,20 @@ DNode* getTail(DNode* head) {
     return curr;
 }
 
-// ========== METHOD 1: Two-Pointer Approach (Optimal) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Find all Pairs with given Sum in sorted Doubly Linked List
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/find-pairs-with-given-sum-in-doubly-linked-list/1
+ *
+ * Find all pairs in sorted DLL whose sum equals target.
+ * Example: DLL: 1<->2<->4<->5<->6<->8<->9, target=7 -> (1,6), (2,5)
+ *
+ * Time: O(n) - single pass with two pointers
+ * Space: O(1)
+ */
+
+// Method 1: Two-Pointer Approach (Optimal)
+// Use left pointer at head and right pointer at tail
 vector<pair<int, int>> findPairs(DNode* head, int target) {
     vector<pair<int, int>> pairs;
     
@@ -88,16 +100,17 @@ vector<pair<int, int>> findPairs(DNode* head, int target) {
     DNode* left = head;
     DNode* right = getTail(head);
     
-    // Use two-pointer technique similar to sorted array
+    // Two-pointer technique: move based on sum comparison
     while (left && right && left != right && left->prev != right) {
         int sum = left->data + right->data;
         
         if (sum == target) {
+            // Found a pair
             pairs.push_back({left->data, right->data});
-            left = left->next;
+            left = left->next; // Move both pointers
             right = right->prev;
         } else if (sum < target) {
-            // Sum is less, move left pointer forward
+            // Sum is less, move left pointer forward (increase sum)
             left = left->next;
         } else {
             // Sum is greater, move right pointer backward

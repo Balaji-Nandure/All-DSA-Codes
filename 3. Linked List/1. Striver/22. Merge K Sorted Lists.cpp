@@ -87,9 +87,21 @@ Node* mergeTwoLists(Node* list1, Node* list2) {
     return result;
 }
 
-// ========== METHOD 1: Divide and Conquer / Merge Pairs (Optimal) ==========
-// Time Complexity: O(n * log k), Space Complexity: O(1)
-// where n is total number of nodes, k is number of lists
+/*
+ * Problem: Merge k Sorted Lists
+ *
+ * LeetCode 23: Merge k Sorted Lists
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/merge-k-sorted-linked-lists/1
+ *
+ * Merge k sorted linked lists into one sorted list.
+ * Example: [[1,4,5],[1,3,4],[2,6]] -> [1,1,2,3,4,4,5,6]
+ *
+ * Time: O(n * log k) - where n is total nodes, k is number of lists
+ * Space: O(1) for divide-conquer, O(k) for heap
+ */
+
+// Method 1: Divide and Conquer / Merge Pairs (Optimal)
+// Merge pairs of lists iteratively until one remains
 Node* mergeKLists(vector<Node*>& lists) {
     if (lists.empty()) return nullptr;
     
@@ -97,22 +109,24 @@ Node* mergeKLists(vector<Node*>& lists) {
     
     // Merge pairs of lists until only one remains
     while (k > 1) {
-        int newK = 0;
+        int newK = 0; // Count of merged lists in this round
         
         // Merge pairs: lists[i] and lists[i+1]
         for (int i = 0; i < k; i += 2) {
             if (i + 1 < k) {
+                // Merge two lists
                 lists[newK] = mergeTwoLists(lists[i], lists[i + 1]);
             } else {
+                // Odd number: keep the last list as is
                 lists[newK] = lists[i];
             }
             newK++;
         }
         
-        k = newK;
+        k = newK; // Update count for next round
     }
     
-    return lists[0];
+    return lists[0]; // Final merged list
 }
 
 // ========== METHOD 2: Merge One by One ==========
@@ -131,22 +145,22 @@ Node* mergeKListsOneByOne(vector<Node*>& lists) {
     return result;
 }
 
-// ========== METHOD 3: Priority Queue / Min Heap ==========
-// Time Complexity: O(n * log k), Space Complexity: O(k)
+// Method 3: Priority Queue / Min Heap
+// Use min heap to always get the smallest element
 Node* mergeKListsHeap(vector<Node*>& lists) {
     if (lists.empty()) return nullptr;
     
-    // Min heap using pair<int, Node*>
+    // Min heap: stores (value, node) pairs
     priority_queue<pair<int, Node*>, vector<pair<int, Node*>>, greater<pair<int, Node*>>> minHeap;
     
-    // Push head of each list into heap
+    // Push head of each non-empty list into heap
     for (Node* list : lists) {
         if (list) {
             minHeap.push({list->data, list});
         }
     }
     
-    // Create dummy node for result
+    // Create dummy node to build result
     Node* dummy = new Node(0);
     Node* tail = dummy;
     
@@ -155,10 +169,11 @@ Node* mergeKListsHeap(vector<Node*>& lists) {
         auto [minValue, minNode] = minHeap.top();
         minHeap.pop();
         
+        // Add minimum node to result
         tail->next = minNode;
         tail = tail->next;
         
-        // Push next node from the same list
+        // Push next node from the same list (if exists)
         if (minNode->next) {
             minHeap.push({minNode->next->data, minNode->next});
         }

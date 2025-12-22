@@ -54,37 +54,47 @@ using namespace std;
 
 class Solution {
 public:
+/*
+ * Problem: Top View of Binary Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/top-view-of-binary-tree/1
+ *
+ * Return topmost node in each vertical line (first node encountered in BFS).
+ *
+ * Time: O(n) - single pass
+ * Space: O(n) - map and queue
+ */
+
     vector<int> topView(TreeNode* root) {
         if (!root) return {};
-        // Step 1: Create a map to store the topmost node for each column
+        // Map: column -> topmost node value
         map<int, int> mp; // col -> node_value
         
-        // Step 2: BFS traversal with only col information
-        // Queue stores: {node pointer, col}
+        // BFS with column index: root at col 0
         queue<pair<TreeNode*, int>> q;
         q.push({root, 0});
         
-        // Step 3: Traverse the tree using BFS
+        // Traverse level by level
         while (!q.empty()) {
             auto [node, col] = q.front();
             q.pop();
 
-            // If this is the first time we're seeing this column, store the node
+            // Store first node encountered in each column (topmost)
             if (mp.find(col) == mp.end()) {
                 mp[col] = node->val;
             }
             
+            // Left: col-1, Right: col+1
             if (node->left) q.push({node->left, col - 1});
             if (node->right) q.push({node->right, col + 1});
         }
         
-        // Step 4: Build the result by extracting values in column order
+        // Extract values in column order (left to right)
         vector<int> result;
         for (auto& [col, val] : mp) {
             result.push_back(val);
         }
         
-        // Step 5: Return result (columns are already sorted by map's key order)
         return result;
     }
 };

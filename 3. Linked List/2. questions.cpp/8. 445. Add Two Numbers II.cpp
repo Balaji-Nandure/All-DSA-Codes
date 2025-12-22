@@ -42,16 +42,28 @@ private:
     }
     
 public:
+/*
+ * Problem: Add Two Numbers II
+ *
+ * LeetCode 445: Add Two Numbers II
+ *
+ * Add two numbers represented as linked lists (most significant digit first).
+ * Example: [7,2,4,3] + [5,6,4] = [7,8,0,7] (7243 + 564 = 7807)
+ *
+ * Time: O(max(m,n)) - where m, n are lengths
+ * Space: O(m+n) for stacks, O(1) for reverse method
+ */
+
     ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
         stack<int> s1, s2;
         
-        // Push all digits from l1 into stack
+        // Push all digits from l1 into stack (reverses order)
         while (l1 != nullptr) {
             s1.push(l1->val);
             l1 = l1->next;
         }
         
-        // Push all digits from l2 into stack
+        // Push all digits from l2 into stack (reverses order)
         while (l2 != nullptr) {
             s2.push(l2->val);
             l2 = l2->next;
@@ -60,10 +72,11 @@ public:
         int carry = 0;
         ListNode* result = nullptr;
         
-        // Process digits from both stacks
+        // Process digits from both stacks (add from least significant)
         while (!s1.empty() || !s2.empty() || carry != 0) {
             int sum = carry;
             
+            // Add digits from both stacks
             if (!s1.empty()) {
                 sum += s1.top();
                 s1.pop();
@@ -74,13 +87,13 @@ public:
                 s2.pop();
             }
             
-            carry = sum / 10;
-            int digit = sum % 10;
+            carry = sum / 10; // New carry
+            int digit = sum % 10; // Current digit
             
-            // Create new node and add to front of result list
+            // Create new node and add to front (most significant digit first)
             ListNode* newNode = new ListNode(digit);
             newNode->next = result;
-            result = newNode;
+            result = newNode; // Update head
         }
         
         return result;

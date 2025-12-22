@@ -1,78 +1,95 @@
+/*
+ * Problem: Quick Sort
+ *
+ * Divide and conquer sorting algorithm using partitioning.
+ * Choose a pivot, partition array around pivot, recursively sort partitions.
+ *
+ * Time: O(n log n) average, O(n²) worst case
+ * Space: O(log n) - recursion stack depth
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
-// partition function with Lomuto's partition scheme
-// Partition1 is with i = low - 1
+// Partition function using Lomuto's partition scheme
+// Partition1: Initialize i = low - 1
 int partition1(vector<int>& arr, int low, int high) {
-    // we can choose any element as pivot.
-    int pivot = arr[high]; // choose last element as pivot
-    int i = low - 1; // place for swapping
+    // Choose any element as pivot (here: last element)
+    int pivot = arr[high];
+    int i = low - 1; // Index for smaller elements (right boundary)
 
-    // running this till high - 1 because pibote is present at high.
+    // Traverse from low to high-1 (pivot is at high)
     for (int j = low; j <= high - 1; ++j) {
-        // CHANGE HERE: > instead of <. if you want to sort in descending order.
+        // If current element is smaller than pivot
+        // For descending order: use arr[j] > pivot
         if (arr[j] < pivot) {
-            ++i;
+            ++i; // Increment index of smaller elements
             swap(arr[i], arr[j]);
         }
     }
-    swap(arr[i + 1], arr[high]); // put pivot into correct position
-    return i + 1;
+    // Place pivot in correct position (after all smaller elements)
+    swap(arr[i + 1], arr[high]);
+    return i + 1; // Return pivot index
 }
 
-// in this partition i = low (I will prefer this partition but both are correct)
+// Partition: Initialize i = low (preferred approach)
 int partition(vector<int>& arr, int low, int high) {
-    // we can choose any element as pivot.
-    int pivot = arr[high]; // choose last element as pivot
-    int i = low;
+    // Choose pivot (last element)
+    int pivot = arr[high];
+    int i = low; // Index for smaller elements
+
+    // Traverse and partition
     for (int j = low; j <= high - 1; j++) {
-        // CHANGE HERE: > instead of <. if you want to sort in descending order.
+        // If element is smaller than pivot, swap with element at i
+        // For descending order: use arr[j] > pivot
         if (arr[j] < pivot) {
             swap(arr[i], arr[j]);
-            i++;  
+            i++; // Move boundary of smaller elements
         }
     }
-    // Finally put pivot in correct place
-    swap(arr[i], arr[high]);  
-    return i;
-
+    // Place pivot in its correct position
+    swap(arr[i], arr[high]);
+    return i; // Return pivot index
 }
 
-// in this we are choosing middle element as pivot // just a variation
+// Partition2: Choose middle element as pivot (variation)
 int partition2(vector<int>& arr, int low, int high) {
-    // choose middle element as pivot
+    // Choose middle element as pivot (better for avoiding worst case)
     int mid = low + (high - low) / 2;
     int pivot = arr[mid];
 
-    // move pivot to the end so that the rest of the code works unchanged
+    // Move pivot to end so partition logic works unchanged
     swap(arr[mid], arr[high]);
 
     int i = low;
     for (int j = low; j <= high - 1; j++) {
-        // CHANGE HERE: > instead of <. if you want to sort in descending order.
+        // Partition around pivot
+        // For descending order: use arr[j] > pivot
         if (arr[j] < pivot) {
             swap(arr[i], arr[j]);
             i++;
         }
     }
 
-    // put pivot in its correct position
+    // Place pivot in correct position
     swap(arr[i], arr[high]);
     return i;
 }
 
 
-// quick sort recursive implementation
+// Quick Sort: Divide and conquer using partitioning
 void quickSort(vector<int>& arr, int low, int high) {
+    // Base case: single element or empty subarray is sorted
     if (low >= high) return;
-    // choose pivote and put it in correct position  i.e at index pi.
-    // after this pi will be at correct position
+    
+    // Partition: place pivot at correct position
+    // After partition, pivot is at index pi and in correct position
     int pi = partition(arr, low, high);
-    // sort left part
-    // left part is from low to pi - 1
+    
+    // Recursively sort left part (elements < pivot)
     quickSort(arr, low, pi - 1);
-    // sort right part
-    // right part is from pi + 1 to high
+    
+    // Recursively sort right part (elements > pivot)
     quickSort(arr, pi + 1, high);
 }
 

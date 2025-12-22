@@ -26,9 +26,24 @@ struct Node {
     }
 };
 
+/*
+ * Problem: Maximum Depth of Binary Tree
+ *
+ * LeetCode 104: Maximum Depth of Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/height-of-binary-tree/1
+ *
+ * Find the maximum depth (height) of binary tree.
+ * Depth = number of nodes on longest path from root to leaf.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) for recursive, O(w) for iterative (where h=height, w=width)
+ */
+
 // Method 1: Recursive DFS
 int maxDepth(Node* root) {
+    // Base case: empty tree has depth 0
     if (!root) return 0;
+    // Depth = 1 (current node) + max depth of left and right subtrees
     return 1 + max(maxDepth(root->left), maxDepth(root->right));
 }
 
@@ -38,12 +53,15 @@ int maxDepthBFS(Node* root) {
     queue<Node*> q;
     q.push(root);
     int depth = 0;
+    // Process level by level
     while (!q.empty()) {
-        int sz = (int)q.size();
-        depth++;
+        int sz = (int)q.size(); // Number of nodes in current level
+        depth++; // Increment depth for each level
+        // Process all nodes in current level
         while (sz--) {
             Node* node = q.front();
             q.pop();
+            // Add children for next level
             if (node->left) q.push(node->left);
             if (node->right) q.push(node->right);
         }

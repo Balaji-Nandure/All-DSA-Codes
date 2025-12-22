@@ -52,17 +52,32 @@ public:
     // after 4th iteration, P(Node 1 stays) = 1/4
     // after 5th iteration, P(Node 1 stays) = 1/5 and so on...
     
+/*
+ * Problem: Linked List Random Node
+ *
+ * LeetCode 382: Linked List Random Node
+ *
+ * Return a random node's value with equal probability for all nodes.
+ * Use Reservoir Sampling algorithm for O(1) space.
+ *
+ * Time: O(n) for each getRandom() call
+ * Space: O(1) - no extra space needed
+ */
+
     int getRandom() {
         int result = 0;
         int count = 0;
         ListNode* current = head;
         
         // Reservoir Sampling Algorithm
+        // For each node at position i, probability of selecting it is 1/i
+        // This ensures each node has equal probability 1/n overall
         while (current != nullptr) {
             count++;
             // Probability of selecting current node is 1/count
+            // rand() % count == 0 happens with probability 1/count
             if (rand() % count == 0) {
-                result = current->val;
+                result = current->val; // Update result
             }
             current = current->next;
         }

@@ -25,27 +25,40 @@ Explanation: We swap nodes 1-2 and 3-4 to get [2,1,4,3].
  * };
  */
 
-// Approach 1: Iterative
+/*
+ * Problem: Swap Nodes in Pairs
+ *
+ * LeetCode 24: Swap Nodes in Pairs
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/pairwise-swap-elements-of-a-linked-list-by-swapping-data/1
+ *
+ * Swap every two adjacent nodes. Only swap nodes, not values.
+ * Example: [1,2,3,4] -> [2,1,4,3]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1) for iterative, O(n) for recursive
+ */
+
+// Approach 1: Iterative (Optimal Space)
 class Solution {
 public:
     ListNode* swapPairs(ListNode* head) {
-        // Create a dummy node to simplify edge cases
+        // Dummy node simplifies edge case (swapping first two nodes)
         ListNode* dummy = new ListNode(0);
         dummy->next = head;
         
-        ListNode* prev = dummy;
+        ListNode* prev = dummy; // Points to node before current pair
         
         while (prev->next && prev->next->next) {
-            // Nodes to be swapped
+            // Store references to nodes in current pair
             ListNode* first = prev->next;
             ListNode* second = prev->next->next;
             
-            // Perform the swap
-            prev->next = second;        // prev -> second
-            first->next = second->next;  // first -> third
-            second->next = first;        // second -> first
+            // Perform swap: prev -> second -> first -> third
+            prev->next = second;        // prev points to second
+            first->next = second->next;  // first points to node after pair
+            second->next = first;        // second points to first
             
-            // Move prev to the node before the next pair
+            // Move prev to node before next pair (first is now second in pair)
             prev = first;
         }
         
@@ -57,23 +70,23 @@ public:
 class Solution2 {
 public:
     ListNode* swapPairs(ListNode* head) {
-        // Base case: if list is empty or has only one node
+        // Base case: empty list or single node (nothing to swap)
         if (!head || !head->next) {
             return head;
         }
         
-        // Nodes to be swapped
+        // Store references to first two nodes
         ListNode* first = head;
         ListNode* second = head->next;
         
-        // Recursively swap the rest of the list
+        // Recursively swap the rest of the list (starting from second->next)
         ListNode* rest = swapPairs(second->next);
         
-        // Perform the swap
-        second->next = first;
-        first->next = rest;
+        // Perform swap: second -> first -> rest
+        second->next = first;  // second points to first
+        first->next = rest;    // first points to swapped rest
         
-        // Return the new head (which is second)
+        // Return new head (second is now first)
         return second;
     }
 };

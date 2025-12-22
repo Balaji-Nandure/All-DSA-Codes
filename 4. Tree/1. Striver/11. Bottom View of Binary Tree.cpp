@@ -54,39 +54,46 @@ using namespace std;
 
 class Solution {
 public:
+/*
+ * Problem: Bottom View of Binary Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/bottom-view-of-binary-tree/1
+ *
+ * Return bottommost node in each vertical line (last node encountered in BFS).
+ *
+ * Time: O(n) - single pass
+ * Space: O(n) - map and queue
+ */
+
     vector<int> bottomView(TreeNode* root) {
         if (!root) return {};
         
-        // Step 1: Create a map to store the bottommost node for each column
-        // Key: column number (col)
-        // Value: node value (we keep updating with the last node we see in each column)
+        // Map: column -> bottommost node value (keep updating)
         map<int, int> mp; // col -> node_value
         
-        // Step 2: BFS traversal with only col information
-        // Queue stores: {node pointer, col}
+        // BFS with column index: root at col 0
         queue<pair<TreeNode*, int>> q;
         q.push({root, 0});
         
-        // Step 3: Traverse the tree using BFS
+        // Traverse level by level
         while (!q.empty()) {
             auto [node, col] = q.front();
             q.pop();
 
-            // Always update the column with the current node
-            // This ensures we get the last (bottommost) node in each column
+            // Always update column (last node in column = bottommost)
             mp[col] = node->val;
             
+            // Left: col-1, Right: col+1
             if (node->left) q.push({node->left, col - 1});
             if (node->right) q.push({node->right, col + 1});
         }
         
-        // Step 4: Build the result by extracting values in column order
+        // Extract values in column order (left to right)
         vector<int> result;
         for (auto& [col, val] : mp) {
             result.push_back(val);
         }
         
-        // Step 5: Return result (columns are already sorted by map's key order)
         return result;
     }
 };

@@ -49,28 +49,41 @@ using namespace std;
 // Solution 1: Morris Inorder Traversal
 class MorrisInorderSolution {
 public:
+/*
+ * Problem: Morris Traversal
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/inorder-traversal/1
+ *
+ * Traverse binary tree without recursion or stack (O(1) space).
+ * Uses threading: create temporary links, then remove them.
+ *
+ * Time: O(n) - each edge traversed at most twice
+ * Space: O(1) - only pointers, no extra space
+ */
+
+    // Morris Inorder: Left -> Root -> Right
     vector<int> inorderTraversal(TreeNode* root) {
         vector<int> result;
         TreeNode* current = root;
         
         while (current != NULL) {
-            // If left child is NULL, process current and move right
+            // Case 1: No left child - process current and go right
             if (current->left == NULL) {
                 result.push_back(current->val);
                 current = current->right;
             } else {
-                // Find inorder predecessor (rightmost node in left subtree)
+                // Case 2: Has left child - find inorder predecessor
                 TreeNode* predecessor = current->left;
                 while (predecessor->right != NULL && predecessor->right != current) {
                     predecessor = predecessor->right;
                 }
                 
-                // If predecessor's right is NULL, create thread and move left
+                // If thread doesn't exist, create it and go left
                 if (predecessor->right == NULL) {
                     predecessor->right = current;  // Create thread
                     current = current->left;
                 } else {
-                    // Thread already exists, remove it and process current
+                    // Thread exists: remove it, process current, go right
                     predecessor->right = NULL;  // Remove thread
                     result.push_back(current->val);
                     current = current->right;
@@ -85,29 +98,30 @@ public:
 // Solution 2: Morris Preorder Traversal
 class MorrisPreorderSolution {
 public:
+    // Morris Preorder: Root -> Left -> Right
     vector<int> preorderTraversal(TreeNode* root) {
         vector<int> result;
         TreeNode* current = root;
         
         while (current != NULL) {
-            // If left child is NULL, process current and move right
+            // Case 1: No left child - process current and go right
             if (current->left == NULL) {
                 result.push_back(current->val);
                 current = current->right;
             } else {
-                // Find inorder predecessor (rightmost node in left subtree)
+                // Case 2: Has left child - find inorder predecessor
                 TreeNode* predecessor = current->left;
                 while (predecessor->right != NULL && predecessor->right != current) {
                     predecessor = predecessor->right;
                 }
                 
-                // If predecessor's right is NULL, create thread and process current
+                // If thread doesn't exist, create it, process current, go left
                 if (predecessor->right == NULL) {
                     predecessor->right = current;  // Create thread
-                    result.push_back(current->val);  // Process before going left
+                    result.push_back(current->val);  // Process root first
                     current = current->left;
                 } else {
-                    // Thread already exists, remove it and move right
+                    // Thread exists: remove it, go right
                     predecessor->right = NULL;  // Remove thread
                     current = current->right;
                 }

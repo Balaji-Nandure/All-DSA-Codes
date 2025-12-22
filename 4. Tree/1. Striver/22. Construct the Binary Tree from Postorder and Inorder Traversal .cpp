@@ -68,19 +68,33 @@ public:
     }
 
 private:
+/*
+ * Problem: Construct Binary Tree from Postorder and Inorder Traversal
+ *
+ * LeetCode 106: Construct Binary Tree from Inorder and Postorder Traversal
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/tree-from-postorder-and-inorder/1
+ *
+ * Build binary tree from postorder and inorder traversals.
+ * Postorder gives root (from end), inorder splits left and right subtrees.
+ *
+ * Time: O(n) with hash map, O(n^2) without
+ * Space: O(n) - hash map and recursion stack
+ */
+
     TreeNode* build(vector<int>& postorder, vector<int>& inorder,
                    int inStart, int inEnd, int& postIndex,
                    unordered_map<int, int>& inorderMap) {
+        // Base case: invalid range
         if (inStart > inEnd) return nullptr;
 
-        // Current root is the next element in postorder (from the end)
+        // Root is next element in postorder (from the end, decrementing)
         int rootVal = postorder[postIndex--];
         TreeNode* root = new TreeNode(rootVal);
 
-        // Find root position in inorder
+        // Find root position in inorder (O(1) with map)
         int rootIndex = inorderMap[rootVal];
 
-        // Build right subtree first (since we decrement postIndex)
+        // Build right subtree first (since postIndex decrements)
         root->right = build(postorder, inorder, rootIndex + 1, inEnd, postIndex, inorderMap);
 
         // Build left subtree

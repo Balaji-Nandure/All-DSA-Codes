@@ -94,23 +94,35 @@ Node* findMiddle(Node* head) {
     return slow;
 }
 
-// ========== METHOD 1: Merge Sort (Optimal) ==========
-// Time Complexity: O(n log n), Space Complexity: O(log n) for recursion stack
+/*
+ * Problem: Sort List
+ *
+ * LeetCode 148: Sort List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/sort-a-linked-list/1
+ *
+ * Sort linked list in O(n log n) time and O(1) space (using merge sort).
+ * Example: [4,2,1,3] -> [1,2,3,4]
+ *
+ * Time: O(n log n) - merge sort
+ * Space: O(log n) - recursion stack
+ */
+
+// Method 1: Merge Sort (Optimal)
 Node* sortList(Node* head) {
-    // Base case: empty list or single node
+    // Base case: empty list or single node (already sorted)
     if (!head || !head->next) {
         return head;
     }
     
-    // Step 1: Find the middle node
+    // Step 1: Find middle node to split list
     Node* mid = findMiddle(head);
     Node* right = mid->next;
-    mid->next = nullptr;  // Split the list
+    mid->next = nullptr; // Split the list into two halves
     
     // Step 2: Recursively sort both halves
-    Node* left = sortList(head);
-    right = sortList(right);
+    Node* left = sortList(head); // Sort left half
+    right = sortList(right); // Sort right half
     
-    // Step 3: Merge the sorted halves
+    // Step 3: Merge the two sorted halves
     return mergeTwoLists(left, right);
 }

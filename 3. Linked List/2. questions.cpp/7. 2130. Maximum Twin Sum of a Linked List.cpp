@@ -46,22 +46,34 @@ private:
     }
     
 public:
+/*
+ * Problem: Maximum Twin Sum of a Linked List
+ *
+ * LeetCode 2130: Maximum Twin Sum of a Linked List
+ *
+ * Find maximum sum of twin pairs (i-th and (n-1-i)-th nodes).
+ * Example: [5,4,2,1] -> twins: (5,1)=6, (4,2)=6 -> max=6
+ *
+ * Time: O(n) - find middle, reverse, calculate
+ * Space: O(1) for reverse method, O(n) for stack/vector
+ */
+
     int pairSum(ListNode* head) {
-        // Find the middle of the linked list using two pointers
+        // Step 1: Find middle using two pointers
         ListNode* slow = head;
         ListNode* fast = head;
-
         while (fast != nullptr && fast->next != nullptr) {
             slow = slow->next;
             fast = fast->next->next;
         }
 
-        // Reverse the second half
+        // Step 2: Reverse second half
         ListNode* secondHalf = reverseList(slow);
         ListNode* firstHalf = head;
-        ListNode* reversedHead = secondHalf; // Remember the head of reversed part
+        ListNode* reversedHead = secondHalf; // Save to restore later
 
-        // Calculate maximum twin sum
+        // Step 3: Calculate maximum twin sum
+        // Traverse both halves simultaneously
         int maxSum = 0;
         while (secondHalf != nullptr) {
             maxSum = max(maxSum, firstHalf->val + secondHalf->val);
@@ -69,7 +81,7 @@ public:
             secondHalf = secondHalf->next;
         }
 
-        // Restore the list by reversing the second half back
+        // Step 4: Restore list (optional but good practice)
         reverseList(reversedHead);
 
         return maxSum;

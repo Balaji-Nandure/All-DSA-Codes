@@ -28,22 +28,36 @@ Explanation: You are given the second node with value 5, the linked list should 
  * };
  */
 
+/*
+ * Problem: Delete Node in a Linked List
+ *
+ * LeetCode 237: Delete Node in a Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/delete-a-node-in-single-linked-list/1
+ *
+ * Delete a node when only that node is given (no access to head).
+ * We can't delete the node directly, so we copy next node's value and delete next.
+ *
+ * Time: O(1) - constant time operation
+ * Space: O(1)
+ */
+
 class Solution {
 public:
     void deleteNode(ListNode* node) {
-        // Since we don't have access to the head, we can't traverse from the beginning
-        // Instead, we copy the value from the next node and delete the next node
+        // Since we don't have access to head, we can't traverse from beginning
+        // Instead, copy next node's value to current node, then delete next node
+        // This effectively "deletes" the given node
         
-        // Copy the value from next node to current node
+        // Copy value from next node to current node
         node->val = node->next->val;
         
-        // Store the next node to delete it
+        // Store next node to delete it
         ListNode* temp = node->next;
         
-        // Point current node to the node after next
+        // Bypass next node: point current to node after next
         node->next = node->next->next;
         
-        // Delete the next node (optional in LeetCode, but good practice)
+        // Delete the next node (good practice)
         delete temp;
     }
 };

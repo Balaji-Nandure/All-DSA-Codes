@@ -25,30 +25,43 @@ The blue edges and nodes in the above figure indicate the result.
 
 class Solution {
 public:
+/*
+ * Problem: Merge In Between Linked Lists
+ *
+ * LeetCode 1669: Merge In Between Linked Lists
+ *
+ * Remove nodes from index a to b in list1, replace with entire list2.
+ * Example: list1=[0,1,2,3,4,5], a=3, b=4, list2=[1000000,1000001,1000002]
+ * -> [0,1,2,1000000,1000001,1000002,5]
+ *
+ * Time: O(n + m) - traverse list1 to find positions, list2 to find tail
+ * Space: O(1)
+ */
+
     ListNode* mergeInBetween(ListNode* list1, int a, int b, ListNode* list2) {
-        // Find the node before position a (prevA) and the node after position b (nodeB)
+        // Find node before position a (prevA) and node after position b (nodeB)
         ListNode* prevA = nullptr;
         ListNode* nodeB = list1;
+        // Traverse to position b+1 to find both nodes
         for (int i = 0; i <= b; ++i) {
             if (i == a - 1) {
-                prevA = nodeB;
+                prevA = nodeB; // Node before position a
             }
-            nodeB = nodeB->next;
+            nodeB = nodeB->next; // Continue to position b+1
         }
 
-        // Connect prevA's next to list2's head
+        // Connect prevA to list2 head (removes nodes from a to b)
         prevA->next = list2;
 
-        // Find the tail of list2
+        // Find tail of list2
         ListNode* list2Tail = list2;
         while (list2Tail->next != nullptr) {
             list2Tail = list2Tail->next;
         }
 
-        // Connect list2's tail to nodeB
+        // Connect list2 tail to nodeB (node after position b)
         list2Tail->next = nodeB;
 
-        // Return the (possibly unchanged) head of list1
         return list1;
     }
 };

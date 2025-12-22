@@ -1,24 +1,36 @@
+/*
+ * Problem: Last Index of Occurrence
+ *
+ * Find the last index where element x occurs in array using recursion.
+ * Return -1 if element is not found.
+ *
+ * Key difference from firstIndex:
+ * - firstIndex: checks current index first, then recurses (left-to-right)
+ * - lastIndex: recurses first, then checks current (right-to-left, finds last match)
+ *
+ * Time: O(n) - worst case visit all elements
+ * Space: O(n) - recursion stack depth is n
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
-// Recursive function to return the last index of occurrence of x in arr[]
-// DIFFERENCE from 'first index of occurrence':
-// - 'firstIndex' checks at the current idx first, then recursively goes forward (left-to-right).
-// - 'lastIndex' FIRST DOES the recursion to the end and checks results while coming back (right-to-left).
-//   Thus, lastIndex explores *deeper* first, preferring the last match on the return/backtracking phase.
+// Find last index of x in array
 int lastIndex(int arr[], int n, int idx, int x) {
-    if (idx == n) return -1; // base case: reached end
+    // Base case: reached end of array
+    if (idx == n) return -1;
     
-    // Go to end first, looking for the match during the backtrack
+    // First recurse to end (explore deeper first)
+    // This ensures we check from right to left
     int res = lastIndex(arr, n, idx + 1, x);
 
-    // If found in further recursion, return that index (the last match)
+    // If found in further recursion, return that index (last match)
     if (res != -1) return res;
 
-    // Else, check if current element matches
+    // If not found in rest, check current element
     if (arr[idx] == x) return idx;
 
-    // Not found in rest or current location
+    // Not found anywhere
     return -1;
 }
 

@@ -46,45 +46,47 @@
  */
 class Solution {
 public:
+/*
+ * Problem: Vertical Order Traversal of a Binary Tree
+ *
+ * LeetCode 987: Vertical Order Traversal of a Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/print-a-binary-tree-in-vertical-order/1
+ *
+ * Traverse tree vertically. Nodes at same position (row, col) sorted by value.
+ *
+ * Time: O(n log n) - sorting nodes at same position
+ * Space: O(n) - map and queue
+ */
+
     vector<vector<int>> verticalTraversal(TreeNode* root) {
-        // Step 1: Create a map to store nodes grouped by their column (vertical line)
-        // Key: column number (col)
-        // Value: vector of pairs {row, node_value} for all nodes in that column
+        // Map: column -> list of (row, value) pairs
         map<int, vector<pair<int, int>>> mp; // col -> [(row, val), ...]
         
-        // Step 2: BFS traversal with coordinates
-        // Queue stores: {node pointer, {row, col}}
-        // Root is at position (0, 0)
+        // BFS with coordinates: root at (0, 0)
         queue<pair<TreeNode*, pair<int, int>>> q; // {node, {row, col}}
         q.push({root, {0, 0}});
         
-        // Step 3: Traverse the tree using BFS
+        // Traverse tree level by level
         while (!q.empty()) {
-            // Get the front node and its coordinates
             auto [node, coord] = q.front();
             auto [row, col] = coord;
             q.pop();
             
-            // Store this node in the map with its column as key
-            // We store {row, value} so we can sort later
+            // Store node with its coordinates
             mp[col].push_back({row, node->val});
             
-            // For left child: move down (row+1) and left (col-1)
+            // Left child: (row+1, col-1), Right child: (row+1, col+1)
             if (node->left) q.push({node->left, {row + 1, col - 1}});
-            
-            // For right child: move down (row+1) and right (col+1)
             if (node->right) q.push({node->right, {row + 1, col + 1}});
         }
         
-        // Step 4: Build the result by processing each column
+        // Build result: sort nodes at same position, then extract values
         vector<vector<int>> result;
         for (auto& [col, nodes] : mp) {
-            // Sort nodes in the same column:
-            // First by row (top to bottom), then by value (if same row)
-            // Since pair<int,int> compares first element (row), then second (val)
+            // Sort by row first, then by value
             sort(nodes.begin(), nodes.end());
             
-            // Extract just the values (ignore row info now)
+            // Extract values
             vector<int> vertical;
             for (auto& [row, val] : nodes) {
                 vertical.push_back(val); 
@@ -92,7 +94,6 @@ public:
             result.push_back(vertical);
         }
         
-        // Step 5: Return result (columns are already sorted by map's key order)
         return result;
     }
 };

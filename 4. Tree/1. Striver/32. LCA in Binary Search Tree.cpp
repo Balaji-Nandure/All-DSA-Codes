@@ -60,20 +60,34 @@
 // Solution 1: Recursive Using BST Property
 class RecursiveSolution {
 public:
+/*
+ * Problem: Lowest Common Ancestor in Binary Search Tree
+ *
+ * LeetCode 235: Lowest Common Ancestor of a Binary Search Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-bst/1
+ *
+ * Find LCA of two nodes in BST using BST property.
+ * If both < root, LCA in left; if both > root, LCA in right; else root is LCA.
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
+
+    // Recursive: Use BST property to navigate
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
         if (root == NULL) return NULL;
         
-        // If both nodes are smaller than root, LCA lies in left subtree
+        // Both nodes < root: LCA in left subtree
         if (p->val < root->val && q->val < root->val) {
             return lowestCommonAncestor(root->left, p, q);
         }
         
-        // If both nodes are greater than root, LCA lies in right subtree
+        // Both nodes > root: LCA in right subtree
         if (p->val > root->val && q->val > root->val) {
             return lowestCommonAncestor(root->right, p, q);
         }
         
-        // Otherwise, root is the split point and hence the LCA
+        // Split point: root is LCA (nodes on different sides or one is root)
         return root;
     }
 };
@@ -81,18 +95,21 @@ public:
 // Solution 2: Iterative Using BST Property (O(1) space)
 class IterativeSolution {
 public:
+    // Iterative: O(1) space, same logic
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
         TreeNode* current = root;
         
         while (current != NULL) {
+            // Both < current: go left
             if (p->val < current->val && q->val < current->val) {
-                // Both nodes are in left subtree
                 current = current->left;
-            } else if (p->val > current->val && q->val > current->val) {
-                // Both nodes are in right subtree
+            } 
+            // Both > current: go right
+            else if (p->val > current->val && q->val > current->val) {
                 current = current->right;
-            } else {
-                // Split point found (or one is equal to current)
+            } 
+            // Split point: current is LCA
+            else {
                 return current;
             }
         }

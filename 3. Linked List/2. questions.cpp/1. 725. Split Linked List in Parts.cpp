@@ -29,8 +29,21 @@ and earlier parts are a larger size than the later parts.
 
 class Solution {
 public:
+/*
+ * Problem: Split Linked List in Parts
+ *
+ * LeetCode 725: Split Linked List in Parts
+ *
+ * Split linked list into k consecutive parts as equal as possible.
+ * Earlier parts should have size >= later parts.
+ * Example: [1,2,3], k=5 -> [[1],[2],[3],[],[]]
+ *
+ * Time: O(n) - calculate length + split
+ * Space: O(k) - result array
+ */
+
     vector<ListNode*> splitListToParts(ListNode* head, int k) {
-        // Calculate the length of the linked list
+        // Step 1: Calculate length of list
         int length = 0;
         ListNode* current = head;
         while (current) {
@@ -38,29 +51,31 @@ public:
             current = current->next;
         }
         
-        // Calculate base size and number of parts with extra node
+        // Step 2: Calculate sizes
+        // baseSize = length/k, extraNodes = length%k
+        // First 'extraNodes' parts have size (baseSize+1), rest have baseSize
         int baseSize = length / k;
         int extraNodes = length % k;
         
         vector<ListNode*> result(k, nullptr);
         current = head;
         
-        // Split the list into k parts
+        // Step 3: Split list into k parts
         for (int i = 0; i < k && current; i++) {
-            result[i] = current;
+            result[i] = current; // Head of current part
             
-            // Calculate size of current part
+            // Calculate size: first 'extraNodes' parts get one extra node
             int partSize = baseSize + (i < extraNodes ? 1 : 0);
             
-            // Move to the end of current part
+            // Move to end of current part
             for (int j = 1; j < partSize; j++) {
                 current = current->next;
             }
             
-            // Disconnect current part from the rest
+            // Disconnect current part from rest
             ListNode* next = current->next;
-            current->next = nullptr;
-            current = next;
+            current->next = nullptr; // Terminate current part
+            current = next; // Move to start of next part
         }
         
         return result;

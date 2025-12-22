@@ -25,18 +25,31 @@ They maintain their relative order.
 
 class Solution {
 public:
+/*
+ * Problem: Partition List
+ *
+ * LeetCode 86: Partition List
+ *
+ * Partition list such that nodes < x come before nodes >= x.
+ * Preserve relative order within each partition.
+ * Example: [1,4,3,2,5,2], x=3 -> [1,2,2,4,3,5]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
     ListNode* partition(ListNode* head, int x) {
         // Create two dummy nodes for two partitions
-        ListNode* lessDummy = new ListNode(0);
-        ListNode* greaterDummy = new ListNode(0);
+        ListNode* lessDummy = new ListNode(0);      // Nodes < x
+        ListNode* greaterDummy = new ListNode(0);   // Nodes >= x
         
-        // Pointers to track the end of each partition
+        // Pointers to track tail of each partition
         ListNode* lessTail = lessDummy;
         ListNode* greaterTail = greaterDummy;
         
         ListNode* current = head;
         
-        // Partition the list
+        // Partition: separate nodes into two lists
         while (current != nullptr) {
             if (current->val < x) {
                 // Add to less than x partition
@@ -50,11 +63,11 @@ public:
             current = current->next;
         }
         
-        // Connect the two partitions
+        // Connect partitions: less -> greater
         lessTail->next = greaterDummy->next;
-        greaterTail->next = nullptr;  // Important: terminate the list
+        greaterTail->next = nullptr;  // Important: terminate list to avoid cycles
             
-        // Get the new head
+        // Get new head (skip dummy)
         ListNode* result = lessDummy->next;
         
         // Clean up dummy nodes

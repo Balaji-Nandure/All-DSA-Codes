@@ -1,23 +1,33 @@
 /*
-Question: Insert an element at the bottom of a stack using recursion, without using any extra data structures (except call stack).
-For example: stack = [1,2,3,4,5] (5 is at top), insertAtBottom(stack, 0) --> stack = [0,1,2,3,4,5].
-*/
+ * Problem: Insert Element at Bottom of Stack
+ *
+ * Insert an element at the bottom of a stack using recursion.
+ * Cannot use extra data structures (except call stack).
+ *
+ * Example: stack = [1,2,3,4,5] (5 is at top)
+ * After insertAtBottom(stack, 0): stack = [0,1,2,3,4,5]
+ *
+ * Time: O(n) - where n is stack size
+ * Space: O(n) - recursion stack depth is n
+ */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// Function to insert an element at the bottom of a stack
+// Insert element x at bottom of stack using recursion
 void insertAtBottom(stack<int>& st, int x) {
-    // Base Case: If stack is empty, push x and return
+    // Base case: stack is empty, push x (now at bottom)
     if(st.empty()) {
         st.push(x);
         return;
     }
-    // Remove top element and recurse for the rest
+    // Remove top element temporarily
     int topElem = st.top();
     st.pop();
+    // Recurse to insert x in remaining stack
     insertAtBottom(st, x);
     // After recursion, push back the removed element
+    // This restores original order with x at bottom
     st.push(topElem);
 }
 

@@ -83,28 +83,29 @@ Node* reverseList(Node* head) {
     return prev;
 }
 
-// ========== METHOD 1: Reverse Second Half (Optimal) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+// Method 1: Reverse Second Half (Optimal - O(1) space)
+// Find middle, reverse second half, compare, then restore
 bool isPalindrome(Node* head) {
+    // Edge cases: empty or single node is palindrome
     if (!head || !head->next) return true;
     
-    // Step 1: Find the middle of the list using slow and fast pointers
+    // Step 1: Find middle using slow and fast pointers
     Node* slow = head;
     Node* fast = head;
-    
+    // When fast reaches end, slow is at middle
     while (fast->next && fast->next->next) {
         slow = slow->next;
         fast = fast->next->next;
     }
     
-    // Step 2: Reverse the second half
+    // Step 2: Reverse second half (starting from slow->next)
     Node* secondHalf = reverseList(slow->next);
     Node* firstHalf = head;
     
     // Step 3: Compare first half with reversed second half
     while (secondHalf) {
         if (firstHalf->data != secondHalf->data) {
-            // Restore the list (optional, but good practice)
+            // Restore list before returning false
             reverseList(secondHalf);
             return false;
         }
@@ -112,14 +113,14 @@ bool isPalindrome(Node* head) {
         secondHalf = secondHalf->next;
     }
     
-    // Restore the list (optional)
+    // Restore the list (good practice)
     reverseList(slow->next);
     
-    return true;
+    return true; // All comparisons matched
 }
 
-// ========== METHOD 2: Using Stack ==========
-// Time Complexity: O(n), Space Complexity: O(n)
+// Method 2: Using Stack (O(n) space)
+// Push first half onto stack, compare with second half
 bool isPalindromeStack(Node* head) {
     if (!head || !head->next) return true;
     
@@ -134,12 +135,12 @@ bool isPalindromeStack(Node* head) {
         fast = fast->next->next;
     }
     
-    // If odd number of nodes, skip the middle node
+    // If odd number of nodes, skip middle node
     if (fast) {
         slow = slow->next;
     }
     
-    // Compare second half with stack
+    // Compare second half with stack (which has first half in reverse)
     while (slow) {
         if (st.top() != slow->data) {
             return false;

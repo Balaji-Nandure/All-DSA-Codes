@@ -41,16 +41,19 @@ Base cases:
 - Answer = min(dp[n-1][j]) for all j in last row
 */
 
-// recursive approach
+// Recursive approach
 int minFallingPathSumRec(int i, int j, vector<vector<int>> &matrix, int n) {
-    if (i == 0) return matrix[i][j]; // base case: first row
-    if (j < 0 || j >= n) return INF; // out of bounds
+    // Base case: first row (can start from any column)
+    if (i == 0) return matrix[i][j];
+    // Base case: out of bounds
+    if (j < 0 || j >= n) return INF;
     
-    int up = minFallingPathSumRec(i - 1, j, matrix, n); // move up (from below)
+    // Can come from three directions: up, up-left, up-right
+    int up = minFallingPathSumRec(i - 1, j, matrix, n); // Directly above
     int upLeft = INF;
-    if (j > 0) upLeft = minFallingPathSumRec(i - 1, j - 1, matrix, n); // move up-left
+    if (j > 0) upLeft = minFallingPathSumRec(i - 1, j - 1, matrix, n); // Diagonally left
     int upRight = INF;
-    if (j < n - 1) upRight = minFallingPathSumRec(i - 1, j + 1, matrix, n); // move up-right
+    if (j < n - 1) upRight = minFallingPathSumRec(i - 1, j + 1, matrix, n); // Diagonally right
     
     return matrix[i][j] + min({up, upLeft, upRight});
 }
@@ -70,30 +73,29 @@ int minFallingPathSumMemo(int i, int j, vector<vector<int>> &matrix, int n, vect
     return dp[i][j] = matrix[i][j] + min({up, upLeft, upRight});
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int minFallingPathSumTab(int n, vector<vector<int>> &matrix) {
-    // vector<vector<int>> dp(n, vector<int>(n, INF));
     vector<vector<int>> dp(n, vector<int>(n, 0));
     
-    // base case: first row (can start from any column)
+    // Base case: first row (can start from any column)
     for (int j = 0; j < n; j++) {
         dp[0][j] = matrix[0][j];
     }
     
-    // fill from row 1 to n-1
+    // Fill from row 1 to n-1
     for (int i = 1; i < n; i++) {
         for (int j = 0; j < n; j++) {
-            int up = dp[i - 1][j];
+            int up = dp[i - 1][j]; // From directly above
             int upLeft = INF;
-            if (j > 0) upLeft = dp[i - 1][j - 1];
+            if (j > 0) upLeft = dp[i - 1][j - 1]; // From diagonally left
             int upRight = INF;
-            if (j < n - 1) upRight = dp[i - 1][j + 1];
+            if (j < n - 1) upRight = dp[i - 1][j + 1]; // From diagonally right
             
             dp[i][j] = matrix[i][j] + min({up, upLeft, upRight});
         }
     }
     
-    // answer is min value in the last row
+    // Answer is minimum value in the last row (can end at any column)
     int ans = INF;
     for (int j = 0; j < n; j++) {
         ans = min(ans, dp[n - 1][j]);

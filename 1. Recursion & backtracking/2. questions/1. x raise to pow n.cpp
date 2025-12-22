@@ -8,13 +8,17 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: X raised to the power N
-Calculate x raised to the power n (x^n) using recursion.
-
-We need to implement both:
-1. Linear approach: O(n) time complexity
-2. Logarithmic approach: O(log n) time complexity using binary exponentiation
-*/
+ * Problem: X raised to the Power N
+ *
+ * LeetCode 50: Pow(x, n)
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/power-of-numbers/0
+ *
+ * Calculate x raised to the power n (x^n) using recursion.
+ * Implement both linear and logarithmic approaches.
+ *
+ * Time: O(n) for linear, O(log n) for logarithmic
+ * Space: O(n) for linear, O(log n) for logarithmic
+ */
 
 // Linear approach - O(n) time complexity
 int powerLinear(int x, int n) {
@@ -22,22 +26,22 @@ int powerLinear(int x, int n) {
     if (n == 0) return 1;
     
     // Recursive case: x^n = x * x^(n-1)
+    // Multiply x with result of x^(n-1)
     return x * powerLinear(x, n - 1);
 }
 
-// Logarithmic approach - O(log n) time complexity
-// Using binary exponentiation (divide and conquer)
+// Logarithmic approach - O(log n) time complexity using binary exponentiation
+// Divide and conquer: reduce problem size by half at each step
 int powerLog(int x, int n) {
     // Base case: any number raised to 0 is 1
     if (n == 0) return 1;
     
-    // If n is even: x^n = (x^(n/2))^2
-    // If n is odd: x^n = x * (x^((n-1)/2))^2
-    
+    // Calculate x^(n/2) once and reuse
     int halfPower = powerLog(x, n / 2);
-    int result = halfPower * halfPower;
+    int result = halfPower * halfPower; // Square the result
     
     // If n is odd, multiply by x one more time
+    // For odd n: x^n = x * (x^(n/2))^2
     if (n % 2 == 1) {
         result = result * x;
     }

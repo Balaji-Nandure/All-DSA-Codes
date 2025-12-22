@@ -42,6 +42,19 @@ The maximum distance is between the first and the third critical points is 3.
 
 class Solution {
 public:
+/*
+ * Problem: Find the Minimum and Maximum Number of Nodes Between Critical Points
+ *
+ * LeetCode 2058: Find the Minimum and Maximum Number of Nodes Between Critical Points
+ *
+ * Critical point = local maxima or minima.
+ * Find min distance between any two critical points, and max distance between first and last.
+ * Example: [5,3,1,2,5,1,2] -> critical points at indices 2,4,5 -> [1,3]
+ *
+ * Time: O(n) - single pass to find critical points
+ * Space: O(k) - where k is number of critical points
+ */
+
     vector<int> nodesBetweenCriticalPoints(ListNode* head) {
         vector<int> criticalPoints;
         
@@ -49,10 +62,10 @@ public:
         ListNode* current = head;
         int index = 0;
         
-        // Find all critical points
+        // Find all critical points (local maxima or minima)
         while (current != nullptr && current->next != nullptr) {
             if (prev != nullptr) {
-                // Check if current is a local maxima or minima
+                // Check if current is local maxima or minima
                 bool isMaxima = current->val > prev->val && current->val > current->next->val;
                 bool isMinima = current->val < prev->val && current->val < current->next->val;
                 
@@ -66,18 +79,18 @@ public:
             index++;
         }
         
-        // If we have less than 2 critical points, return [-1, -1]
+        // Need at least 2 critical points
         if (criticalPoints.size() < 2) {
             return {-1, -1};
         }
         
-        // Calculate minimum distance (between consecutive critical points)
+        // Calculate minimum distance: smallest gap between consecutive critical points
         int minDistance = INT_MAX;
         for (int i = 1; i < criticalPoints.size(); i++) {
             minDistance = min(minDistance, criticalPoints[i] - criticalPoints[i - 1]);
         }
         
-        // Maximum distance is between first and last critical point
+        // Maximum distance: between first and last critical point
         int maxDistance = criticalPoints.back() - criticalPoints.front();
         
         return {minDistance, maxDistance};

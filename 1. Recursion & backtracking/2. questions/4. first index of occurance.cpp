@@ -1,14 +1,25 @@
+/*
+ * Problem: First Index of Occurrence
+ *
+ * Find the first index where element x occurs in array using recursion.
+ * Return -1 if element is not found.
+ *
+ * Time: O(n) - worst case visit all elements
+ * Space: O(n) - recursion stack depth is n
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
-// Recursive function to return the first index of occurrence of x in arr[]
+// Find first index of x in array
 int firstIndex(int arr[], int n, int idx, int x) {
-    if (idx == n) return -1; // base case: reached end, not found
+    // Base case: reached end of array, element not found
+    if (idx == n) return -1;
 
-    // first check at current index
-    if (arr[idx] == x) return idx; // found at current index
+    // Check current index first (to find first occurrence)
+    if (arr[idx] == x) return idx; // Found at current index
 
-    // if not found, search in rest of array
+    // Search in remaining array
     return firstIndex(arr, n, idx + 1, x);
 }
 

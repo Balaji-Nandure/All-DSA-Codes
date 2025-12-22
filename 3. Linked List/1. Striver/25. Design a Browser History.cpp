@@ -22,14 +22,26 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// ========== METHOD 1: Doubly Linked List (Optimal) ==========
-// Time Complexity: O(1) for all operations, Space Complexity: O(n)
+/*
+ * Problem: Design Browser History
+ *
+ * LeetCode 1472: Design Browser History
+ *
+ * Design browser history using doubly linked list.
+ * Operations: visit(url), back(steps), forward(steps)
+ *
+ * Time: O(1) for visit/back/forward, O(n) for clearing forward history
+ * Space: O(n) - number of pages visited
+ */
+
+// Method 1: Doubly Linked List (Optimal)
+// Each node represents a page, prev = back, next = forward
 class BrowserHistory {
 private:
     struct Node {
         string url;
-        Node* prev;
-        Node* next;
+        Node* prev; // Previous page (back)
+        Node* next; // Next page (forward)
         
         Node(string url) {
             this->url = url;
@@ -38,11 +50,11 @@ private:
         }
     };
     
-    Node* current;
+    Node* current; // Current page pointer
 
 public:
     BrowserHistory(string homepage) {
-        current = new Node(homepage);
+        current = new Node(homepage); // Initialize with homepage
     }
         
     void visit(string url) {
@@ -54,14 +66,15 @@ public:
             temp = next;
         }
         
-        // Create new node and link it
+        // Create new node and link it after current
         Node* newNode = new Node(url);
         current->next = newNode;
         newNode->prev = current;
-        current = newNode;
+        current = newNode; // Move current to new page
     }
     
     string back(int steps) {
+        // Move back 'steps' times (or until beginning)
         while (steps > 0 && current->prev) {
             current = current->prev;
             steps--;
@@ -70,6 +83,7 @@ public:
     }
     
     string forward(int steps) {
+        // Move forward 'steps' times (or until end)
         while (steps > 0 && current->next) {
             current = current->next;
             steps--;

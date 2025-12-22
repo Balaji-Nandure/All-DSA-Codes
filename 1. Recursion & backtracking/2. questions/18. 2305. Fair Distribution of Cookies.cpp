@@ -14,20 +14,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Backtracking function: tries all possible distributions
+// Backtracking: try all possible distributions of cookies to children
 void backtrack(int idx, vector<int>& cookies, vector<int>& children, int& res) {
     int k = children.size();
+    // Base case: distributed all cookies
     if (idx == (int)cookies.size()) {
+        // Calculate unfairness (maximum cookies any child has)
         int unfairness = *max_element(children.begin(), children.end());
-        // int unfairness = max({children.begin(), children.end()}); // ❌❌❌
+        // Update minimum unfairness
         res = min(res, unfairness);
         return;
     }
+    // Try giving current cookie bag to each child
     for (int i = 0; i < k; ++i) {
         children[i] += cookies[idx];
         backtrack(idx + 1, cookies, children, res);
-        children[i] -= cookies[idx];
-        // Pruning: if current child has no cookies before, don't try other children at this position (avoid duplicates)
+        children[i] -= cookies[idx]; // Backtrack
+        // Pruning: if child had 0 cookies, don't try other children
+        // This avoids duplicate distributions (symmetry breaking)
         if (children[i] == 0) break;
     }
 }

@@ -29,24 +29,24 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// DFS/backtracking function to count unique paths
+// DFS/backtracking to count paths visiting all non-obstacle cells
 void dfs(int i, int j, int m, int n, vector<vector<int>>& grid, 
          int cellsVisited, int totalCells, int& count) {
-    // Out of bounds or obstacle
+    // Base case: out of bounds or obstacle
     if (i < 0 || j < 0 || i >= m || j >= n || grid[i][j] == -1) {
         return;
     }
     
-    // Reached the ending square
+    // Base case: reached ending square (value 2)
     if (grid[i][j] == 2) {
-        // Check if we've visited all non-obstacle cells
+        // Valid path only if visited all non-obstacle cells
         if (cellsVisited == totalCells) {
             count++;
         }
         return;
     }
     
-    // Mark current cell as visited (obstacle)
+    // Mark current cell as visited (temporarily set to -1)
     int saved = grid[i][j];
     grid[i][j] = -1;
     
@@ -56,7 +56,7 @@ void dfs(int i, int j, int m, int n, vector<vector<int>>& grid,
     dfs(i, j - 1, m, n, grid, cellsVisited + 1, totalCells, count); // LEFT
     dfs(i, j + 1, m, n, grid, cellsVisited + 1, totalCells, count); // RIGHT
     
-    // Backtrack: restore cell
+    // Backtrack: restore cell value
     grid[i][j] = saved;
 }
 

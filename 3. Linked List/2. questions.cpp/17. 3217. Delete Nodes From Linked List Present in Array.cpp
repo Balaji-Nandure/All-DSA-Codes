@@ -24,26 +24,40 @@ Explanation: Nodes 1, 2, and 3 are deleted because their values are in nums.
 
 class Solution {
 public:
+/*
+ * Problem: Delete Nodes From Linked List Present in Array
+ *
+ * LeetCode 3217: Delete Nodes From Linked List Present in Array
+ *
+ * Delete all nodes whose values are present in the given array.
+ * Example: [1,2,3,4,5], nums=[1,2,3] -> [4,5]
+ *
+ * Time: O(n + m) - where n is list length, m is array length
+ * Space: O(m) - hash set for array values
+ */
+
     ListNode* modifiedList(vector<int>& nums, ListNode* head) {
-        // Step 1: Store all nums in a hash set for O(1) lookup.
+        // Step 1: Store nums in hash set for O(1) lookup
         unordered_set<int> st(nums.begin(), nums.end());
 
-        // Step 2: Use a dummy node to easily handle removals, including the head.
+        // Step 2: Dummy node handles edge case (deleting head)
         ListNode* dummy = new ListNode(0, head);
         ListNode* prev = dummy;
         ListNode* curr = head;
 
-        // Step 3: Traverse the list and remove nodes whose values are in the set.
+        // Step 3: Traverse and remove nodes whose values are in set
         while (curr != nullptr) {
             if (st.count(curr->val)) {
+                // Delete node: bypass it
                 prev->next = curr->next;
             } else {
+                // Keep node: move prev forward
                 prev = curr;
             }
             curr = curr->next;
         }
 
-        // Step 4: Return the new head (after dummy).
+        // Step 4: Return new head (skip dummy)
         return dummy->next;
     }
 };

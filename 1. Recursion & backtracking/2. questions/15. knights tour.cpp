@@ -1,61 +1,55 @@
 /*
  * Problem: Knight's Tour
- * 
- * Given an n x n chessboard, find a sequence of moves for a knight such that it visits 
- * every square exactly once. A knight moves in an L-shape: 2 squares in one direction 
- * and 1 square perpendicular to it.
- * 
- * The knight has 8 possible moves:
- * - (row-2, col-1), (row-2, col+1)
- * - (row-1, col-2), (row-1, col+2)
- * - (row+1, col-2), (row+1, col+2)
- * - (row+2, col-1), (row+2, col+1)
- * 
- * Return a 2D array showing the order in which squares are visited (1 to n*n),
- * or return empty if no solution exists.
- * 
- * Example for 5x5 board:
- * One possible solution exists starting from (0,0)
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/knight-tour/0
+ *
+ * Find a sequence of moves for a knight to visit every square exactly once.
+ * Knight moves in L-shape: 2 squares in one direction, 1 square perpendicular.
+ *
+ * Knight has 8 possible moves from any position.
+ *
+ * Time: O(8^(n²)) - exponential backtracking
+ * Space: O(n²) - board storage
  */
 
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// All 8 possible moves for a knight
+// All 8 possible knight moves (L-shaped)
 int dx[] = {-2, -2, -1, -1, 1, 1, 2, 2};
 int dy[] = {-1, 1, -2, 2, -2, 2, -1, 1};
 
-// Recursive backtracking function to solve Knight's Tour
+// Recursive backtracking to solve Knight's Tour
 bool solveKnightTour(int row, int col, int move, int n, vector<vector<int>>& board) {
-    // Base case: all squares visited
+    // Base case: visited all n*n squares
     if (move == n * n) {
         return true;
     }
     
-    // Try all 8 possible moves
+    // Try all 8 possible knight moves
     for (int i = 0; i < 8; i++) {
         int newRow = row + dx[i];
         int newCol = col + dy[i];
         
-        // Check if the move is valid
+        // Check if move is valid (within bounds and unvisited)
         if (newRow >= 0 && newRow < n && newCol >= 0 && newCol < n && 
             board[newRow][newCol] == -1) {
             
-            // Mark this square as visited
+            // Mark square as visited with move number
             board[newRow][newCol] = move;
             
-            // Recurse for next move
+            // Recurse to find next move
             if (solveKnightTour(newRow, newCol, move + 1, n, board)) {
                 return true;
             }
             
-            // Backtrack: unmark this square
+            // Backtrack: unmark square if path doesn't lead to solution
             board[newRow][newCol] = -1;
         }
     }
     
-    return false;
+    return false; // No valid move found
 }
 
 // Main function to solve Knight's Tour

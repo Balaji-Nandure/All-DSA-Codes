@@ -25,16 +25,28 @@
  
  * };
  */
+/*
+ * Problem: Same Tree
+ *
+ * LeetCode 100: Same Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/determine-if-two-trees-are-identical/1
+ *
+ * Check if two binary trees are structurally identical and have same values.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
 class Solution {
 public:
     bool isSameTree(TreeNode* p, TreeNode* q) {
-        // Both null - identical
+        // Base case: both null - identical
         if (!p && !q) return true;
         
-        // One null, other not - not identical
+        // Base case: one null, other not - not identical
         if (!p || !q) return false;
         
-        // Both exist - check val and recursively check subtrees
+        // Both exist: check value and recursively check subtrees
         return (p->val == q->val) &&
                isSameTree(p->left, q->left) &&
                isSameTree(p->right, q->right);

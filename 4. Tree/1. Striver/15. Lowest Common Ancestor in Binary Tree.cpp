@@ -60,8 +60,21 @@ using namespace std;
 // Solution 1: Recursive DFS (Optimal - LeetCode 236 standard solution)
 class RecursiveLCASolution {
 public:
+/*
+ * Problem: Lowest Common Ancestor in Binary Tree
+ *
+ * LeetCode 236: Lowest Common Ancestor of a Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/lowest-common-ancestor-in-a-binary-tree/1
+ *
+ * Find the lowest common ancestor of two nodes in binary tree.
+ * LCA is the lowest node that has both nodes as descendants.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
     TreeNode* lowestCommonAncestor(TreeNode* root, TreeNode* p, TreeNode* q) {
-        // Base case: if root is null or root is one of the target nodes
+        // Base case: null or found one of the target nodes
         if (!root || root == p || root == q) {
             return root;
         }
@@ -71,12 +84,13 @@ public:
         TreeNode* right = lowestCommonAncestor(root->right, p, q);
         
         // If both subtrees return non-null, current node is LCA
+        // (p and q are in different subtrees)
         if (left && right) {
             return root;
         }
         
         // If one subtree returns non-null, return that result
-        // (either found one of the nodes, or found LCA in that subtree)
+        // (either found one node, or LCA is in that subtree)
         return left ? left : right;
     }
 };

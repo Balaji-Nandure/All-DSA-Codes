@@ -61,39 +61,50 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// ========== METHOD 1: Two-Pointer with Dummy Node (Optimal) ==========
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Delete the Middle Node of a Linked List
+ *
+ * LeetCode 2095: Delete the Middle Node of a Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/delete-middle-of-linked-list/1
+ *
+ * Delete the middle node of a linked list. Middle = ⌊n/2⌋ (0-indexed).
+ * Example: [1,3,4,7,1,2,6] -> [1,3,4,1,2,6] (deleted 7)
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
+// Method 1: Two-Pointer with Dummy Node (Optimal)
 Node* deleteMiddle(Node* head) {
-    // Edge case: single node
+    // Edge case: single node - delete and return null
     if (!head || !head->next) {
         delete head;
         return nullptr;
     }
     
-    // Edge case: two nodes - delete the second one
+    // Edge case: two nodes - delete second one
     if (!head->next->next) {
         delete head->next;
         head->next = nullptr;
         return head;
     }
     
-    // Use dummy node to handle edge cases easily
+    // Dummy node simplifies code (handles head deletion case)
     Node* dummy = new Node(0);
     dummy->next = head;
     
-    Node* slow = dummy;
-    Node* fast = head;
+    Node* slow = dummy; // Will point to node before middle
+    Node* fast = head; // Moves 2 steps
     
-    // Move fast pointer 2 steps and slow pointer 1 step
-    // When fast reaches end, slow will be at node before middle
+    // When fast reaches end, slow is at node before middle
     while (fast && fast->next) {
         slow = slow->next;
         fast = fast->next->next;
     }
     
-    // Delete the middle node (slow->next)
+    // Delete middle node (slow->next)
     Node* nodeToDelete = slow->next;
-    slow->next = slow->next->next;
+    slow->next = slow->next->next; // Bypass middle node
     delete nodeToDelete;
     
     Node* newHead = dummy->next;

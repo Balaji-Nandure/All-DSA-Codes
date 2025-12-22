@@ -34,49 +34,49 @@ using namespace std;
 void solve(int row, int col, vector<vector<int>> &maze, int n,
            vector<string> &result, string &path,
            vector<vector<bool>> &visited) {
-    // Base case: reached destination
+    // Base case: reached destination (n-1, n-1)
     if (row == n - 1 && col == n - 1) {
         result.push_back(path);
         return;
     }
 
     // Try all 4 directions in lexicographic order: D, L, R, U
-    // This ensures we get paths in lexicographically smallest order
+    // This ensures paths are generated in lexicographically smallest order
 
-    // DOWN (D)
+    // DOWN (D): Move to row+1
     if (row + 1 < n && !visited[row + 1][col] && maze[row + 1][col] == 1) {
         visited[row + 1][col] = true;
         path.push_back('D');
         solve(row + 1, col, maze, n, result, path, visited);
-        path.pop_back();
-        visited[row + 1][col] = false;
+        path.pop_back(); // Backtrack
+        visited[row + 1][col] = false; // Backtrack
     }
 
-    // LEFT (L)
+    // LEFT (L): Move to col-1
     if (col - 1 >= 0 && !visited[row][col - 1] && maze[row][col - 1] == 1) {
         visited[row][col - 1] = true;
         path.push_back('L');
         solve(row, col - 1, maze, n, result, path, visited);
-        path.pop_back();
-        visited[row][col - 1] = false;
+        path.pop_back(); // Backtrack
+        visited[row][col - 1] = false; // Backtrack
     }
 
-    // RIGHT (R)
+    // RIGHT (R): Move to col+1
     if (col + 1 < n && !visited[row][col + 1] && maze[row][col + 1] == 1) {
         visited[row][col + 1] = true;
         path.push_back('R');
         solve(row, col + 1, maze, n, result, path, visited);
-        path.pop_back();
-        visited[row][col + 1] = false;
+        path.pop_back(); // Backtrack
+        visited[row][col + 1] = false; // Backtrack
     }
 
-    // UP (U)
+    // UP (U): Move to row-1
     if (row - 1 >= 0 && !visited[row - 1][col] && maze[row - 1][col] == 1) {
         visited[row - 1][col] = true;
         path.push_back('U');
         solve(row - 1, col, maze, n, result, path, visited);
-        path.pop_back();
-        visited[row - 1][col] = false;
+        path.pop_back(); // Backtrack
+        visited[row - 1][col] = false; // Backtrack
     }
 }
 

@@ -64,9 +64,23 @@ using namespace std;
 // Solution 1: BFS with Indexing (Optimal - LeetCode 662 standard solution)
 class BFSIndexingSolution {
 public:
+/*
+ * Problem: Maximum Width of Binary Tree
+ *
+ * LeetCode 662: Maximum Width of Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/maximum-width-of-tree/1
+ *
+ * Find maximum width among all levels. Width = distance between leftmost and rightmost nodes
+ * (including null nodes in between for complete tree).
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(n) - queue storage
+ */
+
     int widthOfBinaryTree(TreeNode* root) {
         if (!root) return 0;
         
+        // BFS with indexing: root at index 0
         queue<pair<TreeNode*, unsigned long long>> q; // {node, index}
         q.push({root, 0});
         int maxWidth = 0;
@@ -81,10 +95,10 @@ public:
                 auto [node, index] = q.front();
                 q.pop();
                 
-                lastIndex = index;
+                lastIndex = index; // Track last index in level
                 
-                // Assign indices to children
-                // Left child: 2*index + 1, Right child: 2*index + 2
+                // Assign indices to children (like heap indexing)
+                // Left: 2*index+1, Right: 2*index+2
                 if (node->left) {
                     q.push({node->left, 2 * index + 1});
                 }
@@ -93,7 +107,7 @@ public:
                 }
             }
             
-            // Calculate width for current level
+            // Width = last index - first index + 1
             int width = lastIndex - firstIndex + 1;
             maxWidth = max(maxWidth, width);
         }

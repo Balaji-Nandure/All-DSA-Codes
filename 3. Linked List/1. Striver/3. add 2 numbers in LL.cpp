@@ -65,40 +65,52 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// Add two numbers represented as linked lists
-// The digits are stored in reverse order
+/*
+ * Problem: Add Two Numbers
+ *
+ * LeetCode 2: Add Two Numbers
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/add-two-numbers-represented-by-linked-lists/1
+ *
+ * Add two numbers represented as linked lists (digits in reverse order).
+ * Example: [2,4,3] + [5,6,4] = [7,0,8] (342 + 465 = 807)
+ *
+ * Time: O(max(m,n)) - where m, n are lengths of lists
+ * Space: O(max(m,n)) - for result list
+ */
+
+// Add two numbers represented as linked lists (digits in reverse order)
 Node* addTwoNumbers(Node* l1, Node* l2) {
-    // Create a dummy node to simplify the code
+    // Dummy node to simplify code (avoids special case for head)
     Node* dummy = new Node(0);
-    Node* curr = dummy;
-    int carry = 0;
+    Node* curr = dummy; // Pointer to build result list
+    int carry = 0; // Carry from previous addition
     
-    // Traverse both lists while they exist or carry is non-zero
+    // Continue while either list has nodes or carry exists
     while (l1 || l2 || carry) {
-        int sum = carry;
+        int sum = carry; // Start with carry
         
-        // Add value from l1 if it exists
+        // Add digit from l1 if it exists
         if (l1) {
             sum += l1->data;
-            l1 = l1->next;
+            l1 = l1->next; // Move to next node
         }
         
-        // Add value from l2 if it exists
+        // Add digit from l2 if it exists
         if (l2) {
             sum += l2->data;
-            l2 = l2->next;
+            l2 = l2->next; // Move to next node
         }
         
-        // Calculate digit and carry
-        int digit = sum % 10;
-        carry = sum / 10;
+        // Calculate current digit and new carry
+        int digit = sum % 10; // Current digit (0-9)
+        carry = sum / 10; // Carry for next iteration
         
-        // Create new node with the digit
+        // Create new node with current digit
         curr->next = new Node(digit);
-        curr = curr->next;
+        curr = curr->next; // Move to next position
     }
     
-    // Return the head of the result list (skip dummy node)
+    // Return result (skip dummy node)
     Node* result = dummy->next;
     delete dummy;
     return result;

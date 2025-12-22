@@ -58,20 +58,34 @@ using namespace std;
 // Solution 1: Build Parent Map + BFS (Optimal - LeetCode 863 standard solution)
 class ParentMapBFSSolution {
 public:
+/*
+ * Problem: All Nodes Distance K in Binary Tree
+ *
+ * LeetCode 863: All Nodes Distance K in Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/nodes-at-given-distance-in-binary-tree/1
+ *
+ * Find all nodes at distance k from target node.
+ * Can traverse in three directions: left, right, and parent.
+ *
+ * Time: O(n) - build parent map + BFS
+ * Space: O(n) - parent map, queue, visited set
+ */
+
     vector<int> distanceK(TreeNode* root, TreeNode* target, int k) {
         if (!root || !target) return {};
         
-        // Build parent map
+        // Build parent map to traverse upward
         unordered_map<TreeNode*, TreeNode*> parent;
         buildParentMap(root, nullptr, parent);
         
-        // BFS starting from target
+        // BFS starting from target (like graph BFS)
         queue<TreeNode*> q;
         unordered_set<TreeNode*> visited;
         q.push(target);
         visited.insert(target);
         
         int distance = 0;
+        // Traverse until distance k
         while (!q.empty() && distance < k) {
             int levelSize = q.size();
             for (int i = 0; i < levelSize; i++) {

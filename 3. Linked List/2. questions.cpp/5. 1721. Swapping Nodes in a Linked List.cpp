@@ -24,8 +24,20 @@ Explanation: We swap the values of node 2 (value 2) and node 4 (value 4).
 
 class Solution {
 public:
+/*
+ * Problem: Swapping Nodes in a Linked List
+ *
+ * LeetCode 1721: Swapping Nodes in a Linked List
+ *
+ * Swap values of kth node from beginning and kth node from end.
+ * Example: [1,2,3,4,5], k=2 -> swap node 2 and node 4 -> [1,4,3,2,5]
+ *
+ * Time: O(n) - two passes or one pass
+ * Space: O(1)
+ */
+
     ListNode* swapNodes(ListNode* head, int k) {
-        // Find the length of the linked list
+        // Step 1: Find length of list
         int length = 0;
         ListNode* current = head;
         while (current != nullptr) {
@@ -33,19 +45,19 @@ public:
             current = current->next;
         }
         
-        // Find kth node from beginning (1-indexed)
+        // Step 2: Find kth node from beginning (1-indexed)
         ListNode* first = head;
         for (int i = 1; i < k; i++) {
             first = first->next;
         }
         
-        // Find kth node from end (which is (length - k + 1)th from beginning)
+        // Step 3: Find kth node from end (at position length-k+1 from beginning)
         ListNode* second = head;
         for (int i = 1; i < length - k + 1; i++) {
             second = second->next;
         }
         
-        // Swap the values
+        // Step 4: Swap values (not nodes)
         int temp = first->val;
         first->val = second->val;
         second->val = temp;
@@ -57,23 +69,27 @@ public:
 // Approach 2: One Pass (More Efficient)
 class Solution2 {
 public:
+// Approach 2: One Pass (More Efficient)
+// Use two pointers: when first reaches kth node, start moving second
+// When first reaches end, second will be at kth from end
     ListNode* swapNodes(ListNode* head, int k) {
         ListNode* first = nullptr;
         ListNode* second = nullptr;
         ListNode* current = head;
         
-        // Traverse the list once
         int count = 0;
+        // Single pass: find both nodes simultaneously
         while (current != nullptr) {
             count++;
             
-            // When we reach kth node, store it
+            // When we reach kth node, store it and initialize second
             if (count == k) {
                 first = current;
-                second = head; // initialize second pointer to head
+                second = head; // Start second from head
             }
             
-            // if count is greater than k, move second pointer to next node
+            // After k nodes, move second pointer
+            // When current reaches end, second will be at kth from end
             if (count > k) {
                 second = second->next;
             } 

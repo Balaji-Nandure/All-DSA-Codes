@@ -60,24 +60,36 @@
 // Solution 1: Recursive Approach
 class RecursiveSolution {
 public:
+/*
+ * Problem: Ceil in Binary Search Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/implementing-ceil-in-bst/1
+ *
+ * Find smallest value >= X in BST.
+ * Ceil(X) = smallest value >= X, or -1 if not found.
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
+
+    // Recursive: Track potential ceil while traversing
     int findCeil(TreeNode* root, int X) {
         if (root == NULL) return -1;
         
-        // If exact match found, return it
+        // Exact match: return it
         if (root->val == X) {
             return root->val;
         }
         
-        // If root value is less than X, ceil must be in right subtree
+        // root < X: ceil must be in right subtree
         if (root->val < X) {
             return findCeil(root->right, X);
         }
         
-        // If root value is greater than X, ceil might be root or in left subtree
+        // root > X: ceil might be root or in left subtree
         int leftCeil = findCeil(root->left, X);
         
-        // If we found a valid ceil in left subtree, return it
-        // Otherwise, root is the ceil
+        // Return smaller valid ceil (leftCeil or root)
         return (leftCeil >= X) ? leftCeil : root->val;
     }
 };
@@ -85,23 +97,23 @@ public:
 // Solution 2: Iterative Approach (O(1) space)
 class IterativeSolution {
 public:
+    // Iterative: Track potential ceil while traversing
     int findCeil(TreeNode* root, int X) {
         int ceil = -1;
         TreeNode* current = root;
         
         while (current != NULL) {
-            // If exact match found, return it
+            // Exact match: return it
             if (current->val == X) {
                 return current->val;
             }
             
-            // If current value is greater than X, it's a potential ceil
+            // current > X: potential ceil, try to find smaller in left
             if (current->val > X) {
                 ceil = current->val;
-                // Try to find a smaller value in left subtree
                 current = current->left;
             } else {
-                // Current value is less than X, ceil must be in right subtree
+                // current < X: ceil must be in right subtree
                 current = current->right;
             }
         }

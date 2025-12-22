@@ -1,47 +1,58 @@
+/*
+ * Problem: Merge Sort
+ *
+ * Divide and conquer sorting algorithm.
+ * Divide array into halves, sort each half, then merge them.
+ *
+ * Time: O(n log n) - always, stable performance
+ * Space: O(n) - for temporary arrays during merge
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
-
-// Merge function to merge two sorted halves of arr[l..m] and arr[m+1..r]
-// this will merge in ascending order.
+// Merge two sorted subarrays arr[l..m] and arr[m+1..r] into one sorted array
 void merge(vector<int>& arr, int l, int m, int r) {
-    int n1 = m - l + 1; // size of left
-    int n2 = r - m;     // size of right
+    int n1 = m - l + 1; // Size of left subarray
+    int n2 = r - m;     // Size of right subarray
 
     vector<int> left(n1), right(n2);
 
-    // Copy data because we are not allowed to change the original array.
+    // Copy data to temporary arrays
     for (int i = 0; i < n1; ++i)
         left[i] = arr[l + i];
     for (int j = 0; j < n2; ++j)
         right[j] = arr[m + 1 + j];
 
+    // Merge the two sorted arrays back into arr[l..r]
     int i = 0, j = 0, k = l;
-    // Merge the temp arrays back into arr[l..r]
     while (i < n1 && j < n2) {
-        // if (left[i] >= right[j])   // descending order
-        // if (left[i] <= right[j])   // ascending order
+        // Compare and place smaller element first (ascending order)
+        // For descending: use left[i] >= right[j]
         if (left[i] <= right[j]) 
             arr[k++] = left[i++];
-        else arr[k++] = right[j++];
+        else 
+            arr[k++] = right[j++];
     }
-    // Copy the remaining elements
+    // Copy remaining elements from left subarray
     while (i < n1) arr[k++] = left[i++];
+    // Copy remaining elements from right subarray
     while (j < n2) arr[k++] = right[j++];
 }
 
-// Merge Sort function
+// Merge Sort: Divide and conquer
 void mergeSort(vector<int>& arr, int l, int r) {
-    // base vase
+    // Base case: single element or empty array is already sorted
     if (l >= r) return;
 
+    // Find middle point to divide array
     int m = l + (r - l) / 2;
-    // Sort left half first
+    // Recursively sort left half
     mergeSort(arr, l, m);
-    // then sort right half
+    // Recursively sort right half
     mergeSort(arr, m + 1, r);
 
-    // Now merge both the halves
+    // Merge the two sorted halves
     merge(arr, l, m, r);
 }
 

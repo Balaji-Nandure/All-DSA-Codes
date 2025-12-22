@@ -1,3 +1,20 @@
+/*
+ * Problem: Permutations II (with Duplicates)
+ *
+ * LeetCode 47: Permutations II
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/permutations-of-a-given-string/0
+ *
+ * Generate all unique permutations of an array that may contain duplicates.
+ *
+ * Three methods to handle duplicates:
+ * 1. Used[] + Sort: Only pick duplicate if previous occurrence is used
+ * 2. Map-based: Use frequency map to track available numbers
+ * 3. Set in loop: Track used values at each recursion level
+ *
+ * Time: O(n! * n) - n! permutations, each copied in O(n)
+ * Space: O(n) - recursion stack depth is n
+ */
+
 #include <vector>
 #include <iostream>
 #include <algorithm>
@@ -7,36 +24,9 @@
 #include <string>
 using namespace std;
 
-/*
-    Generate all unique permutations of an array that may contain duplicates.
-
-    Three methods:
-
-    1. Used[] + sort:
-       At each level (decision), DO NOT choose the second or later duplicate 
-       before having chosen the first occurrence at that level.
-       Only allow picking nums[i] if it is not used,
-       and if it is a duplicate (same as previous value) only pick it
-       if the previous copy has been used in this branch.
-
-       This avoids permuting duplicate numbers in different order at the same recursion level,
-       which would lead to duplicate permutations in the result.
-
-    2. Map-based method:
-       Use a frequency map (unordered_map<int, int>) to track available numbers.
-       At each step, pick any unused number with count > 0, decrement count, recurse,
-       then backtrack (restore count).
-       No need to sort for the map-based method.
-
-    3. Unordered_set in for loop:
-       At each recursion level, use a set to record which numbers have been used
-       at this level, so as to skip duplicate choices and ensure uniqueness
-       without sorting. This avoids re-picking a duplicate at the same branch level.
-*/
-
-// ---------- Method 1: Used[] + Sort ----------
+// Method 1: Used[] + Sort approach
 void backtrack(vector<int>& nums, vector<bool>& used, vector<int>& curr, vector<vector<int>>& result) {
-    // Base case: current permutation is complete
+    // Base case: permutation complete
     if (curr.size() == nums.size()) {
         result.push_back(curr);
         return;
@@ -45,20 +35,17 @@ void backtrack(vector<int>& nums, vector<bool>& used, vector<int>& curr, vector<
         // Skip if already used in current permutation
         if (used[i]) continue;
 
-        // IMPORTANT:
-        // For duplicates: 
-        // Only allow picking nums[i] if it's not a duplicate, 
-        // OR if it's same as previous and previous occurrence has been used.
-        // This ensures that we ALWAYS pick the first unused duplicate first at a given recursion level.
-        // If we picked nums[1] before nums[0] when both are duplicates, they would generate identical subtrees.
+        // Key: For duplicates, only pick if previous occurrence is used
+        // This ensures we always pick first occurrence before duplicates at same level
+        // Prevents generating duplicate permutations
         if (i > 0 && nums[i] == nums[i-1] && !used[i-1])
-            continue; // skip using a duplicate before its previous copy at the same level
+            continue; // Skip duplicate before its previous copy is used
 
-        // Mark as used and add to current permutation
+        // Pick nums[i] and recurse
         used[i] = true;
         curr.push_back(nums[i]);
         backtrack(nums, used, curr, result);
-        // Backtrack: unmark and remove last
+        // Backtrack: unmark and remove
         curr.pop_back();
         used[i] = false;
     }
@@ -74,23 +61,24 @@ vector<vector<int>> permuteUnique(vector<int>& nums) {
     return result;
 }
 
-// ---------- Method 2: Map-based method (frequency map) ----------
+// Method 2: Map-based (frequency map) - no sorting needed
 void backtrack_map(unordered_map<int, int>& freq, vector<int>& curr, int n, vector<vector<int>>& result) {
-    // Base case: current permutation is complete
+    // Base case: permutation complete
     if (curr.size() == n) {
         result.push_back(curr);
         return;
     }
-    // Try picking any number with count > 0
+    // Try each unique number with count > 0
     for (auto& pair : freq) { 
         int num = pair.first;
         int& count = pair.second;
-        if (count == 0) continue;
+        if (count == 0) continue; // Skip if no more available
 
-        // Pick number, decrease count, recurse, then backtrack
+        // Pick number, decrement count, recurse
         curr.push_back(num);
         count--;
         backtrack_map(freq, curr, n, result);
+        // Backtrack: restore count
         count++;
         curr.pop_back();
     }
@@ -105,17 +93,19 @@ vector<vector<int>> permuteUnique_map(vector<int>& nums) {
     return result;
 }
 
-// ---------- Method 3: set in for loop (to avoid duplicates at each recursion level) ----------
+// Method 3: Set in for loop - track used values at each level
 void backtrack_setfor(vector<int>& nums, vector<bool>& used, vector<int>& curr, vector<vector<int>>& result) {
+    // Base case: permutation complete
     if (curr.size() == nums.size()) {
         result.push_back(curr);
         return;
     }
-    set<int> unique; // Only at this level
+    set<int> unique; // Track values used at this recursion level
     for (int i = 0; i < nums.size(); ++i) {
-        if (used[i]) continue;
-        if (unique.count(nums[i])) continue; // Skip if already picked this val at this level
-        unique.insert(nums[i]);
+        if (used[i]) continue; // Skip if already used in permutation
+        // Skip if this value already picked at current level (avoids duplicates)
+        if (unique.count(nums[i])) continue;
+        unique.insert(nums[i]); // Mark value as used at this level
         used[i] = true;
         curr.push_back(nums[i]);
         backtrack_setfor(nums, used, curr, result);

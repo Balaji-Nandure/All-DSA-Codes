@@ -3,32 +3,39 @@
  * 
  * LeetCode 39: Combination Sum
  * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/combination-sum/0
+ *
+ * Find all unique combinations where candidate numbers sum to target.
+ * The same number may be reused unlimited times.
+ *
+ * Time: O(2^target) - exponential in worst case
+ * Space: O(target) - recursion stack depth
  */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// -------------------------------------------------------
-// METHOD 1: Pick / Not Pick (your original method)
-// -------------------------------------------------------
+// Method 1: Pick / Not Pick approach
 void findCombinations(int idx, vector<int>& candidates, int target,
                       vector<int>& current, vector<vector<int>>& result) {
+    // Base case: target achieved, add current combination
     if (target == 0) {
         result.push_back(current);
         return;
     }
+    // Base case: no more candidates or target becomes negative
     if (idx == candidates.size() || target < 0) {
         return;
     }
 
-    // Pick the element at idx (reuse allowed)
+    // PICK: Include candidates[idx] (reuse allowed, so stay at idx)
     if (target - candidates[idx] >= 0) {
         current.push_back(candidates[idx]);
+        // Stay at idx to allow reuse of same element
         findCombinations(idx, candidates, target - candidates[idx], current, result);
-        current.pop_back();
+        current.pop_back(); // Backtrack
     }
 
-    // Not pick → move to next index
+    // NOT PICK: Skip candidates[idx] and move to next index
     findCombinations(idx + 1, candidates, target, current, result);
 }
 
@@ -40,25 +47,26 @@ vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
 }
 
 
-// Generally this method is faster.
-// -------------------------------------------------------
-// METHOD 2: Loop Method (also valid for LC-39)
-// -------------------------------------------------------
+// Method 2: Loop-based approach (generally faster)
 void dfsLoop(int start, vector<int>& a, int target,
              vector<int>& curr, vector<vector<int>>& ans) {
-
-    if (target == 0) { // found answer
+    // Base case: target achieved, add combination
+    if (target == 0) {
         ans.push_back(curr);
         return;
     }
-    if (target < 0) return; // no point continuing
+    // Pruning: if target becomes negative, no solution possible
+    if (target < 0) return;
 
+    // Try each candidate from start position
     for (int i = start; i < (int)a.size(); i++) {
-        // if (a[i] > target) break; // pruning if sorted // only if array is sorted
+        // Pruning: if sorted and a[i] > target, skip rest (all larger)
+        // if (a[i] > target) break;
 
         curr.push_back(a[i]);
-        dfsLoop(i, a, target - a[i], curr, ans);   // reuse allowed → stay at i
-        curr.pop_back();
+        // Stay at i to allow reuse of same element
+        dfsLoop(i, a, target - a[i], curr, ans);
+        curr.pop_back(); // Backtrack
     }
 }
 

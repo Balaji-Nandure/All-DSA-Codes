@@ -37,57 +37,59 @@ Explanation: Nodes in blue form a subpath in the tree.
 class Solution {
 private:
     // Helper function to check if linked list exists starting from a tree node
+    // Helper: Check if linked list exists as downward path from current tree node
     bool dfs(TreeNode* root, ListNode* head) {
-        // Step 1:
-        // Base case: if we've matched all nodes in the linked list
-        // This means we found the complete path
+        // Base case: matched all list nodes (complete path found)
         if (head == nullptr) {
             return true;
         }
         
-        // Step 2:
-        // Base case: if tree node is null but linked list still has nodes
-        // This means we couldn't find a complete path
+        // Base case: tree node null but list still has nodes (path incomplete)
         if (root == nullptr) {
             return false;
         }
         
-        // Step 3:
-        // Check if current tree node value matches current linked list node value
+        // Check if current tree node matches current list node
         if (root->val != head->val) {
             return false;
         }
         
-        // Step 4:
-        // If values match, continue matching the rest of the linked list
-        // Try both left and right children
+        // Values match: continue matching rest of list
+        // Try both left and right children (downward path)
         return dfs(root->left, head->next) || dfs(root->right, head->next);
     }
     
 public:
+/*
+ * Problem: Linked List in Binary Tree
+ *
+ * LeetCode 1367: Linked List in Binary Tree
+ *
+ * Check if linked list exists as a downward path in binary tree.
+ * Example: head=[4,2,8], tree contains path 4->2->8 -> true
+ *
+ * Time: O(n * m) - where n is tree nodes, m is list length
+ * Space: O(h) - recursion stack depth
+ */
+
     bool isSubPath(ListNode* head, TreeNode* root) {
-        // Step 1:
-        // Base case: if linked list is empty, it exists (trivially)
+        // Base case: empty list exists trivially
         if (head == nullptr) {
             return true;
         }
         
-        // Step 2:
-        // Base case: if tree is empty but linked list is not, it doesn't exist
+        // Base case: empty tree but non-empty list
         if (root == nullptr) {
             return false;
         }
         
-        // Step 3:
-        // Check if the linked list exists starting from current tree node
-        // This uses DFS to match the linked list path
+        // Check if list exists starting from current tree node
         if (dfs(root, head)) {
             return true;
         }
         
-        // Step 4:
-        // If not found starting from current node, try starting from left and right children
-        // This allows us to check all possible starting points in the tree
+        // If not found from current node, try left and right subtrees
+        // This checks all possible starting points in the tree
         return isSubPath(head, root->left) || isSubPath(head, root->right);
     }
 };

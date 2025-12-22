@@ -56,15 +56,28 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// ========== METHOD 1: Iterative Approach with Dummy Node (Optimal) ==========
-// Time Complexity: O(n + m), Space Complexity: O(1)
+/*
+ * Problem: Merge Two Sorted Lists
+ *
+ * LeetCode 21: Merge Two Sorted Lists
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/merge-two-sorted-linked-lists/1
+ *
+ * Merge two sorted linked lists into one sorted list.
+ * Example: [1,2,4] + [1,3,4] = [1,1,2,3,4,4]
+ *
+ * Time: O(n + m) - where n, m are lengths
+ * Space: O(1)
+ */
+
+// Method 1: Iterative with Dummy Node (Optimal)
 Node* mergeTwoLists(Node* list1, Node* list2) {
-    // Create a dummy node to simplify edge cases
+    // Dummy node simplifies code (avoids special case for head)
     Node* dummy = new Node(0);
-    Node* tail = dummy;
+    Node* tail = dummy; // Pointer to build merged list
     
     // Merge while both lists have nodes
     while (list1 && list2) {
+        // Compare and attach smaller node
         if (list1->data <= list2->data) {
             tail->next = list1;
             list1 = list1->next;
@@ -72,17 +85,17 @@ Node* mergeTwoLists(Node* list1, Node* list2) {
             tail->next = list2;
             list2 = list2->next;
         }
-        tail = tail->next;
+        tail = tail->next; // Move tail forward
     }
     
-    // Attach remaining nodes from either list
+    // Attach remaining nodes from whichever list is left
     if (list1) {
         tail->next = list1;
     } else if (list2) {
         tail->next = list2;
     }
     
-    // Get the actual head and delete dummy
+    // Return actual head (skip dummy)
     Node* result = dummy->next;
     delete dummy;
     return result;

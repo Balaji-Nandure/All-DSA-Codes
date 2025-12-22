@@ -29,24 +29,36 @@ The above figure represents the given linked list. The modified list contains:
 
 class Solution {
 public:
+/*
+ * Problem: Merge Nodes in Between Zeros
+ *
+ * LeetCode 2181: Merge Nodes in Between Zeros
+ *
+ * Merge all nodes between consecutive zeros into single node with sum.
+ * Example: [0,3,1,0,4,5,2,0] -> [4,11] (3+1=4, 4+5+2=11)
+ *
+ * Time: O(n) - single pass
+ * Space: O(n) - new list for result
+ */
+
     ListNode* mergeNodes(ListNode* head) {
-        // Create dummy node for result
+        // Dummy node simplifies result list construction
         ListNode* dummy = new ListNode(0);
         ListNode* result = dummy;
         
-        ListNode* current = head->next;  // Skip the first 0
+        ListNode* current = head->next;  // Skip first 0
         int sum = 0;
         
         while (current != nullptr) {
             if (current->val == 0) {
-                // End of current segment, create new node with sum
+                // End of segment: create node with sum
                 if (sum > 0) {
                     result->next = new ListNode(sum);
                     result = result->next;
-                    sum = 0;
+                    sum = 0; // Reset for next segment
                 }
             } else {
-                // Add to current sum
+                // Add to current segment sum
                 sum += current->val;
             }
             current = current->next;

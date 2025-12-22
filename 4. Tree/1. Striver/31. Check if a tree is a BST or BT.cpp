@@ -66,14 +66,28 @@ public:
     }
 
 private:
+/*
+ * Problem: Validate Binary Search Tree
+ *
+ * LeetCode 98: Validate Binary Search Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/check-for-bst/1
+ *
+ * Check if binary tree is valid BST.
+ * BST property: left < root < right, and all subtrees are BSTs.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
+    // Helper: Check if node is in valid range (minVal, maxVal)
     bool helper(TreeNode* node, long long minVal, long long maxVal) {
         if (node == nullptr) return true;
         
-        // Current node must lie strictly between (minVal, maxVal)
+        // Current node must be strictly between (minVal, maxVal)
         if (node->val <= minVal || node->val >= maxVal) return false;
         
-        // Left subtree: values < node->val
-        // Right subtree: values > node->val
+        // Left subtree: values must be in (minVal, node->val)
+        // Right subtree: values must be in (node->val, maxVal)
         return helper(node->left, minVal, node->val) &&
                helper(node->right, node->val, maxVal);
     }
@@ -88,15 +102,16 @@ public:
     }
 
 private:
+    // Inorder approach: BST inorder is strictly increasing
     bool inorder(TreeNode* node, TreeNode*& prev) {
         if (node == nullptr) return true;
         
-        // Check left subtree
+        // Check left subtree first
         if (!inorder(node->left, prev)) return false;
         
-        // Current node must be greater than previous inorder node
+        // Current node must be > previous inorder node
         if (prev != nullptr && node->val <= prev->val) return false;
-        prev = node;
+        prev = node; // Update previous
         
         // Check right subtree
         return inorder(node->right, prev);

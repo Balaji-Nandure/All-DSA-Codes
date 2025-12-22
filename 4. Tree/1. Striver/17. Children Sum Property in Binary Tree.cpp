@@ -61,19 +61,31 @@ using namespace std;
 // Solution 0: Optimal Solution - Convert to Children Sum Property (O(n) time, O(h) space)
 class OptimalConvertChildrenSumPropertySolution {
 public:
+/*
+ * Problem: Children Sum Property in Binary Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/children-sum-parent/1
+ *
+ * Convert tree to follow children sum property: node value = sum of children values.
+ * Can only increment values, not decrement.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
     void changeTree(TreeNode* root) {
         if (root == nullptr) return;
 
-        // DOWN: Ensure children are at least as large as parent (push parent value down if needed)
+        // DOWN: Push parent value down if children sum is less
         int child = 0;
         if (root->left)  child += root->left->val;
         if (root->right) child += root->right->val;
 
         if (child >= root->val) {
-            // If children sum greater/equal, update parent
+            // Children sum >= parent: update parent
             root->val = child;
         } else {
-            // Otherwise, push parent value down to children
+            // Children sum < parent: push parent value down
             if (root->left) root->left->val = root->val;
             else if (root->right) root->right->val = root->val;
         }
@@ -82,7 +94,7 @@ public:
         changeTree(root->left);
         changeTree(root->right);
 
-        // UP: After processing children, set current node to sum of (possibly updated) children
+        // UP: Set current node to sum of (updated) children
         int tot = 0;
         if (root->left)  tot += root->left->val;
         if (root->right) tot += root->right->val;

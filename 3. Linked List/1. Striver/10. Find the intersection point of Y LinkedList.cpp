@@ -84,8 +84,20 @@ int getLength(Node* head) {
     return length;
 }
 
-// ========== METHOD 1: Two-Pointer with Length Difference (Optimal) ==========
-// Time Complexity: O(m + n), Space Complexity: O(1)
+/*
+ * Problem: Intersection of Two Linked Lists
+ *
+ * LeetCode 160: Intersection of Two Linked Lists
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/intersection-point-in-y-shapped-linked-lists/1
+ *
+ * Find the intersection node where two linked lists meet.
+ * Example: List A: [4,1,8,4,5], List B: [5,6,1,8,4,5] -> intersection at node 8
+ *
+ * Time: O(m + n) - where m, n are lengths
+ * Space: O(1)
+ */
+
+// Method 1: Two-Pointer with Length Difference (Optimal)
 Node* getIntersectionNode(Node* headA, Node* headB) {
     if (!headA || !headB) return nullptr;
     
@@ -93,7 +105,8 @@ Node* getIntersectionNode(Node* headA, Node* headB) {
     int lenA = getLength(headA);
     int lenB = getLength(headB);
     
-    // Step 2: Move the longer list pointer ahead by the difference
+    // Step 2: Move longer list pointer ahead by difference
+    // This aligns both pointers to same distance from intersection
     Node* currA = headA;
     Node* currB = headB;
     
@@ -110,13 +123,13 @@ Node* getIntersectionNode(Node* headA, Node* headB) {
     // Step 3: Move both pointers together until they meet
     while (currA && currB) {
         if (currA == currB) {
-            return currA;  // Found intersection
+            return currA; // Found intersection
         }
         currA = currA->next;
         currB = currB->next;
     }
     
-    return nullptr;  // No intersection
+    return nullptr; // No intersection
 }
 
 // Hashmap approach fixed: Avoid duplicate function, rename for clarity, and avoid shadowing main logic

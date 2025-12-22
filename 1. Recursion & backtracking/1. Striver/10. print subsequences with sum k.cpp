@@ -1,11 +1,21 @@
+/*
+ * Problem: Print All Subsequences with Sum K
+ *
+ * Find and print all subsequences of an array that sum to exactly K.
+ * Uses backtracking: try including/excluding each element.
+ *
+ * Time: O(2^n * n) - 2^n subsequences, each printed in O(n)
+ * Space: O(n) - recursion stack depth is n
+ */
+
 #include <bits/stdc++.h>
 using namespace std;
 
-// method 1: pick and not pick
+// Method 1: Pick and Not Pick approach
 void printAll(int i, vector<int> &a, vector<int> &curr, int &sum, int k) {
-
-    // Base case: reached end
+    // Base case: processed all elements
     if (i == (int)a.size()) {
+        // If current sum equals k, print the subsequence
         if (sum == k) {
             for (int x : curr) cout << x << " ";
             cout << endl;
@@ -13,123 +23,133 @@ void printAll(int i, vector<int> &a, vector<int> &curr, int &sum, int k) {
         return;
     }
 
-    // TAKE a[i]
+    // TAKE: Include a[i] in subsequence
     curr.push_back(a[i]);
     sum += a[i];
     printAll(i + 1, a, curr, sum, k);
 
-    // BACKTRACK
+    // BACKTRACK: Remove a[i] to try without it
     curr.pop_back();
     sum -= a[i];
 
-    // NOT TAKE a[i]
+    // NOT TAKE: Skip a[i] and continue
     printAll(i + 1, a, curr, sum, k);
 }
 
-// method 2: loop
+// Method 2: Loop-based approach (similar to generating combinations)
 void printAll_loop(int start, vector<int> &a, vector<int> &curr, int sum, int k) {
+    // Check if current sum equals k (print if found)
     if (sum == k) {
         for (int x : curr) cout << x << " ";
         cout << endl;
-        // NOTE: don't return here; there may be further elements (positive/negative)
-        // If all a[i] > 0, you *can* return to prune.
+        // Note: Don't return here if array has negative numbers
+        // If all elements are positive, can return early to prune
     }
 
+    // Base case: processed all elements
     if (start == (int)a.size()) return;
 
+    // Try each element from start to end
     for (int i = start; i < (int)a.size(); i++) {
         curr.push_back(a[i]);
+        // Recursively try with a[i] included
         printAll_loop(i + 1, a, curr, sum + a[i], k);
-        // If repetition is allowed, after choosing a[i], allow picking it again by staying at i (don't increment i)
-        // printAll_loop(i, a, curr, sum + a[i], k); // stay at i for repetition
-        curr.pop_back();
+        // For repetition allowed: use i instead of i+1
+        // printAll_loop(i, a, curr, sum + a[i], k);
+        curr.pop_back(); // Backtrack
     }
 }
 
 
-// PRINT ONLY ONE SUBSEQUENCE WITH SUM = K
-// method 1: pick and not pick
+// Print only ONE subsequence with sum = K (early termination)
+// Method 1: Pick and Not Pick with boolean return
 bool printOne(int i, vector<int> &a, vector<int> &ds, int &sum, int k) {
-
+    // Base case: processed all elements
     if (i == a.size()) {
-        // if condition is satisfied then return true and stop the function
+        // If sum equals k, print and return true to stop recursion
         if (sum == k) {
             for (int x : ds) cout << x << " ";
             cout << endl;
-            return true;  // stop
+            return true;  // Found one, stop searching
         }
-        // otherwise return false and continue the function
-        return false;
+        return false; // Not found, continue searching
     }
 
-    // TAKE
+    // TAKE: Try including a[i]
     ds.push_back(a[i]);
     sum += a[i];
-    // if true then immediate return true and stop the function
-    // do this whenewer you are making a function call.
+    // If found in this path, return true immediately (stop recursion)
     if (printOne(i + 1, a, ds, sum, k)) {
-        // stop further recursion calls
         return true;
     }
-
+    // BACKTRACK: Remove a[i] if not found
     ds.pop_back();
     sum -= a[i];
 
-    // NOT TAKE
-    // do this whenewer you are making a function call.
+    // NOT TAKE: Try without a[i]
     if (printOne(i + 1, a, ds, sum, k)) return true;
 
-    // if none of the aboce calls return true, then return false
+    // Neither path found a solution
     return false;
 }
 
-// method 2: loop
+// Method 2: Loop-based with early termination
 bool printOne_loop(int start, vector<int> &a, vector<int> &curr, int sum, int k) {
+    // If sum equals k, print and return true (found one)
     if (sum == k) {
         for (int x : curr) cout << x << " ";
         cout << endl;
-        return true;              // found one → stop
+        return true; // Found one, stop searching
     }
+    // Base case: no more elements
     if (start == (int)a.size()) return false;
 
+    // Try each element from start
     for (int i = start; i < (int)a.size(); i++) {
         curr.push_back(a[i]);
-        if (printOne_loop(i + 1, a, curr, sum + a[i], k)) return true; // propagate true
-        curr.pop_back();
+        // If found in this path, propagate true upward
+        if (printOne_loop(i + 1, a, curr, sum + a[i], k)) return true;
+        curr.pop_back(); // Backtrack
     }
-    return false;
+    return false; // Not found in this path
 }
 
-// PRINT COUNT OF SUBSEQUENCES WITH SUM = K
-// here no need to maintain the curr vector because we are not printing the subsequences
-// and just maintaining the sum if more than sufficient.
-// method 1: pick and not pick
+// Count total subsequences with sum = K
+// Note: No need to maintain curr vector, only track sum
+// Method 1: Pick and Not Pick
 int countWays(int i, vector<int> &a, int &sum, int k) {
-    // this can only be done if array contains positive numbers only.
+    // Early pruning: if sum exceeds k and all elements are positive
+    // This optimization only works if array has positive numbers only
     if(sum > k) return 0;
+    
+    // Base case: processed all elements
     if (i == a.size()) {
-        return (sum == k);
+        return (sum == k); // Return 1 if sum equals k, else 0
     }
 
-    // TAKE
+    // TAKE: Count ways including a[i]
     sum += a[i];
     int take = countWays(i + 1, a, sum, k);
-    sum -= a[i];
+    sum -= a[i]; // Backtrack
 
-    // NOT TAKE
+    // NOT TAKE: Count ways excluding a[i]
     int not_take = countWays(i + 1, a, sum, k);
 
+    // Total ways = ways with a[i] + ways without a[i]
     return take + not_take;
 }
 
-// method 2: loop
+// Method 2: Loop-based counting
 int countWays_loop(int start, vector<int> &a, int sum, int k) {
+    // Base case: if sum equals k or processed all elements
     if (sum == k || start == (int)a.size()) {
-        return sum == k;
+        return sum == k; // Return 1 if sum equals k, else 0
     }
 
     int ways = 0;
+    // Try each element from start
     for (int i = start; i < (int)a.size(); i++) {
+        // Add ways from including a[i]
         ways += countWays_loop(i + 1, a, sum + a[i], k);
     }
     return ways;

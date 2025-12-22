@@ -21,16 +21,35 @@
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };
  */
+/*
+ * Problem: Diameter of Binary Tree
+ *
+ * LeetCode 543: Diameter of Binary Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/diameter-of-binary-tree/1
+ *
+ * Find the diameter (longest path between any two nodes).
+ * Path may or may not pass through root.
+ *
+ * Time: O(n) - single pass
+ * Space: O(h) - recursion stack
+ */
+
 class Solution {
 public:
-    // Returns diameter only (does not expose height to caller)
-    // It is just a find height function with a maxDiameter variable(pass by reference)
-    // we are only modifying maxDiameter variable for each node.
+    // Helper: Returns height, updates maxDiameter for each node
+    // Diameter through a node = leftHeight + rightHeight
     int diameterUtil(TreeNode* root, int& maxDiameter) {
+        // Base case: empty tree has height 0
         if (!root) return 0;
+        
+        // Get heights of left and right subtrees
         int left = diameterUtil(root->left, maxDiameter);
         int right = diameterUtil(root->right, maxDiameter);
+        
+        // Update maxDiameter: diameter through current node = left + right
         maxDiameter = max(maxDiameter, left + right);
+        
+        // Return height of current subtree
         return 1 + max(left, right);
     }
     

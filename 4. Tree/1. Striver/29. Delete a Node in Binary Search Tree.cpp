@@ -89,30 +89,45 @@
 // =========================================================
 class SolutionRecursive {
 public:
-    TreeNode* deleteNode(TreeNode* root, int key) {
-        if (root == nullptr)
-            return nullptr;
+/*
+ * Problem: Delete Node in Binary Search Tree
+ *
+ * LeetCode 450: Delete Node in a BST
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/delete-a-node-from-bst/1
+ *
+ * Delete node with given key from BST maintaining BST property.
+ * Three cases: 0 children (leaf), 1 child, 2 children (replace with successor/predecessor).
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
 
+    TreeNode* deleteNode(TreeNode* root, int key) {
+        if (root == nullptr) return nullptr;
+
+        // Search for node to delete
         if (key < root->val) {
             root->left = deleteNode(root->left, key);
         } else if (key > root->val) {
             root->right = deleteNode(root->right, key);
         } else {
-            // Case 1 & 2: No child or one child
+            // Found node to delete
+            // Case 1: No left child - replace with right child
             if (root->left == nullptr) {
                 TreeNode* temp = root->right;
                 delete root;
                 return temp;
             }
+            // Case 2: No right child - replace with left child
             if (root->right == nullptr) {
                 TreeNode* temp = root->left;
                 delete root;
                 return temp;
             }
-            // Case 3: Two children
-            TreeNode* succ = getMin(root->right);
-            root->val = succ->val;
-            root->right = deleteNode(root->right, succ->val);
+            // Case 3: Two children - replace with inorder successor
+            TreeNode* succ = getMin(root->right); // Leftmost in right subtree
+            root->val = succ->val; // Copy successor's value
+            root->right = deleteNode(root->right, succ->val); // Delete successor
         }
         return root;
     }

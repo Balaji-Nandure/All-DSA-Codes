@@ -30,21 +30,23 @@ Base cases:
 - dp[0][arr[0]] = true (if first element equals target)
 */
 
-// recursive approach
+// Recursive approach
 bool subsetSumRec(int idx, int target, vector<int> &arr) {
-    if (target == 0) return true; // base case: target achieved
-    if (idx < 0) return false; // base case: no elements left
+    // Base case: target achieved (empty subset sums to 0)
+    if (target == 0) return true;
+    // Base case: no elements left, target not achieved
+    if (idx < 0) return false;
     
     // Two choices:
-    // 1. Pick current element: check if we can achieve (target - arr[idx]) with remaining elements
-    // 2. Skip current element: check if we can achieve target with remaining elements
+    // 1. PICK: Include arr[idx], check if we can achieve (target - arr[idx]) with remaining
     bool pick = false;
     if (target >= arr[idx]) {
         pick = subsetSumRec(idx - 1, target - arr[idx], arr);
     }
+    // 2. NOT PICK: Skip arr[idx], check if we can achieve target with remaining
     bool notPick = subsetSumRec(idx - 1, target, arr);
     
-    return pick || notPick;
+    return pick || notPick; // Return true if either choice works
 }
 
 // memoization approach
@@ -63,7 +65,7 @@ bool subsetSumMemo(int idx, int target, vector<int> &arr, vector<vector<int>> &d
     return dp[idx][target] = (pick || notPick);
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 bool subsetSumTab(int n, int target, vector<int> &arr) {
     vector<vector<bool>> dp(n, vector<bool>(target + 1, false));
     
@@ -74,16 +76,18 @@ bool subsetSumTab(int n, int target, vector<int> &arr) {
     
     // Base case: first element
     if (arr[0] <= target) {
-        dp[0][arr[0]] = true;
+        dp[0][arr[0]] = true; // Can achieve target = arr[0] using first element
     }
     
-    // Fill the dp table
+    // Fill dp table: dp[i][t] = can we achieve target t using elements 0 to i
     for (int i = 1; i < n; i++) {
         for (int t = 1; t <= target; t++) {
             bool pick = false;
+            // Pick arr[i]: check if we can achieve (t - arr[i]) with previous elements
             if (t >= arr[i]) {
                 pick = dp[i - 1][t - arr[i]];
             }
+            // Not pick arr[i]: check if we can achieve t with previous elements
             bool notPick = dp[i - 1][t];
             dp[i][t] = pick || notPick;
         }
@@ -92,12 +96,12 @@ bool subsetSumTab(int n, int target, vector<int> &arr) {
     return dp[n - 1][target];
 }
 
-// space optimization approach
+// Space optimization (only need previous row)
 bool subsetSumSpaceOpt(int n, int target, vector<int> &arr) {
-    // We only need previous row, so use 1D array
+    // Only track previous row (size target+1)
     vector<bool> prev(target + 1, false);
     
-    // Base case: target = 0
+    // Base case: target = 0 is always achievable
     prev[0] = true;
     
     // Base case: first element
@@ -112,14 +116,16 @@ bool subsetSumSpaceOpt(int n, int target, vector<int> &arr) {
         
         for (int t = 1; t <= target; t++) {
             bool pick = false;
+            // Pick arr[i]: check previous row at (t - arr[i])
             if (t >= arr[i]) {
                 pick = prev[t - arr[i]];
             }
+            // Not pick: check previous row at t
             bool notPick = prev[t];
             curr[t] = pick || notPick;
         }
         
-        prev = curr;
+        prev = curr; // Update for next iteration
     }
     
     return prev[target];

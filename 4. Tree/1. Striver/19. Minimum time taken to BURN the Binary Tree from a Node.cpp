@@ -53,18 +53,30 @@ using namespace std;
 // Solution 1: Build Parent Map + BFS, with target as int value
 class ParentMapBFSSolution {
 public:
+/*
+ * Problem: Minimum Time to Burn Binary Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/burning-tree/1
+ *
+ * Find minimum time to burn entire tree starting from target node.
+ * In 1 second, all nodes connected to burning node get burned (left, right, parent).
+ *
+ * Time: O(n) - build parent map + BFS
+ * Space: O(n) - parent map, queue, visited set
+ */
+
     int minTime(TreeNode* root, int target) {
         if (!root) return 0;
 
-        // Build parent map
+        // Build parent map to traverse upward
         unordered_map<TreeNode*, TreeNode*> parent;
         buildParentMap(root, nullptr, parent);
 
-        // Find the pointer to the TreeNode that has target value
+        // Find target node by value
         TreeNode* targetNode = findTargetNode(root, target);
         if (!targetNode) return 0;
 
-        // BFS starting from targetNode
+        // BFS starting from target (like graph BFS)
         queue<TreeNode*> q;
         unordered_set<TreeNode*> visited;
         q.push(targetNode);
@@ -76,11 +88,12 @@ public:
             int levelSize = q.size();
             bool burnedAny = false;
 
+            // Process all nodes at current time
             for (int i = 0; i < levelSize; i++) {
                 TreeNode* node = q.front();
                 q.pop();
 
-                // Traverse in three directions: left, right, parent
+                // Burn connected nodes: left, right, parent
                 if (node->left && visited.find(node->left) == visited.end()) {
                     q.push(node->left);
                     visited.insert(node->left);
@@ -98,6 +111,7 @@ public:
                 }
             }
 
+            // Increment time if any new nodes were burned
             if (burnedAny) {
                 time++;
             }

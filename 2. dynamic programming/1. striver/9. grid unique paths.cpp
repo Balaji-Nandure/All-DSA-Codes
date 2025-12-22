@@ -38,40 +38,44 @@ Base cases:
 - dp[i][0] = 1 (only way: move down)
 */
 
-// recursive approach
+// Recursive approach
 int gridUniquePaths(int i, int j){
-    if(i == 0 && j == 0) return 1; // reached destination
-    if(i < 0 || j < 0) return 0; // out of bounds
+    // Base case: reached destination (top-left)
+    if(i == 0 && j == 0) return 1;
+    // Base case: out of bounds
+    if(i < 0 || j < 0) return 0;
     
-    // Can come from top (i-1, j) or left (i, j-1)
+    // Can reach (i,j) from top (i-1,j) or left (i,j-1)
     int fromTop = gridUniquePaths(i - 1, j);
     int fromLeft = gridUniquePaths(i, j - 1);
     
     return fromTop + fromLeft;
 }
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int gridUniquePathsMemoization(int i, int j, vector<vector<int>> &dp){
+    // Base cases
     if(i == 0 && j == 0) return 1;
     if(i < 0 || j < 0) return 0;
-    
+    // Return cached result
     if(dp[i][j] != -1) return dp[i][j];
     
+    // Compute and store result
     int fromTop = gridUniquePathsMemoization(i - 1, j, dp);
     int fromLeft = gridUniquePathsMemoization(i, j - 1, dp);
     
     return dp[i][j] = fromTop + fromLeft;
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int gridUniquePathsTabulation(int m, int n){
     vector<vector<int>> dp(m, vector<int>(n, 0));
     
-    // Base cases: first row and first column
-    for(int i = 0; i < m; i++) dp[i][0] = 1;
-    for(int j = 0; j < n; j++) dp[0][j] = 1;
+    // Base cases: first row and first column have only 1 path
+    for(int i = 0; i < m; i++) dp[i][0] = 1; // First column
+    for(int j = 0; j < n; j++) dp[0][j] = 1; // First row
     
-    // Fill the dp table
+    // Fill dp table: paths[i][j] = paths[i-1][j] + paths[i][j-1]
     for(int i = 1; i < m; i++){
         for(int j = 1; j < n; j++){
             dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
@@ -81,20 +85,21 @@ int gridUniquePathsTabulation(int m, int n){
     return dp[m - 1][n - 1];
 }
 
-// space optimization approach
+// Space optimization (only need previous row)
 int gridUniquePathsSpaceOptimization(int m, int n){
-    // We only need previous row, so use 1D array
-    vector<int> prev(n, 1); // first row is all 1s
+    // Only track previous row (size n)
+    vector<int> prev(n, 1); // First row is all 1s
     
     for(int i = 1; i < m; i++){
         vector<int> curr(n, 0);
-        curr[0] = 1; // first column is always 1
+        curr[0] = 1; // First column is always 1
         
+        // Compute current row using previous row
         for(int j = 1; j < n; j++){
-            curr[j] = prev[j] + curr[j - 1];
+            curr[j] = prev[j] + curr[j - 1]; // From top + from left
         }
         
-        prev = curr;
+        prev = curr; // Update for next iteration
     }
     
     return prev[n - 1];

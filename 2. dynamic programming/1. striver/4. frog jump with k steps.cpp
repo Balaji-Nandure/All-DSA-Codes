@@ -8,26 +8,30 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 /*
-Problem: Frog Jump with K Steps
-A frog is standing on the 1st stair of an N stairs long staircase. The frog wants to reach the Nth stair.
-- HEIGHT[i] represents the height of the (i+1)th stair (0-indexed array)
-- When the frog jumps from the ith stair to the jth stair, the energy lost is |HEIGHT[i] - HEIGHT[j]|
-- From any ith stair, the frog can jump to any stair from (i+1)th to (i+k)th stair (at most k steps)
-- Find the minimum total energy the frog needs to use to travel from the 1st stair to the Nth stair
+ * Problem: Frog Jump with K Steps
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/minimal-cost/1
+ *
+ * Frog can jump at most k steps from any stair. Find minimum energy to reach Nth stair.
+ * Energy = |HEIGHT[i] - HEIGHT[j]|
+ *
+ * Example: HEIGHT = [10, 20, 30, 10, 20], k = 3
+ * From stair 0, can jump to stairs 1, 2, or 3
+ *
+ * Time: O(n*k) with DP
+ * Space: O(n) with DP, O(k) space optimized
+ */
 
-Example:
-HEIGHT = [10, 20, 30, 10, 20], k = 3
-From stair 0, can jump to stairs 1, 2, or 3
-From stair 1, can jump to stairs 2, 3, or 4
-*/
-
-// recursive approach
+// Recursive approach
 int frogJumpK(int idx, vector<int> &height, int k){
-    if(idx == 0) return 0; // base case: at first stair, no energy needed
+    // Base case: at first stair, no energy needed
+    if(idx == 0) return 0;
     
+    // Try all possible k steps and find minimum energy
     int minEnergy = INF;
     for(int j = 1; j <= k; j++){
         if(idx - j >= 0){
+            // Energy to reach idx from (idx-j)
             int energy = frogJumpK(idx - j, height, k) + abs(height[idx] - height[idx - j]);
             minEnergy = min(minEnergy, energy);
         }
@@ -36,11 +40,14 @@ int frogJumpK(int idx, vector<int> &height, int k){
     return minEnergy;
 }
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int frogJumpKMemoization(int idx, vector<int> &height, int k, vector<int> &dp){
+    // Base case
     if(idx == 0) return 0;
+    // Return cached result
     if(dp[idx] != -1) return dp[idx];
     
+    // Try all k possible steps and find minimum
     int minEnergy = INF;
     for(int j = 1; j <= k; j++){
         if(idx - j >= 0){
@@ -52,11 +59,12 @@ int frogJumpKMemoization(int idx, vector<int> &height, int k, vector<int> &dp){
     return dp[idx] = minEnergy;
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int frogJumpKTabulation(int n, vector<int> &height, int k){
     vector<int> dp(n, INF);
-    dp[0] = 0;
+    dp[0] = 0; // Base case
     
+    // For each stair, try all k possible previous positions
     for(int i = 1; i < n; i++){
         for(int j = 1; j <= k; j++){
             if(i - j >= 0){
@@ -69,24 +77,24 @@ int frogJumpKTabulation(int n, vector<int> &height, int k){
     return dp[n - 1];
 }
 
-// space optimization approach using a circular buffer and modulo for O(k) space
-// This approach uses modulo arithmetic to maintain only k previous dp values
+// Space optimization: Use circular buffer of size k (only need last k values)
 int frogJumpKSpaceOptimization(int n, vector<int> &height, int k){
     if(n == 1) return 0;
     
-    vector<int> dp(k, INF); // rolling array for sliding window, size k (dp[i % k])
+    vector<int> dp(k, INF); // Rolling array: dp[i % k] stores dp[i]
     dp[0] = 0; // dp[0] = 0
 
     for(int i = 1; i < n; i++){
         int minEnergy = INF;
+        // Check all k possible previous positions
         for(int j = 1; j <= k; j++){
             if(i - j >= 0){
-                int prevIdx = (i - j) % k;
+                int prevIdx = (i - j) % k; // Get previous value from circular buffer
                 int energy = dp[prevIdx] + abs(height[i] - height[i - j]);
                 minEnergy = min(minEnergy, energy);
             }
         }
-        dp[i % k] = minEnergy;
+        dp[i % k] = minEnergy; // Store in circular buffer
     }
 
     return dp[(n - 1) % k];

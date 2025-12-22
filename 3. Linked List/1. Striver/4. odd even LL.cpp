@@ -71,34 +71,48 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// Odd Even Linked List: Group odd-indexed nodes followed by even-indexed nodes
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Odd Even Linked List
+ *
+ * LeetCode 328: Odd Even Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/rearrange-a-linked-list/1
+ *
+ * Group all nodes with odd indices together, followed by nodes with even indices.
+ * First node is at index 1 (odd), second at index 2 (even), etc.
+ *
+ * Example: [1,2,3,4,5] -> [1,3,5,2,4]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1) - in-place rearrangement
+ */
+
+// Group odd-indexed nodes followed by even-indexed nodes
 Node* oddEvenList(Node* head) {
-    // Edge cases: empty list or list with 1 or 2 nodes
+    // Edge cases: empty list or list with 1 or 2 nodes (already in correct order)
     if (!head || !head->next || !head->next->next) {
         return head;
     }
     
-    // Separate odd and even nodes
+    // Separate odd and even nodes using two pointers
     Node* odd = head;           // Points to odd-indexed nodes (1st, 3rd, 5th, ...)
     Node* even = head->next;    // Points to even-indexed nodes (2nd, 4th, 6th, ...)
-    Node* evenHead = even;      // Save the head of even list to connect later
+    Node* evenHead = even;      // Save head of even list to connect later
     
-    // Traverse and separate
+    // Traverse and separate: connect odd nodes together, even nodes together
     while (even && even->next) {
-        // Connect odd nodes
-        odd->next = even->next;  // odd->next points to next odd node
-        odd = odd->next;
+        // Connect odd nodes: link current odd to next odd
+        odd->next = even->next;  // Skip even node, link to next odd
+        odd = odd->next; // Move odd pointer forward
         
-        // Connect even nodes
-        even->next = odd->next;  // even->next points to next even node
-        even = even->next;
+        // Connect even nodes: link current even to next even
+        even->next = odd->next;  // Skip odd node, link to next even
+        even = even->next; // Move even pointer forward
     }
     
     // Connect odd list to even list
     odd->next = evenHead;
     
-    return head;
+    return head; // Head remains the same (first node is odd)
 }
 
 

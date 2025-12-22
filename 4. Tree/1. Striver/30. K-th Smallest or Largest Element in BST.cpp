@@ -63,24 +63,38 @@ using namespace std;
 // Solution 1: Recursive Inorder Traversal
 class Solution {
 public:
+/*
+ * Problem: Kth Smallest Element in BST
+ *
+ * LeetCode 230: Kth Smallest Element in a BST
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/find-k-th-smallest-element-in-bst/1
+ *
+ * Find kth smallest element in BST (1-indexed).
+ * Inorder traversal gives sorted order, so kth node in inorder = kth smallest.
+ *
+ * Time: O(h + k) - where h is height
+ * Space: O(h) - recursion stack
+ */
+
+    // Helper: Inorder traversal, return kth node
     int helper(TreeNode *root, int &k){
-        // Base case: if root is NULL, return -1
+        // Base case: null node
         if(!root) return -1;
-        // Traverse left subtree
+        
+        // Traverse left subtree first (smaller values)
         int left = helper(root->left, k);
-        // If left subtree has a valid result, return it
-        if(left != -1) return left;
-        // Process current node
+        if(left != -1) return left; // Found in left subtree
+        
+        // Process current node (inorder)
         k--;
-        // If k is 0, we've found the kth smallest element
-        if(!k) return root->val;
-        // Traverse right subtree
+        if(!k) return root->val; // Found kth smallest
+        
+        // Traverse right subtree (larger values)
         return helper(root->right, k);
     }
 
     int kthSmallest(TreeNode* root, int k) {
-        int ans = helper(root, k);
-        return ans;
+        return helper(root, k);
     }
 };
  

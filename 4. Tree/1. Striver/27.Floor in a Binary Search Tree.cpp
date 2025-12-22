@@ -60,24 +60,36 @@
 // Solution 1: Recursive Approach
 class RecursiveSolution {
 public:
+/*
+ * Problem: Floor in Binary Search Tree
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/floor-in-bst/1
+ *
+ * Find largest value <= X in BST.
+ * Floor(X) = largest value <= X, or -1 if not found.
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
+
+    // Recursive: Track potential floor while traversing
     int findFloor(TreeNode* root, int X) {
         if (root == NULL) return -1;
         
-        // If exact match found, return it
+        // Exact match: return it
         if (root->val == X) {
             return root->val;
         }
         
-        // If root value is greater than X, floor must be in left subtree
+        // root > X: floor must be in left subtree
         if (root->val > X) {
             return findFloor(root->left, X);
         }
         
-        // If root value is less than X, floor might be root or in right subtree
+        // root < X: floor might be root or in right subtree
         int rightFloor = findFloor(root->right, X);
         
-        // If we found a valid floor in right subtree, return it
-        // Otherwise, root is the floor
+        // Return larger valid floor (rightFloor or root)
         return (rightFloor <= X && rightFloor != -1) ? rightFloor : root->val;
     }
 };
@@ -85,23 +97,23 @@ public:
 // Solution 2: Iterative Approach (O(1) space)
 class IterativeSolution {
 public:
+    // Iterative: Track potential floor while traversing
     int findFloor(TreeNode* root, int X) {
         int floor = -1;
         TreeNode* current = root;
         
         while (current != NULL) {
-            // If exact match found, return it
+            // Exact match: return it
             if (current->val == X) {
                 return current->val;
             }
             
-            // If current value is less than X, it's a potential floor
+            // current < X: potential floor, try to find larger in right
             if (current->val < X) {
                 floor = current->val;
-                // Try to find a closer (greater) value in right subtree
                 current = current->right;
             } else {
-                // Current value is greater than X, floor must be in left subtree
+                // current > X: floor must be in left subtree
                 current = current->left;
             }
         }

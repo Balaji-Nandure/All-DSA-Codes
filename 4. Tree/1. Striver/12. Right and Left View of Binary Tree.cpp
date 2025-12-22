@@ -48,7 +48,20 @@ using namespace std;
 
 class Solution {
 public:
-    // LeetCode 199: Binary Tree Right Side View
+/*
+ * Problem: Right View and Left View of Binary Tree
+ *
+ * LeetCode 199: Binary Tree Right Side View
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/left-view-of-binary-tree/1
+ *
+ * Right View: rightmost node at each level.
+ * Left View: leftmost node at each level.
+ *
+ * Time: O(n) - single pass
+ * Space: O(n) - queue
+ */
+
+    // Right View: Store last node at each level
     vector<int> rightSideView(TreeNode* root) {
         if (!root) return {};
         
@@ -56,7 +69,7 @@ public:
         queue<TreeNode*> q;
         q.push(root);
         
-        // BFS traversal level by level
+        // BFS level by level
         while (!q.empty()) {
             int levelSize = q.size();
             
@@ -65,7 +78,7 @@ public:
                 TreeNode* node = q.front();
                 q.pop();
                 
-                // Store the last node at this level (rightmost node)
+                // Store last node (rightmost) at this level
                 if (i == levelSize - 1) {
                     result.push_back(node->val);
                 }
@@ -79,7 +92,7 @@ public:
         return result;
     }
     
-    // Left View of Binary Tree
+    // Left View: Store first node at each level
     vector<int> leftSideView(TreeNode* root) {
         if (!root) return {};
         
@@ -87,7 +100,7 @@ public:
         queue<TreeNode*> q;
         q.push(root);
         
-        // BFS traversal level by level
+        // BFS level by level
         while (!q.empty()) {
             int levelSize = q.size();
             
@@ -96,7 +109,7 @@ public:
                 TreeNode* node = q.front();
                 q.pop();
                 
-                // Store the first node at this level (leftmost node)
+                // Store first node (leftmost) at this level
                 if (i == 0) {
                     result.push_back(node->val);
                 }

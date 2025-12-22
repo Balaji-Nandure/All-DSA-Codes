@@ -64,54 +64,66 @@ void printLinkedList(Node* head) {
     cout << endl;
 }
 
-// Method 1: Using separate lists for 0s, 1s, and 2s (Most Efficient)
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Sort Linked List of 0's, 1's and 2's
+ *
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/given-a-linked-list-of-0s-1s-and-2s-sort-it/1
+ *
+ * Segregate 0s, 1s, and 2s: all 0s first, then 1s, then 2s.
+ * Similar to Dutch National Flag problem for linked lists.
+ *
+ * Example: [1,2,2,1,2,0,2,2] -> [0,1,1,2,2,2,2,2]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1) - in-place rearrangement
+ */
+
+// Method 1: Separate into three lists, then connect (Most Efficient)
 Node* segregate012(Node* head) {
     if (!head || !head->next) return head;
     
-    // Create dummy nodes for three lists
+    // Create dummy nodes for three separate lists
     Node* zeroHead = new Node(-1);
     Node* oneHead = new Node(-1);
     Node* twoHead = new Node(-1);
     
-    // Pointers to track the end of each list
+    // Pointers to track tail of each list
     Node* zero = zeroHead;
     Node* one = oneHead;
     Node* two = twoHead;
     
-    // Traverse the original list and separate nodes
+    // Traverse original list and separate nodes into three lists
     Node* curr = head;
     while (curr) {
         if (curr->data == 0) {
-            zero->next = curr;
+            zero->next = curr; // Add to 0s list
             zero = zero->next;
         } else if (curr->data == 1) {
-            one->next = curr;
+            one->next = curr; // Add to 1s list
             one = one->next;
         } else { // curr->data == 2
-            two->next = curr;
+            two->next = curr; // Add to 2s list
             two = two->next;
         }
         curr = curr->next;
     }
     
     // Connect the three lists: 0s -> 1s -> 2s
-    // Connect 1s to 2s
-    two->next = nullptr;
+    two->next = nullptr; // End of 2s list
     
-    // Connect 0s to 1s
+    // Connect 0s to 1s, and 1s to 2s
     if (oneHead->next) {
-        zero->next = oneHead->next;
-        one->next = twoHead->next;
+        zero->next = oneHead->next; // Connect 0s to 1s
+        one->next = twoHead->next; // Connect 1s to 2s
     } else {
         // If no 1s, connect 0s directly to 2s
         zero->next = twoHead->next;
     }
     
-    // Get the new head
+    // Get new head (first node of 0s list)
     Node* newHead = zeroHead->next;
     
-    // Delete dummy nodes
+    // Clean up dummy nodes
     delete zeroHead;
     delete oneHead;
     delete twoHead;

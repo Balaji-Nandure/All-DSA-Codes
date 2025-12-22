@@ -57,12 +57,30 @@ public:
         return path;
     }
 private:
+/*
+ * Problem: Print Root to Node Path in Binary Tree
+ *
+ * LeetCode 257: Binary Tree Paths
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/root-to-leaf-paths/1
+ *
+ * Find path from root to target node, or print all root-to-leaf paths.
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack and path storage
+ */
+
+    // Helper: Find path from current node to target
     bool findPath(TreeNode* node, int target, vector<int>& path) {
         if (!node) return false;
+        // Add current node to path
         path.push_back(node->val);
+        // Found target: return true
         if (node->val == target) return true;
+        // Search in left subtree
         if (findPath(node->left, target, path)) return true;
+        // Search in right subtree
         if (findPath(node->right, target, path)) return true;
+        // Target not found in this subtree: backtrack
         path.pop_back();
         return false;
     }

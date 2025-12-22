@@ -37,12 +37,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Backtracking approach: try all subsets of requests
+// Backtracking: try all subsets of requests (pick/not pick)
 void backtrack(int idx, vector<vector<int>>& requests, vector<int>& balance, 
                int count, int& maxCount) {
     // Base case: processed all requests
     if (idx == (int)requests.size()) {
         // Check if all buildings are balanced (net change = 0)
+        // For a request to be achievable, each building must have equal in/out transfers
         bool allBalanced = true;
         for (int i = 0; i < (int)balance.size(); i++) {
             if (balance[i] != 0) {
@@ -51,21 +52,21 @@ void backtrack(int idx, vector<vector<int>>& requests, vector<int>& balance,
             }
         }
         
-        // If all balanced, update maximum count
+        // If all balanced, update maximum achievable requests
         if (allBalanced) {
             maxCount = max(maxCount, count);
         }
         return;
     }
     
-    // Option 1: Don't take this request
+    // NOT PICK: Skip current request
     backtrack(idx + 1, requests, balance, count, maxCount);
     
-    // Option 2: Take this request
+    // PICK: Include current request
     int from = requests[idx][0];
     int to = requests[idx][1];
     
-    // Apply the request: decrease balance at 'from', increase at 'to'
+    // Apply request: decrease balance at 'from', increase at 'to'
     balance[from]--;
     balance[to]++;
     

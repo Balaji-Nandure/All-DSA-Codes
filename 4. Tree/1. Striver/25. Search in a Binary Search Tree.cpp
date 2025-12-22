@@ -57,18 +57,32 @@
 // Solution 1: Recursive Approach
 class RecursiveSolution {
 public:
+/*
+ * Problem: Search in a Binary Search Tree
+ *
+ * LeetCode 700: Search in a Binary Search Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/search-a-node-in-bst/1
+ *
+ * Search for node with given value in BST.
+ * Return subtree rooted at that node, or NULL if not found.
+ *
+ * Time: O(h) - where h is height
+ * Space: O(1) for iterative, O(h) for recursive
+ */
+
+    // Recursive: Use BST property to navigate
     TreeNode* searchBST(TreeNode* root, int val) {
-        // Base case: root is NULL or we found the value
+        // Base case: null or found
         if (root == NULL || root->val == val) {
             return root;
         }
         
-        // If val is less than root, search in left subtree
+        // BST property: val < root -> search left
         if (val < root->val) {
             return searchBST(root->left, val);
         }
         
-        // If val is greater than root, search in right subtree
+        // BST property: val > root -> search right
         return searchBST(root->right, val);
     }
 };

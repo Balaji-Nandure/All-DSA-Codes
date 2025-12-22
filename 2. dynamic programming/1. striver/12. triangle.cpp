@@ -39,47 +39,52 @@ using namespace std;
 #define int long long
 const int INF = 1e18;
 
-// recursive approach
+// Recursive approach (top-down)
 int triangleMinPathRec(int i, int j, vector<vector<int>> &triangle, int n) {
-    // if (i == n - 1) return triangle[i][j]; // base case: last row
+    // Base case: reached beyond last row
     if (i == n) return 0;
     
-    int down = triangleMinPathRec(i + 1, j, triangle, n); // move down
-    int diag = triangleMinPathRec(i + 1, j + 1, triangle, n); // move diagonal
+    // Can move down (same column) or diagonal (next column)
+    int down = triangleMinPathRec(i + 1, j, triangle, n); // Move to (i+1, j)
+    int diag = triangleMinPathRec(i + 1, j + 1, triangle, n); // Move to (i+1, j+1)
     
     return triangle[i][j] + min(down, diag);
 }
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int triangleMinPathMemo(int i, int j, vector<vector<int>> &triangle, int n, vector<vector<int>> &dp) {
+    // Base case: last row
     if (i == n - 1) return triangle[i][j];
-    if (dp[i][j] != -1) return dp[i][j]; // already computed
+    // Return cached result
+    if (dp[i][j] != -1) return dp[i][j];
     
+    // Compute minimum path from current position
     int down = triangleMinPathMemo(i + 1, j, triangle, n, dp);
     int diag = triangleMinPathMemo(i + 1, j + 1, triangle, n, dp);
     
     return dp[i][j] = triangle[i][j] + min(down, diag);
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP, bottom to top)
 int triangleMinPathTab(int n, vector<vector<int>> &triangle) {
     vector<vector<int>> dp(n, vector<int>(n, 0));
     
-    // base case: last row
+    // Base case: last row (destination row)
     for (int j = 0; j < n; j++) {
         dp[n - 1][j] = triangle[n - 1][j];
     }
     
-    // fill from bottom to top
+    // Fill from bottom to top
+    // For each cell, minimum path = current value + min(path from below, path from diagonal)
     for (int i = n - 2; i >= 0; i--) {
         for (int j = 0; j <= i; j++) {
-            int down = dp[i + 1][j];
-            int diag = dp[i + 1][j + 1];
+            int down = dp[i + 1][j]; // Path from directly below
+            int diag = dp[i + 1][j + 1]; // Path from diagonal below
             dp[i][j] = triangle[i][j] + min(down, diag);
         }
     }
     
-    return dp[0][0];
+    return dp[0][0]; // Minimum path from top
 }
 
 // tabulation approach 2
@@ -115,24 +120,24 @@ int triangleMinPathTab2(int n, vector<vector<int>> &triangle) {
 }
 
 
-// space optimization approach
+// Space optimization (only need previous row)
 int triangleMinPathSpaceOpt(int n, vector<vector<int>> &triangle) {
     vector<int> prev(n, 0);
     
-    // base case: last row
+    // Base case: last row
     for (int j = 0; j < n; j++) {
         prev[j] = triangle[n - 1][j];
     }
     
-    // process from bottom to top, only keep previous row
+    // Process from bottom to top, only keep previous row
     for (int i = n - 2; i >= 0; i--) {
         vector<int> curr(n, 0);
         for (int j = 0; j <= i; j++) {
-            int down = prev[j];
-            int diag = prev[j + 1];
+            int down = prev[j]; // From directly below
+            int diag = prev[j + 1]; // From diagonal below
             curr[j] = triangle[i][j] + min(down, diag);
         }
-        prev = curr;
+        prev = curr; // Update for next iteration
     }
     
     return prev[0];

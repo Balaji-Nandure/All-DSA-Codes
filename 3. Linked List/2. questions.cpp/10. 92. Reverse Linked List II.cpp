@@ -23,12 +23,24 @@ Explanation: Reverse nodes from position 2 to 4: [1,2,3,4,5] -> [1,4,3,2,5]
 
 class Solution {
 public:
+/*
+ * Problem: Reverse Linked List II
+ *
+ * LeetCode 92: Reverse Linked List II
+ *
+ * Reverse nodes from position left to right (1-indexed).
+ * Example: [1,2,3,4,5], left=2, right=4 -> [1,4,3,2,5]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1)
+ */
+
     ListNode* reverseBetween(ListNode* head, int left, int right) {
-        // Create dummy node to handle edge case (left = 1)
+        // Dummy node handles edge case (left = 1)
         ListNode* dummy = new ListNode(0);
         dummy->next = head;
         
-        // Find the node before the reversal starts
+        // Find node before reversal starts (at position left-1)
         ListNode* prev = dummy;
         for (int i = 1; i < left; i++) {
             prev = prev->next;
@@ -37,21 +49,21 @@ public:
         // Start reversing from prev->next
         ListNode* current = prev->next;
         ListNode* next = nullptr;
-        ListNode* reversePrev = nullptr;  // Previous node in the reversal process
-        ListNode* tail = current;  // This will be the tail of reversed sublist
+        ListNode* reversePrev = nullptr;  // Previous node in reversed sublist
+        ListNode* tail = current;  // Tail of reversed sublist (will be at left position)
         
-        // Reverse the sublist from left to right using standard reversal
+        // Reverse sublist from left to right
         for (int i = 0; i < right - left + 1; i++) {
-            next = current->next;
-            current->next = reversePrev;
-            reversePrev = current;
-            current = next;
+            next = current->next;        // Save next
+            current->next = reversePrev; // Reverse link
+            reversePrev = current;        // Move reversePrev forward
+            current = next;              // Move current forward
         }
         
-        // Connect: prev->next should point to the new head (reversePrev)
-        // and tail should point to the node after right (current)
-        prev->next = reversePrev;
-        tail->next = current;
+        // Connect: prev -> new head of reversed sublist
+        // tail -> node after right position
+        prev->next = reversePrev;  // Connect before reversed part
+        tail->next = current;      // Connect after reversed part
         
         return dummy->next;
     }

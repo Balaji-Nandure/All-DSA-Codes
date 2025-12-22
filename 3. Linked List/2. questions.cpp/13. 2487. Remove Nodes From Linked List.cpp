@@ -43,26 +43,38 @@ private:
     }
     
 public:
+/*
+ * Problem: Remove Nodes From Linked List
+ *
+ * LeetCode 2487: Remove Nodes From Linked List
+ *
+ * Remove every node that has a node with strictly greater value to its right.
+ * Example: [5,2,13,3,8] -> [13,8] (removed 5,2,3)
+ *
+ * Time: O(n) - reverse, traverse, reverse back
+ * Space: O(1) for reverse method, O(n) for stack method
+ */
+
     ListNode* removeNodes(ListNode* head) {
-        // Step 1: Reverse the list
+        // Step 1: Reverse list to process from right to left
         head = reverseList(head);
         
-        // Step 2: Traverse and remove nodes with value less than max seen so far
+        // Step 2: Remove nodes with value < max seen so far
         ListNode* current = head;
-        int maxVal = current->val;
+        int maxVal = current->val; // First node is always kept
         
         while (current->next != nullptr) {
             if (current->next->val < maxVal) {
-                // Remove the node
+                // Remove node: bypass it
                 current->next = current->next->next;
             } else {
-                // Update max and move forward
+                // Keep node: update max and move forward
                 maxVal = max(maxVal, current->next->val);
                 current = current->next;
             }
         }
         
-        // Step 3: Reverse the list back
+        // Step 3: Reverse back to original order
         head = reverseList(head);
         
         return head;

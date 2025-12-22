@@ -73,23 +73,38 @@ private:
     }
     
 public:
+/*
+ * Problem: Convert Sorted List to Binary Search Tree
+ *
+ * LeetCode 109: Convert Sorted List to Binary Search Tree
+ *
+ * Convert sorted linked list to height-balanced BST.
+ * Middle element becomes root, left half = left subtree, right half = right subtree.
+ *
+ * Time: O(n log n) - finding middle O(n), done log n times
+ * Space: O(log n) - recursion stack
+ */
+
     TreeNode* sortedListToBST(ListNode* head) {
+        // Base case: empty list
         if (head == nullptr) {
             return nullptr;
         }
         
+        // Base case: single node
         if (head->next == nullptr) {
             return new TreeNode(head->val);
         }
         
-        // Find the middle node
+        // Find middle node (will disconnect list at middle)
         ListNode* mid = findMiddle(head);
         
         // Create root with middle value
         TreeNode* root = new TreeNode(mid->val);
         
-        // Recursively build left and right subtrees
+        // Recursively build left subtree from left half
         root->left = sortedListToBST(head);
+        // Recursively build right subtree from right half
         root->right = sortedListToBST(mid->next);
         
         return root;

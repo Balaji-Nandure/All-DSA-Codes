@@ -3,45 +3,58 @@
  * 
  * LeetCode 40: Combination Sum II
  * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/combination-sum-part-2/0
+ *
+ * Find all unique combinations where candidate numbers sum to target.
+ * Each number may only be used once. Array may contain duplicates.
+ *
+ * Time: O(2^n) - exponential
+ * Space: O(target) - recursion stack depth
  */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// Approach 1: for-loop backtracking
-
+// Approach 1: Loop-based backtracking
 void backtrack(vector<int>& a, int target, int index, vector<int>& curr, vector<vector<int>>& ans) {
+    // Base case: target achieved
     if (target == 0) {
         ans.push_back(curr);
         return;
     }
 
+    // Try each candidate from index
     for (int i = index; i < (int)a.size(); ++i) {
-        if (i > index && a[i] == a[i - 1]) continue; // skip duplicates at this level
-        if (a[i] > target) break;                    // pruning: array is sorted
+        // Skip duplicates at same level to avoid duplicate combinations
+        // Only skip if it's not the first occurrence at this level
+        if (i > index && a[i] == a[i - 1]) continue;
+        // Pruning: if sorted and current element > target, skip rest
+        if (a[i] > target) break;
 
         curr.push_back(a[i]);
+        // Move to i+1 (no reuse allowed)
         backtrack(a, target - a[i], i + 1, curr, ans);
-        curr.pop_back();
+        curr.pop_back(); // Backtrack
     }
 }
 
-// Approach 2: pick / not-pick with duplicate skip in "not pick" branch
-// this mehod is more intuitive and easy to understand.
+// Approach 2: Pick / Not Pick (more intuitive)
 void solve(int i, vector<int>& a, int target, vector<int>& curr, vector<vector<int>>& ans) {
+    // Base case: target achieved
     if (target == 0) {
         ans.push_back(curr);
         return;
     }
+    // Base case: no more elements or target negative
     if (i >= (int)a.size() || target < 0) return;
 
-    // pick
+    // PICK: Include a[i] in combination
     curr.push_back(a[i]);
     solve(i + 1, a, target - a[i], curr, ans);
-    curr.pop_back();
+    curr.pop_back(); // Backtrack
 
-    // not pick: jump over all equal values
-    int next = i + 1; // move to first index with different value
+    // NOT PICK: Skip a[i] and all its duplicates
+    // Jump to first index with different value to avoid duplicate combinations
+    int next = i + 1;
     while (next < (int)a.size() && a[next] == a[i]) next++;
     solve(next, a, target, curr, ans);
 }

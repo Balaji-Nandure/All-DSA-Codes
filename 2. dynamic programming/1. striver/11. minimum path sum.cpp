@@ -40,49 +40,54 @@ Base cases:
 - dp[i][0] = grid[i][0] + dp[i-1][0] (only from top)
 */
 
-// recursive approach
+// Recursive approach
 int minPathSum(int i, int j, vector<vector<int>> &grid){
-    if(i == 0 && j == 0) return grid[0][0]; // reached starting cell
-    if(i < 0 || j < 0) return INF; // out of bounds
+    // Base case: reached starting cell
+    if(i == 0 && j == 0) return grid[0][0];
+    // Base case: out of bounds
+    if(i < 0 || j < 0) return INF;
     
-    // Can come from top (i-1, j) or left (i, j-1)
+    // Can reach (i,j) from top (i-1,j) or left (i,j-1)
+    // Take minimum and add current cell value
     int fromTop = minPathSum(i - 1, j, grid);
     int fromLeft = minPathSum(i, j - 1, grid);
     
     return grid[i][j] + min(fromTop, fromLeft);
 }
 
-// memoization approach
+// Memoization approach (Top-down DP)
 int minPathSumMemoization(int i, int j, vector<vector<int>> &grid, vector<vector<int>> &dp){
+    // Base cases
     if(i == 0 && j == 0) return grid[0][0];
     if(i < 0 || j < 0) return INF;
-    
+    // Return cached result
     if(dp[i][j] != -1) return dp[i][j];
     
+    // Compute and store result
     int fromTop = minPathSumMemoization(i - 1, j, grid, dp);
     int fromLeft = minPathSumMemoization(i, j - 1, grid, dp);
     
     return dp[i][j] = grid[i][j] + min(fromTop, fromLeft);
 }
 
-// tabulation approach
+// Tabulation approach (Bottom-up DP)
 int minPathSumTabulation(int m, int n, vector<vector<int>> &grid){
     vector<vector<int>> dp(m, vector<int>(n, 0));
     
     // Base case: starting cell
     dp[0][0] = grid[0][0];
     
-    // Fill first row (can only come from left)
+    // Fill first row: can only come from left
     for(int j = 1; j < n; j++){
         dp[0][j] = grid[0][j] + dp[0][j - 1];
     }
     
-    // Fill first column (can only come from top)
+    // Fill first column: can only come from top
     for(int i = 1; i < m; i++){
         dp[i][0] = grid[i][0] + dp[i - 1][0];
     }
     
-    // Fill the dp table
+    // Fill dp table: minSum[i][j] = grid[i][j] + min(minSum[i-1][j], minSum[i][j-1])
     for(int i = 1; i < m; i++){
         for(int j = 1; j < n; j++){
             dp[i][j] = grid[i][j] + min(dp[i - 1][j], dp[i][j - 1]);
@@ -92,11 +97,11 @@ int minPathSumTabulation(int m, int n, vector<vector<int>> &grid){
     return dp[m - 1][n - 1];
 }
 
-// space optimization approach
+// Space optimization (only need previous row)
 int minPathSumSpaceOptimization(int m, int n, vector<vector<int>> &grid){
-    // We only need previous row, so use 1D array
+    // Only track previous row
     vector<int> prev(n, 0);
-    prev[0] = grid[0][0]; // starting cell
+    prev[0] = grid[0][0]; // Starting cell
     
     // Fill first row
     for(int j = 1; j < n; j++){
@@ -105,13 +110,14 @@ int minPathSumSpaceOptimization(int m, int n, vector<vector<int>> &grid){
     
     for(int i = 1; i < m; i++){
         vector<int> curr(n, 0);
-        curr[0] = grid[i][0] + prev[0]; // first column
+        curr[0] = grid[i][0] + prev[0]; // First column: from top
         
+        // Compute current row using previous row
         for(int j = 1; j < n; j++){
-            curr[j] = grid[i][j] + min(prev[j], curr[j - 1]);
+            curr[j] = grid[i][j] + min(prev[j], curr[j - 1]); // From top or from left
         }
         
-        prev = curr;
+        prev = curr; // Update for next iteration
     }
     
     return prev[n - 1];

@@ -65,39 +65,51 @@ void printLinkedList(Node* head) {
 }
 
 
-// Method 1: Three-pointer approach (Most Common)
-// Time Complexity: O(n), Space Complexity: O(1)
+/*
+ * Problem: Reverse Linked List
+ *
+ * LeetCode 206: Reverse Linked List
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/reverse-a-linked-list/1
+ *
+ * Reverse a singly linked list.
+ * Example: [1,2,3,4,5] -> [5,4,3,2,1]
+ *
+ * Time: O(n) - single pass
+ * Space: O(1) for iterative, O(n) for recursive
+ */
+
+// Method 1: Iterative (Three-pointer approach)
 Node* reverseIterative(Node* head) {
-    Node* prev = nullptr;
-    Node* curr = head;
-    Node* next = nullptr;
+    Node* prev = nullptr; // Previous node (starts as null)
+    Node* curr = head; // Current node
+    Node* next = nullptr; // Next node (temporary)
     
     while (curr) {
-        // Store the next node
+        // Save next node before reversing link
         next = curr->next;
-        
-        // Reverse the link
+        // Reverse the link: point current to previous
         curr->next = prev;
-        
         // Move pointers forward
-        prev = curr;
-        curr = next;
+        prev = curr; // prev becomes current
+        curr = next; // curr becomes next
     }
     
-    // prev is now the new head
+    // prev is now the new head (last node of original list)
     return prev;
 }
 
-
-// Method 2: Tail Recursive Approach
-// Time Complexity: O(n), Space Complexity: O(1)
+// Method 2: Tail Recursive (Space optimized recursion)
 Node* reverseTailRecursive(Node* curr, Node* prev) {
+    // Base case: reached end of list
     if (!curr) {
-        return prev;
+        return prev; // prev is new head
     }
     
+    // Save next node
     Node* next = curr->next;
+    // Reverse current link
     curr->next = prev;
+    // Recurse with next node and current as previous
     return reverseTailRecursive(next, curr);
 }
 

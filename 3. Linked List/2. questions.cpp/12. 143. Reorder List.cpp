@@ -42,39 +42,53 @@ private:
     }
     
 public:
+/*
+ * Problem: Reorder List
+ *
+ * LeetCode 143: Reorder List
+ *
+ * Reorder list: L0 → Ln → L1 → Ln-1 → L2 → Ln-2 → ...
+ * Example: [1,2,3,4] -> [1,4,2,3]
+ *
+ * Time: O(n) - find middle, reverse, merge
+ * Space: O(1)
+ */
+
     void reorderList(ListNode* head) {
         if (!head || !head->next) {
             return;
         }
         
-        // Step 1: Find the middle of the list using two pointers
+        // Step 1: Find middle using two pointers
         ListNode* slow = head;
         ListNode* fast = head;
-        
-        // this loop stops at the left half of the list
+        // Loop stops at left half (slow at middle or before middle)
         while (fast->next != nullptr && fast->next->next != nullptr) {
             slow = slow->next;
             fast = fast->next->next;
         }
 
-        // Step 2: Split the list into two halves
+        // Step 2: Split list into two halves
         ListNode* secondHalf = slow->next;
-        slow->next = nullptr;  // Disconnect the two halves
+        slow->next = nullptr;  // Disconnect halves
         
-        // Step 3: Reverse the second half
+        // Step 3: Reverse second half
         secondHalf = reverseList(secondHalf);
         
-        // Step 4: Merge the two halves alternately
+        // Step 4: Merge halves alternately
         ListNode* first = head;
         ListNode* second = secondHalf;
         
         while (second) {
+            // Save next nodes before modifying links
             ListNode* firstNext = first->next;
             ListNode* secondNext = second->next;
             
+            // Interleave: first -> second -> firstNext
             first->next = second;
             second->next = firstNext;
             
+            // Move to next nodes
             first = firstNext;
             second = secondNext;
         }

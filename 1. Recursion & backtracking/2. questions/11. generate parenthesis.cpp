@@ -5,40 +5,39 @@
  * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/generate-all-possible-parentheses/1
  *
  * Given an integer n, return all combinations of n pairs of balanced parentheses.
-For example: n = 3
-Output: ["((()))","(()())","(())()","()(())","()()()"]
-
-Approach:
-- Use recursion & backtracking.
-- At each step, we can:
-    - Add '(' if we still have left parentheses available.
-    - Add ')' if it will not invalidate the sequence (i.e., right < left used).
-
-Function signature:
-vector<string> generateParenthesis(int n)
-*/
+ *
+ * Example: n = 3
+ * Output: ["((()))","(()())","(())()","()(())","()()()"]
+ *
+ * Approach: Use backtracking
+ * - Add '(' if left parentheses available
+ * - Add ')' if right < left (maintains balance)
+ *
+ * Time: O(4^n / sqrt(n)) - Catalan number
+ * Space: O(n) - recursion stack depth is n
+ */
 
 #include <bits/stdc++.h>
 using namespace std;
 
-// Helper backtracking function
+// Backtracking function to generate balanced parentheses
 void backtrack(int n, int left, int right, string &curr, vector<string> &result) {
-    // Base case: all parentheses used
+    // Base case: generated 2n characters (n pairs)
     if (curr.length() == 2 * n) {
         result.push_back(curr);
         return;
     }
-    // Add '(' if available
+    // Add '(' if we still have left parentheses available
     if (left < n) {
         curr.push_back('(');
         backtrack(n, left + 1, right, curr, result);
-        curr.pop_back();
+        curr.pop_back(); // Backtrack
     }
-    // Add ')' if it won't invalidate the string
+    // Add ')' if it won't invalidate (right < left ensures balance)
     if (right < left) {
         curr.push_back(')');
         backtrack(n, left, right + 1, curr, result);
-        curr.pop_back();
+        curr.pop_back(); // Backtrack
     }
 }
 

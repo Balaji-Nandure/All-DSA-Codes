@@ -42,31 +42,29 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// -------------------------------------------------------
-// METHOD 1: Basic Backtracking with O(n) isSafe check
-// -------------------------------------------------------
+// Method 1: Basic Backtracking with O(n) isSafe check
 bool isSafe(int row, int col, vector<string>& board, int n) {
-    // Check column above
+    // Check column above current position
     for (int i = 0; i < row; i++) {
         if (board[i][col] == 'Q') return false;
     }
 
-    // Check upper left diagonal
+    // Check upper-left diagonal (\): move up and left
     for (int i = row - 1, j = col - 1; i >= 0 && j >= 0; i--, j--) {
         if (board[i][j] == 'Q') return false;
     }
 
-    // Check upper right diagonal
+    // Check upper-right diagonal (/): move up and right
     for (int i = row - 1, j = col + 1; i >= 0 && j < n; i--, j++) {
         if (board[i][j] == 'Q') return false;
     }
 
-    return true;
+    return true; // Position is safe
 }
 
 void solveNQueens_basic(int row, int n, vector<string>& board, 
                        vector<vector<string>>& result) {
-    // Base case: all queens placed
+    // Base case: all queens placed successfully
     if (row == n) {
         result.push_back(board);
         return;
@@ -74,12 +72,13 @@ void solveNQueens_basic(int row, int n, vector<string>& board,
 
     // Try placing queen in each column of current row
     for (int col = 0; col < n; col++) {
+        // Check if position is safe (no conflicts)
         if (isSafe(row, col, board, n)) {
-            // Place queen
+            // Place queen at (row, col)
             board[row][col] = 'Q';
-            // Recurse for next row
+            // Recurse to place queen in next row
             solveNQueens_basic(row + 1, n, board, result);
-            // Backtrack: remove queen
+            // Backtrack: remove queen to try next column
             board[row][col] = '.';
         }
     }
@@ -92,15 +91,14 @@ vector<vector<string>> solveNQueens_basic_method(int n) {
     return result;
 }
 
-// -------------------------------------------------------
-// METHOD 2: Optimized with HashMaps (O(1) isSafe check)
-// -------------------------------------------------------
+// Method 2: Optimized with HashMaps (O(1) isSafe check)
+// Use boolean arrays to track occupied columns and diagonals
 void solveNQueens_optimized(int row, int n, vector<string>& board,
                            vector<vector<string>>& result,
                            vector<bool>& colUsed,
-                           vector<bool>& diag1Used,  // diagonal: row - col + n - 1
-                           vector<bool>& diag2Used) { // diagonal: row + col
-    // Base case: all queens placed
+                           vector<bool>& diag1Used,  // diagonal \: row - col + n - 1
+                           vector<bool>& diag2Used) { // diagonal /: row + col
+    // Base case: all queens placed successfully
     if (row == n) {
         result.push_back(board);
         return;
@@ -108,22 +106,23 @@ void solveNQueens_optimized(int row, int n, vector<string>& board,
 
     // Try placing queen in each column of current row
     for (int col = 0; col < n; col++) {
-        int diag1 = row - col + n - 1; // for diagonal (row-col direction)
-        int diag2 = row + col;         // for diagonal (row+col direction)
+        // Calculate diagonal indices
+        int diag1 = row - col + n - 1; // Diagonal \ (row-col direction)
+        int diag2 = row + col;         // Diagonal / (row+col direction)
 
-        // Check if position is safe using hash maps
+        // Check if position is safe using O(1) lookup
         if (!colUsed[col] && !diag1Used[diag1] && !diag2Used[diag2]) {
-            // Place queen
+            // Place queen and mark as used
             board[row][col] = 'Q';
             colUsed[col] = true;
             diag1Used[diag1] = true;
             diag2Used[diag2] = true;
 
-            // Recurse for next row
+            // Recurse to place queen in next row
             solveNQueens_optimized(row + 1, n, board, result, 
                                   colUsed, diag1Used, diag2Used);
 
-            // Backtrack: remove queen
+            // Backtrack: remove queen and unmark
             board[row][col] = '.';
             colUsed[col] = false;
             diag1Used[diag1] = false;
@@ -143,12 +142,10 @@ vector<vector<string>> solveNQueens_optimized_method(int n) {
     return result;
 }
 
-// -------------------------------------------------------
-// METHOD 3: Count only (without storing boards)
-// -------------------------------------------------------
+// Method 3: Count only (without storing boards) - space optimized
 void countNQueens(int row, int n, vector<bool>& colUsed,
                   vector<bool>& diag1Used, vector<bool>& diag2Used, int& count) {
-    // Base case: all queens placed
+    // Base case: all queens placed, increment count
     if (row == n) {
         count++;
         return;
@@ -159,13 +156,17 @@ void countNQueens(int row, int n, vector<bool>& colUsed,
         int diag1 = row - col + n - 1;
         int diag2 = row + col;
 
+        // Check if position is safe
         if (!colUsed[col] && !diag1Used[diag1] && !diag2Used[diag2]) {
+            // Mark as used
             colUsed[col] = true;
             diag1Used[diag1] = true;
             diag2Used[diag2] = true;
 
+            // Recurse to count solutions
             countNQueens(row + 1, n, colUsed, diag1Used, diag2Used, count);
 
+            // Backtrack: unmark
             colUsed[col] = false;
             diag1Used[diag1] = false;
             diag2Used[diag2] = false;

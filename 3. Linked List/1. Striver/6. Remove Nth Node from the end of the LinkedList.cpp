@@ -72,9 +72,9 @@ void printLinkedList(Node* head) {
 }
 
 // Method 1: Two-pointer approach (Most Efficient)
-// Time Complexity: O(n), Space Complexity: O(1)
+// Use fast and slow pointers to find (n+1)th node from end
 Node* removeNthFromEnd(Node* head, int n) {
-    // Create a dummy node to handle edge case of deleting head
+    // Dummy node handles edge case of deleting head
     Node* dummy = new Node(0);
     dummy->next = head;
     
@@ -83,26 +83,26 @@ Node* removeNthFromEnd(Node* head, int n) {
     Node* slow = dummy;
     
     // Move fast pointer n+1 steps ahead
-    // This ensures slow will be at (n+1)th node from end when fast reaches null
+    // When fast reaches null, slow will be at (n+1)th node from end
+    // This means slow->next is the nth node from end (node to delete)
     for (int i = 0; i <= n; i++) {
         fast = fast->next;
     }
     
-    // Move both pointers until fast reaches the end
+    // Move both pointers until fast reaches end
     while (fast) {
         fast = fast->next;
         slow = slow->next;
     }
     
-    // Now slow->next is the node to delete
+    // slow->next is the node to delete
     Node* nodeToDelete = slow->next;
-    slow->next = slow->next->next;
+    slow->next = slow->next->next; // Bypass node to delete
     delete nodeToDelete;
     
-    // Get the new head
+    // Return new head (skip dummy)
     Node* newHead = dummy->next;
     delete dummy;
-    
     return newHead;
 }
 

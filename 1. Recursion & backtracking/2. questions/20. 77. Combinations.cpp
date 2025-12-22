@@ -27,17 +27,20 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Backtracking function to generate all combinations
+// Backtracking to generate all combinations of k numbers from [1, n]
 void backtrack(int start, int n, int k, vector<int>& current, vector<vector<int>>& result) {
+    // Base case: combination of size k is complete
     if ((int)current.size() == k) {
         result.push_back(current);
         return;
     }
-    // Prune: if not enough elements remaining, stop recursion early
+    // Pruning: only try if enough elements remaining to form combination
+    // Loop from start to n - (remaining needed) + 1
     for (int i = start; i <= n - (k - current.size()) + 1; ++i) {
         current.push_back(i);
+        // Recurse with next starting position (i+1) to avoid duplicates
         backtrack(i + 1, n, k, current, result);
-        current.pop_back();
+        current.pop_back(); // Backtrack
     }
 }
 

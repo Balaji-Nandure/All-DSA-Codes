@@ -49,22 +49,35 @@ using namespace std;
 
 class Solution {
 public:
-    // Main function to check if the tree is symmetric (recursive)
+/*
+ * Problem: Symmetric Tree
+ *
+ * LeetCode 101: Symmetric Tree
+ * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/symmetric-tree/1
+ *
+ * Check if binary tree is mirror of itself (symmetric around center).
+ *
+ * Time: O(n) - visit each node once
+ * Space: O(h) - recursion stack
+ */
+
+    // Main function: check if tree is symmetric
     bool isSymmetric(TreeNode* root) {
         if (!root) return true;
+        // Tree is symmetric if left and right subtrees are mirrors
         return isMirror(root->left, root->right);
     }
 
 private:
-    // Recursive helper function to check if two trees are mirrors
+    // Helper: Check if two trees are mirrors of each other
     bool isMirror(TreeNode* left, TreeNode* right) {
-        // Both nodes are null: symmetric at this subtree
+        // Both null: symmetric
         if (!left && !right) return true;
-        // Only one node is null: not symmetric
+        // One null: not symmetric
         if (!left || !right) return false;
-        // Values don't match: not symmetric
+        // Values must match
         if (left->val != right->val) return false;
-        // Check mirrored children recursively
+        // Check mirrored children: left->left mirrors right->right, left->right mirrors right->left
         return isMirror(left->left, right->right) && isMirror(left->right, right->left);
     }
 
