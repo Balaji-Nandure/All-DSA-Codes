@@ -50,10 +50,36 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-// Solution 1: Pure Backtracking (without unnecessary path parameter)
+
+// ---------------- take not take method starts here ----------------
+// Solution: Variant using recursion (for loop method)
+// This is for the variant where order DOES NOT matter (each combination of elements is counted once, not permutations--like LC 39)
+class Solution2 {
+    public:
+        int solve(int idx, const vector<int>& nums, int target) {
+            if (target == 0)
+                return 1;
+            if (idx >= (int)nums.size() || target < 0)
+                return 0;   
+    
+            // Take idx (can reuse same index) 
+            // ⭐⭐⭐ if you take start from 0 again.
+            int take_idx = solve(0, nums, target - nums[idx]);
+            // Don't take idx (move to next)
+            int reject_idx = solve(idx + 1, nums, target);
+    
+            return take_idx + reject_idx;
+        }
+    
+        int combinationSum4_variant(vector<int>& nums, int target) {
+            return solve(0, nums, target);
+        }
+    };
+
+// ---------------- For loop mehod starts here ----------------
+// Solution 1: Pure Backtracking 
 class Solution {
 private:
-    // No path argument since we don't need to record the sequence
     void backtrack(vector<int>& nums, int target, int& count) {
         if (target == 0) {
             count++;
@@ -73,6 +99,7 @@ public:
 };
 
 // Solution 3: DP with Memoization
+// ⭐🌟⭐ this is the best method uses single 1d dp array using for loop method.
 class Solution3 {
 public:
     int helper(vector<int>& nums, int target, vector<int>& dp) {
@@ -80,8 +107,8 @@ public:
         if (target < 0) return 0;
         if (dp[target] != -1) return dp[target];
         int ways = 0;
-        for (int num : nums) {
-            ways += helper(nums, target - num, dp);
+        for (int i = 0; i < nums.size(); ++i) {
+            ways += helper(nums, target - nums[i], dp);
         }
         dp[target] = ways;
         return ways;
@@ -92,30 +119,3 @@ public:
         return helper(nums, target, dp);
     }
 };
-
-// Solution: Variant using recursion (for loop method)
-// This is for the variant where order DOES NOT matter (each combination of elements is counted once, not permutations--like LC 39)
-class Solution2 {
-public:
-    int solve(int idx, const vector<int>& nums, int target) {
-        if (target == 0)
-            return 1;
-        if (idx >= (int)nums.size() || target < 0)
-            return 0;   
-
-        // Take idx (can reuse same index) 
-        // ⭐⭐⭐ if you take start from 0 again.
-        int take_idx = solve(0, nums, target - nums[idx]);
-        // Don't take idx (move to next)
-        int reject_idx = solve(idx + 1, nums, target);
-
-        return take_idx + reject_idx;
-    }
-
-    int combinationSum4_variant(vector<int>& nums, int target) {
-        return solve(0, nums, target);
-    }
-};
-
-
-
