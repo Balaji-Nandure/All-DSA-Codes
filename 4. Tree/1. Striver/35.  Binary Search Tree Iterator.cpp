@@ -87,21 +87,6 @@ using namespace std;
 class BSTIterator {
 private:
     stack<TreeNode*> st;
-    
-    // Push all left nodes starting from given node
-/*
- * Problem: Binary Search Tree Iterator
- *
- * LeetCode 173: Binary Search Tree Iterator
- * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/implement-iterator-for-bst/1
- *
- * Implement iterator for inorder traversal of BST.
- * next() returns next smallest element, hasNext() checks if more elements exist.
- *
- * Time: O(1) amortized for next(), O(1) for hasNext()
- * Space: O(h) - stack height
- */
-
     // Push all left nodes from given node (inorder: go left first)
     void pushAllLeft(TreeNode* node) {
         while (node != nullptr) {
@@ -132,39 +117,3 @@ public:
         return !st.empty();
     }
 };
-
-// Solution 2: Array-based Iterator (Simple but O(n) space)
-class BSTIteratorArray {
-private:
-    vector<int> inorder;
-    int index;
-    
-    void inorderTraversal(TreeNode* root) {
-        if (root == nullptr) return;
-        inorderTraversal(root->left);
-        inorder.push_back(root->val);
-        inorderTraversal(root->right);
-    }
-    
-public:
-    BSTIteratorArray(TreeNode* root) {
-        inorderTraversal(root);
-        index = 0;
-    }
-    
-    int next() {
-        return inorder[index++];
-    }
-    
-    bool hasNext() {
-        return index < inorder.size();
-    }
-};
-
-/**
- * Your BSTIterator object will be instantiated and called as such:
- * BSTIterator* obj = new BSTIterator(root);
- * int param_1 = obj->next();
- * bool param_2 = obj->hasNext();
- */
-
