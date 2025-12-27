@@ -114,11 +114,3 @@ public:
         return result;
     }
 };
-
-int main() {
-    Solution sol;
-    int n, k;
-    cin >> n >> k;
-    cout << sol.getHappyString(n, k) << endl;
-    return 0;
-}
