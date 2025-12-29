@@ -30,130 +30,133 @@ Base cases:
 - dp[0][arr[0]] = true (if first element equals target)
 */
 
-// Recursive approach
-bool subsetSumRec(int idx, int target, vector<int> &arr) {
-    // Base case: target achieved (empty subset sums to 0)
-    if (target == 0) return true;
-    // Base case: no elements left, target not achieved
-    if (idx < 0) return false;
-    
-    // Two choices:
-    // 1. PICK: Include arr[idx], check if we can achieve (target - arr[idx]) with remaining
-    bool pick = false;
-    if (target >= arr[idx]) {
-        pick = subsetSumRec(idx - 1, target - arr[idx], arr);
+// 1. Recursive approach pick or not-pick
+class SubsetSumRecursive {
+public:
+    bool solve(int idx, vector<int> &arr, int sum){
+        if(sum == 0) return true;
+        if(sum < 0) return false;
+        if(idx == arr.size()) return false;
+        // Pick
+        bool pick = solve(idx + 1, arr, sum - arr[idx]);
+        if(pick) return true;
+        // Not pick
+        return solve(idx + 1, arr, sum);
     }
-    // 2. NOT PICK: Skip arr[idx], check if we can achieve target with remaining
-    bool notPick = subsetSumRec(idx - 1, target, arr);
-    
-    return pick || notPick; // Return true if either choice works
-}
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        return solve(0, arr, sum);
+    }
+};
 
-// memoization approach
-bool subsetSumMemo(int idx, int target, vector<int> &arr, vector<vector<int>> &dp) {
-    if (target == 0) return true;
-    if (idx < 0) return false;
-    
-    if (dp[idx][target] != -1) return dp[idx][target]; // already computed
-    
-    bool pick = false;
-    if (target >= arr[idx]) {
-        pick = subsetSumMemo(idx - 1, target - arr[idx], arr, dp);
-    }
-    bool notPick = subsetSumMemo(idx - 1, target, arr, dp);
-    
-    return dp[idx][target] = (pick || notPick);
-}
-
-// Tabulation approach (Bottom-up DP)
-bool subsetSumTab(int n, int target, vector<int> &arr) {
-    vector<vector<bool>> dp(n, vector<bool>(target + 1, false));
-    
-    // Base case: target = 0 is always achievable (empty subset)
-    for (int i = 0; i < n; i++) {
-        dp[i][0] = true;
-    }
-    
-    // Base case: first element
-    if (arr[0] <= target) {
-        dp[0][arr[0]] = true; // Can achieve target = arr[0] using first element
-    }
-    
-    // Fill dp table: dp[i][t] = can we achieve target t using elements 0 to i
-    for (int i = 1; i < n; i++) {
-        for (int t = 1; t <= target; t++) {
-            bool pick = false;
-            // Pick arr[i]: check if we can achieve (t - arr[i]) with previous elements
-            if (t >= arr[i]) {
-                pick = dp[i - 1][t - arr[i]];
+// 2. Recursive approach using for loop
+class SubsetSumRecursiveForLoop {
+public:
+    bool solve(int idx, vector<int>& arr, int sum) {
+        if (sum == 0) return true;
+        if (sum < 0) return false;
+        for (int i = idx; i < arr.size(); i++) {
+            if (solve(i + 1, arr, sum - arr[i])) {
+                return true;
             }
-            // Not pick arr[i]: check if we can achieve t with previous elements
-            bool notPick = dp[i - 1][t];
-            dp[i][t] = pick || notPick;
         }
+        return false;
     }
-    
-    return dp[n - 1][target];
-}
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        return solve(0, arr, sum);
+    }
+};
 
-// Space optimization (only need previous row)
-bool subsetSumSpaceOpt(int n, int target, vector<int> &arr) {
-    // Only track previous row (size target+1)
-    vector<bool> prev(target + 1, false);
-    
-    // Base case: target = 0 is always achievable
-    prev[0] = true;
-    
-    // Base case: first element
-    if (arr[0] <= target) {
-        prev[arr[0]] = true;
+// 3. Memoization (top-down DP)
+class SubsetSumMemoization {
+public:
+    // Returns true if there is a subset from arr[0..idx] with sum = target
+    bool solve(int idx, int target, vector<int> &arr, vector<vector<int>> &dp) {
+        // Base Case: target achieved (empty subset sum)
+        if (target == 0) return true;
+        if (idx < 0 || target < 0) return false;
+
+        // If already solved, return cached result
+        if (dp[idx][target] != -1) return dp[idx][target];
+
+        // Try including the current element arr[idx], if possible
+        bool pick = solve(idx - 1, target - arr[idx], arr, dp);;
+
+        // Try excluding the current element
+        bool notPick = solve(idx - 1, target, arr, dp);
+
+        // Save and return if either pick or notPick is true
+        return dp[idx][target] = (pick || notPick);
     }
-    
-    // Process from index 1 to n-1
-    for (int i = 1; i < n; i++) {
-        vector<bool> curr(target + 1, false);
-        curr[0] = true; // target = 0 is always achievable
-        
-        for (int t = 1; t <= target; t++) {
-            bool pick = false;
-            // Pick arr[i]: check previous row at (t - arr[i])
-            if (t >= arr[i]) {
-                pick = prev[t - arr[i]];
+
+    // Public method to check if subset sum equals sum
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        int n = arr.size();
+        // dp[i][t] = -1 means not calculated, 1:true, 0:false
+        vector<vector<int>> dp(n, vector<int>(sum + 1, -1));
+        return solve(n - 1, sum, arr, dp);
+    }
+};
+
+// 4. Tabulation approach (Bottom-up DP)
+class SubsetSumTabulation {
+public:
+    // Returns true if there is a subset of arr[] with sum = target
+    bool isSubsetSum(vector<int>& arr, int target) {
+        int n = arr.size();
+        // dp[i][t]: can we get t using first (i+1) items?
+        vector<vector<bool>> dp(n, vector<bool>(target + 1, false));
+
+        // Base Case: sum 0 can be made with empty subset
+        for (int i = 0; i < n; i++) dp[i][0] = true;
+
+        // Base Case: using only arr[0]
+        if (arr[0] <= target) dp[0][arr[0]] = true;
+
+        // Build table
+        for (int i = 1; i < n; i++) {
+            for (int t = 1; t <= target; t++) {
+                // Include arr[i] if t >= arr[i]
+                bool pick = false;
+                if (t >= arr[i]) pick = dp[i-1][t-arr[i]];
+                // Exclude arr[i]
+                bool notPick = dp[i-1][t];
+                dp[i][t] = pick || notPick;
             }
-            // Not pick: check previous row at t
-            bool notPick = prev[t];
-            curr[t] = pick || notPick;
         }
-        
-        prev = curr; // Update for next iteration
+        return dp[n-1][target];
     }
-    
-    return prev[target];
-}
+};
 
-signed main() {
-    vector<int> arr = {1, 2, 3, 4};
-    int n = arr.size();
-    int target = 7;
-    
-    // Recursive
-    bool ansRec = subsetSumRec(n - 1, target, arr);
-    
-    // Memoization
-    vector<vector<int>> dp(n, vector<int>(target + 1, -1));
-    bool ansMemo = subsetSumMemo(n - 1, target, arr, dp);
-    
-    // Tabulation
-    bool ansTab = subsetSumTab(n, target, arr);
-    
-    // Space Optimized
-    bool ansSpace = subsetSumSpaceOpt(n, target, arr);
-    
-    cout << "Recursive:        " << (ansRec ? "true" : "false") << endl;
-    cout << "Memoization:      " << (ansMemo ? "true" : "false") << endl;
-    cout << "Tabulation:       " << (ansTab ? "true" : "false") << endl;
-    cout << "Space Optimized:  " << (ansSpace ? "true" : "false") << endl;
-    
-    return 0;
-}
+// 5. Space Optimization (Only Previous Row)
+class SubsetSumSpaceOptimized {
+public:
+    // Optimized version using two 1D arrays (prev, curr)
+    bool isSubsetSum(vector<int>& arr, int target) {
+        int n = arr.size();
+        // prev[t] : can we get sum t using first (i) elements
+        vector<bool> prev(target + 1, false);
 
+        // Base case: sum 0 is always possible
+        prev[0] = true;
+        // Base case: sum arr[0] is possible, if arr[0] <= target
+        if (arr[0] <= target) prev[arr[0]] = true;
+
+        // Iterate for each element
+        for (int i = 1; i < n; i++) {
+            vector<bool> curr(target + 1, false);  // Current row
+            curr[0] = true; // Always possible to make sum 0
+
+            for (int t = 1; t <= target; t++) {
+                // Include arr[i] if t >= arr[i]
+                bool pick = false;
+                if (t >= arr[i]) pick = prev[t - arr[i]];
+                // Not include arr[i]
+                bool notPick = prev[t];
+
+                curr[t] = pick || notPick;
+            }
+            prev = curr; // Move to next row
+        }
+        return prev[target];
+    }
+};
