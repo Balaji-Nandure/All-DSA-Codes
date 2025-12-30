@@ -31,31 +31,33 @@ vector<int> mergeKSortedArrays(vector<vector<int>>& arrays) {
     // efficiently find and insert the "next" element from the same array.
     // If we stored only the int value in the heap: we would lose track of 
     // which array and position it came from, so could not know what to push next.
+    int n = mat.size();
     priority_queue<
-        tuple<int,int,int>,
-        vector<tuple<int,int,int>>,
-        greater<tuple<int,int,int>>
-    > minHeap;
-
-    // Push first element of each array
-    for (int i = 0; i < arrays.size(); i++) {
-        if (!arrays[i].empty()) {
-            minHeap.push({arrays[i][0], i, 0});
+        tuple<int, int, int>,
+        vector<tuple<int, int, int>>,
+        greater<tuple<int, int, int>>
+    > pq;
+    
+    // push first element of all the arr in mat
+    for(int i = 0; i < n; i++){
+        if(mat[i].size()){
+            int val = mat[i][0];
+            int x = i;
+            int y = 0;
+            
+            pq.push({val, x, y});
         }
     }
-
-    // K-way merge
-    while (!minHeap.empty()) {
-        auto [val, arrIdx, idx] = minHeap.top();
-        minHeap.pop();
-
+    
+    while(pq.size()){
+        auto [val, x, y] = pq.top();
+        pq.pop();
         result.push_back(val);
-
-        if (idx + 1 < arrays[arrIdx].size()) {
-            minHeap.push({arrays[arrIdx][idx + 1], arrIdx, idx + 1});
+        if(y + 1 < mat[x].size()){
+            pq.push({mat[x][y +  1], x, y + 1});
         }
     }
-
+    
     return result;
 }
 
