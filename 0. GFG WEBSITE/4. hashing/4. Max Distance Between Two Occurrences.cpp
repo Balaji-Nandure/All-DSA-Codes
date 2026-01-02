@@ -22,24 +22,22 @@ int maxDistance(vector<int>& arr) {
     Space: O(n)
     */
 
-    unordered_map<int, int> firstIndex;
-    int maxDist = 0;
+    unordered_map<int, int> firstIndex; // value -> first occurrence index
+    int maxDist = 0; // maximum distance
 
-    for (int i = 0; i < arr.size(); i++) {
-
+    for (int i = 0; i < arr.size(); i++) { // traverse the array
+        // if the element is not in the map, add it to the map
         // First occurrence
         if (firstIndex.find(arr[i]) == firstIndex.end()) {
-            firstIndex[arr[i]] = i;
+            firstIndex[arr[i]] = i; // add the element to the map
         }
         // Repeated occurrence → update distance
         else {
-            maxDist = max(maxDist, i - firstIndex[arr[i]]);
+            maxDist = max(maxDist, i - firstIndex[arr[i]]); // update the maximum distance
         }
     }
-
-    return maxDist;
+    return maxDist; // return the maximum distance
 }
-
 /*
 GeeksforGeeks:
 https://www.geeksforgeeks.org/maximum-distance-two-occurrences-element-array/
