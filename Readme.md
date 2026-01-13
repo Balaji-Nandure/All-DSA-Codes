@@ -1,1 +1,2 @@
--
+- Upto 18 Heap is covered from GFG
+- GFG remainig topics after whole coverage from striver
