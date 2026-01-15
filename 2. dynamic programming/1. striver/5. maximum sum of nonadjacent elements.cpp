@@ -31,7 +31,7 @@ int maxSumNonAdjacent(int idx, vector<int> &arr){
     // Base case: no elements left
     if(idx < 0) return 0;
     // Base case: only one element, must pick it
-    if(idx == 0) return arr[0];
+    // if(idx == 0) return arr[0]; // this will be taken care of in the base case
     
     // Two choices:
     // 1. Pick current: arr[idx] + maxSum(idx-2) (skip previous)
@@ -51,7 +51,8 @@ int maxSumNonAdjacent_loop(int start, vector<int> &arr) {
     int best = 0;
 
     // try picking ANY element end from start down to 0
-    for (int end = start; end >= 0; end--) {
+    // not pick case is handled by the loop itself
+    for (int end = start; end >= 0; end--) { 
         int take = arr[end] + maxSumNonAdjacent_loop(end - 2, arr);
         best = max(best, take);
     }

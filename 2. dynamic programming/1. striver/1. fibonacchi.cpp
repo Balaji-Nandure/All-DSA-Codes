@@ -58,8 +58,9 @@ int fibonacciSpaceOptimization(int n){
     // Only track previous two values
     int prev2 = 0; // F(0)
     int prev1 = 1; // F(1)
+    int curr = 0;
     for(int i = 2; i <= n; i++){
-        int curr = prev1 + prev2; // F(i) = F(i-1) + F(i-2)
+        curr = prev1 + prev2; // F(i) = F(i-1) + F(i-2)
         prev2 = prev1; // Update for next iteration
         prev1 = curr;
     }

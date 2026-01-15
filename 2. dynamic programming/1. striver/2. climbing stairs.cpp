@@ -15,11 +15,13 @@ const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
 int climbingStairs(int n){
+    // only change is base case - 1 way to stay on ground, 1 way to reach step 1
     if(n <= 1) return 1;
     return climbingStairs(n-1) + climbingStairs(n-2);
 }
 
 int climbingStairsMemoization(int n, vector<int> &dp){
+    // only change is base case - 1 way to stay on ground, 1 way to reach step 1
     if(n <= 1) return 1;
     if(dp[n] != -1) return dp[n];
     return dp[n] = climbingStairsMemoization(n-1, dp) + climbingStairsMemoization(n-2, dp);

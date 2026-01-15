@@ -28,7 +28,7 @@ int frogJumpK(int idx, vector<int> &height, int k){
     if(idx == 0) return 0;
     
     // Try all possible k steps and find minimum energy
-    int minEnergy = INF;
+    int minEnergy = INT_MAX;
     for(int j = 1; j <= k; j++){
         if(idx - j >= 0){
             // Energy to reach idx from (idx-j)
@@ -61,17 +61,19 @@ int frogJumpKMemoization(int idx, vector<int> &height, int k, vector<int> &dp){
 
 // Tabulation approach (Bottom-up DP)
 int frogJumpKTabulation(int n, vector<int> &height, int k){
-    vector<int> dp(n, INF);
+    vector<int> dp(n);
     dp[0] = 0; // Base case
     
     // For each stair, try all k possible previous positions
     for(int i = 1; i < n; i++){
+        int minEnergy = INT_MAX;
         for(int j = 1; j <= k; j++){
             if(i - j >= 0){
                 int energy = dp[i - j] + abs(height[i] - height[i - j]);
-                dp[i] = min(dp[i], energy);
+                minEnergy = min(minEnergy, energy);
             }
         }
+        dp[i] = minEnergy;
     }
     
     return dp[n - 1];
@@ -81,9 +83,9 @@ int frogJumpKTabulation(int n, vector<int> &height, int k){
 int frogJumpKSpaceOptimization(int n, vector<int> &height, int k){
     if(n == 1) return 0;
     
-    vector<int> dp(k, INF); // Rolling array: dp[i % k] stores dp[i]
+    vector<int> dp(k); // Rolling array: dp[i % k] stores dp[i]
     dp[0] = 0; // dp[0] = 0
-
+ 
     for(int i = 1; i < n; i++){
         int minEnergy = INF;
         // Check all k possible previous positions

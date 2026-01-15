@@ -1,177 +1,154 @@
-#include <bits/stdc++.h>
-using namespace std;
-
-#define endl '\n'
-#define int long long
-
-const int MOD = 1e9 + 7;
-const int INF = LLONG_MAX >> 1;
-
 /*
- * Problem: House Robber II
- *
- * LeetCode 213: House Robber II
- * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/stickler-theif/0
- *
- * Given an array of integers representing money in each house arranged in a circle,
-find the maximum sum we can obtain by robbing houses such that:
-- No two adjacent houses can be robbed
-- First and last houses are adjacent (circular constraint)
+PROBLEM: House Robber II
+STATEMENT SUMMARY:
+You are given an array nums where nums[i] represents the amount of money in the ith house.
+All houses are arranged in a circle, meaning the first and last houses are adjacent.
+You cannot rob two adjacent houses. Return the maximum money you can rob.
 
-Key Insight:
-Since first and last are adjacent, we can't rob both.
-So we solve two subproblems:
-1. Rob houses from 0 to n-2 (excluding last house)
-2. Rob houses from 1 to n-1 (excluding first house)
-Take the maximum of these two.
+KEY OBSERVATION:
+Because houses are circular, you cannot rob both first and last houses.
+So break into TWO LINEAR subproblems:
+1) Rob houses from index 0 to n-2
+2) Rob houses from index 1 to n-1
+Answer = max(result of both)
 
-Example:
-arr = [2, 3, 2]
-Case 1: [2, 3] -> max = 3
-Case 2: [3, 2] -> max = 3
-Answer = 3 (can't rob first and last together)
+DP STATE (for linear robber):
+dp[i] = maximum money robbed from houses [start...i]
+
+RECURRENCE:
+dp[i] = max(
+    dp[i-1],                // do not rob ith house
+    nums[i] + dp[i-2]       // rob ith house
+)
+
+BASE CASES:
+If n == 1 → answer = nums[0]
+
+PLATFORM LINKS:
+GFG: https://practice.geeksforgeeks.org/problems/house-robber-ii/1
+LeetCode: https://leetcode.com/problems/house-robber-ii/
 */
 
-// recursive approach
-int houseRobber2Recursive(int idx, vector<int> &arr, bool includeFirst){
-    int n = arr.size();
-    
-    if(includeFirst){
-        // Case 1: Include first house, exclude last
-        if(idx < 0) return 0;
-        if(idx == 0) return arr[0];
-        if(idx == n - 1) return houseRobber2Recursive(idx - 1, arr, includeFirst); // skip last
-        
-        int pick = arr[idx] + houseRobber2Recursive(idx - 2, arr, includeFirst);
-        int notPick = houseRobber2Recursive(idx - 1, arr, includeFirst);
-        return max(pick, notPick);
-    } else {
-        // Case 2: Exclude first house, can include last
-        if(idx <= 0) return 0; // skip first house
-        if(idx == 1) return arr[1];
-        
-        int pick = arr[idx] + houseRobber2Recursive(idx - 2, arr, includeFirst);
-        int notPick = houseRobber2Recursive(idx - 1, arr, includeFirst);
+
+/*===============================================================
+  APPROACH 1: PURE RECURSION (PICK / NOT PICK)
+  TC: O(2^N)
+  SC: O(N) recursion stack
+================================================================*/
+class Solution1_Recursion_PickNotPick {
+public:
+    int solve(int idx, int start, vector<int>& nums) {
+        if (idx < start) return 0;          // crossed allowed range
+        if (idx == start) return nums[start];
+
+        int notPick = solve(idx - 1, start, nums);
+        int pick = nums[idx] + solve(idx - 2, start, nums);
+
         return max(pick, notPick);
     }
-}
 
-// memoization approach
-int houseRobber2Memoization(int idx, vector<int> &arr, vector<int> &dp, bool includeFirst){
-    int n = arr.size();
-    
-    if(includeFirst){
-        if(idx < 0) return 0;
-        if(idx == 0) return arr[0];
-        if(idx == n - 1) return houseRobber2Memoization(idx - 1, arr, dp, includeFirst);
-        if(dp[idx] != -1) return dp[idx];
-        
-        int pick = arr[idx] + houseRobber2Memoization(idx - 2, arr, dp, includeFirst);
-        int notPick = houseRobber2Memoization(idx - 1, arr, dp, includeFirst);
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return nums[0];
+
+        int case1 = solve(n - 2, 0, nums);  // exclude last
+        int case2 = solve(n - 1, 1, nums);  // exclude first
+
+        return max(case1, case2);
+    }
+};
+
+/*===============================================================
+  APPROACH 2: MEMOIZATION (TOP-DOWN)
+  TC: O(N)
+  SC: O(N) + recursion stack
+================================================================*/
+class Solution2_Memoization {
+public:
+    int solve(int idx, int start, vector<int>& nums, vector<int>& dp) {
+        if (idx < start) return 0;
+        if (idx == start) return nums[start];
+
+        if (dp[idx] != -1) return dp[idx];     // reuse
+
+        int notPick = solve(idx - 1, start, nums, dp);
+        int pick = nums[idx] + solve(idx - 2, start, nums, dp);
+
         return dp[idx] = max(pick, notPick);
-    } else {
-        if(idx <= 0) return 0;
-        if(idx == 1) return arr[1];
-        if(dp[idx] != -1) return dp[idx];
-        
-        int pick = arr[idx] + houseRobber2Memoization(idx - 2, arr, dp, includeFirst);
-        int notPick = houseRobber2Memoization(idx - 1, arr, dp, includeFirst);
-        return dp[idx] = max(pick, notPick);
     }
-}
 
-// Helper function: Maximum sum of non-adjacent elements (from previous problem)
-// This will be used to solve the linear subproblems
-int maxSumNonAdjacentHelper(int start, int end, vector<int> &arr){
-    if(start > end) return 0;
-    if(start == end) return arr[start];
-    
-    int prev2 = arr[start];
-    int prev1 = max(arr[start], arr[start + 1]);
-    
-    for(int i = start + 2; i <= end; i++){
-        int pick = arr[i] + prev2;
-        int notPick = prev1;
-        int curr = max(pick, notPick);
-        prev2 = prev1;
-        prev1 = curr;
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return nums[0];
+
+        vector<int> dp1(n, -1), dp2(n, -1);
+
+        int case1 = solve(n - 2, 0, nums, dp1);
+        int case2 = solve(n - 1, 1, nums, dp2);
+
+        return max(case1, case2);
     }
-    
-    return prev1;
-}
+};
 
-// tabulation approach (cleaner implementation)
-int houseRobber2Tabulation(int n, vector<int> &arr){
-    if(n == 0) return 0;
-    if(n == 1) return arr[0];
-    if(n == 2) return max(arr[0], arr[1]);
-    
-    // Case 1: Include first, exclude last (houses 0 to n-2)
-    int case1 = maxSumNonAdjacentHelper(0, n - 2, arr);
-    
-    // Case 2: Exclude first, include last (houses 1 to n-1)
-    int case2 = maxSumNonAdjacentHelper(1, n - 1, arr);
-    
-    return max(case1, case2);
-}
 
-// space optimization approach (using helper function which is already optimized)
-int houseRobber2SpaceOptimization(int n, vector<int> &arr){
-    if(n == 0) return 0;
-    if(n == 1) return arr[0];
-    if(n == 2) return max(arr[0], arr[1]);
-    
-    // Case 1: Rob houses 0 to n-2
-    int prev2_case1 = arr[0];
-    int prev1_case1 = max(arr[0], arr[1]);
-    
-    for(int i = 2; i < n - 1; i++){ // stop at n-2
-        int pick = arr[i] + prev2_case1;
-        int notPick = prev1_case1;
-        int curr = max(pick, notPick);
-        prev2_case1 = prev1_case1;
-        prev1_case1 = curr;
+/*===============================================================
+  APPROACH 3: TABULATION (BOTTOM-UP)
+  TC: O(N)
+  SC: O(N)
+================================================================*/
+class Solution3_Tabulation {
+public:
+    int helper(int start, int end, vector<int>& nums) {
+        vector<int> dp(nums.size(), 0);
+
+        dp[start] = nums[start];                          // base
+        dp[start + 1] = max(nums[start], nums[start + 1]);
+
+        for (int i = start + 2; i <= end; i++) {
+            dp[i] = max(dp[i - 1], nums[i] + dp[i - 2]);
+        }
+
+        return dp[end];
     }
-    
-    // Case 2: Rob houses 1 to n-1
-    int prev2_case2 = arr[1];
-    int prev1_case2 = max(arr[1], arr[2]);
-    
-    for(int i = 3; i < n; i++){ // start from index 3
-        int pick = arr[i] + prev2_case2;
-        int notPick = prev1_case2;
-        int curr = max(pick, notPick);
-        prev2_case2 = prev1_case2;
-        prev1_case2 = curr;
+
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return nums[0];
+
+        int case1 = helper(0, n - 2, nums);
+        int case2 = helper(1, n - 1, nums);
+
+        return max(case1, case2);
     }
-    
-    return max(prev1_case1, prev1_case2);
-}
+};
 
-signed main() {
-    vector<int> arr = {2, 3, 2};
-    int n = arr.size();
-    
-    // Recursive approach
-    int recursive_case1 = houseRobber2Recursive(n - 2, arr, true); // exclude last
-    int recursive_case2 = houseRobber2Recursive(n - 1, arr, false); // exclude first
-    int recursive = max(recursive_case1, recursive_case2);
-    
-    // Memoization approach
-    vector<int> dp1(n, -1);
-    int memoization_case1 = houseRobber2Memoization(n - 2, arr, dp1, true);
-    vector<int> dp2(n, -1);
-    int memoization_case2 = houseRobber2Memoization(n - 1, arr, dp2, false);
-    int memoization = max(memoization_case1, memoization_case2);
-    
-    int tabulation = houseRobber2Tabulation(n, arr);
-    int spaceOptimization = houseRobber2SpaceOptimization(n, arr);
-    
-    cout << "Recursive: " << recursive << endl;
-    cout << "Memoization: " << memoization << endl;
-    cout << "Tabulation: " << tabulation << endl;
-    cout << "Space Optimization: " << spaceOptimization << endl;
-    
-    return 0;
-}
 
+/*===============================================================
+  APPROACH 4: SPACE OPTIMIZATION
+  TC: O(N)
+  SC: O(1)
+================================================================*/
+class Solution4_SpaceOptimized {
+public:
+    int helper(int start, int end, vector<int>& nums) {
+        int prev2 = nums[start];                      // dp[i-2]
+        int prev1 = max(nums[start], nums[start + 1]); // dp[i-1]
+
+        for (int i = start + 2; i <= end; i++) {
+            int curr = max(prev1, nums[i] + prev2);
+            prev2 = prev1;
+            prev1 = curr;
+        }
+        return prev1;
+    }
+
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        if (n == 1) return nums[0];
+
+        int case1 = helper(0, n - 2, nums);
+        int case2 = helper(1, n - 1, nums);
+
+        return max(case1, case2);
+    }
+};

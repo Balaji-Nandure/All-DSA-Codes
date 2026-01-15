@@ -1,111 +1,136 @@
+/*
+Problem: Frog Jump (Minimum Energy)
+
+Statement:
+Given an array height[] of size n.
+A frog starts at index 0 and wants to reach index n-1.
+The frog can jump either 1 step or 2 steps.
+Cost of a jump from i to j = abs(height[i] - height[j]).
+Return the minimum total energy required.
+
+DP State:
+dp[i] = minimum energy required to reach index i
+
+Recurrence:
+dp[i] = min(
+            dp[i-1] + abs(h[i] - h[i-1]),
+            dp[i-2] + abs(h[i] - h[i-2])
+         )
+
+Links:
+GFG : https://practice.geeksforgeeks.org/problems/geek-jump/1
+LC  : https://leetcode.com/problems/frog-jump/
+*/
+
 #include <bits/stdc++.h>
 using namespace std;
 
-#define endl '\n'
-#define int long long
+/* ---------------------------------------------------------- */
+/* Approach 1: Pure Recursion
+   TC: O(2^n)
+   SC: O(n) (recursion stack)
+*/
+int frogJumpRec(int i, vector<int> &h) {
+    // Base case: starting position
+    if (i == 0) return 0;
 
-const int MOD = 1e9 + 7;
-const int INF = LLONG_MAX >> 1;
+    // Jump from i-1
+    int oneJump = frogJumpRec(i - 1, h) + abs(h[i] - h[i - 1]);
 
-/*
- * Problem: Frog Jump
- *
- * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/geek-jump/1
- *
- * A frog wants to reach the Nth stair. From ith stair, can jump to (i+1)th or (i+2)th.
- * Energy lost = |HEIGHT[i] - HEIGHT[j]|. Find minimum total energy.
- *
- * Example: HEIGHT = [10, 20, 30, 10]
- * Path: 0->1->3, Energy: |10-20| + |20-10| = 20
- *
- * Time: O(n) with DP, O(2^n) recursive
- * Space: O(n) with DP, O(1) space optimized
- */
+    // Jump from i-2 (if possible)
+    // this recrsion call always will not happen so we keep a check
+    int twoJump = INT_MAX;
+    if (i > 1)
+        twoJump = frogJumpRec(i - 2, h) + abs(h[i] - h[i - 2]);
 
-// Recursive approach
-int frogJump(int idx, vector<int> &height){
-    // Base case: at first stair, no energy needed
-    if(idx == 0) return 0;
-    
-    // Option 1: Jump 1 step from previous stair
-    int oneStep = frogJump(idx - 1, height) + abs(height[idx] - height[idx - 1]);
-    
-    // Option 2: Jump 2 steps (only if idx >= 2)
-    int twoStep = 1e9;
-    if(idx > 1) twoStep = frogJump(idx - 2, height) + abs(height[idx] - height[idx - 2]);
-    
-    // Return minimum energy
-    return min(oneStep, twoStep);
+    // Take minimum energy
+    return min(oneJump, twoJump);
 }
 
-// Memoization approach (Top-down DP)
-int frogJumpMemoization(int idx, vector<int> &height, vector<int> &dp){
+/* ---------------------------------------------------------- */
+/* Approach 2: Memoization (Top-Down DP)
+   TC: O(n)
+   SC: O(n) + recursion stack
+*/
+int frogJumpMemo(int i, vector<int> &h, vector<int> &dp) {
     // Base case
-    if(idx == 0) return 0;
-    // Return cached result if available
-    if(dp[idx] != -1) return dp[idx];
-    
-    // Compute minimum energy
-    int oneStep = frogJumpMemoization(idx - 1, height, dp) + abs(height[idx] - height[idx - 1]);
-    int twoStep = 1e9;
-    if(idx > 1) twoStep = frogJumpMemoization(idx - 2, height, dp) + abs(height[idx] - height[idx - 2]);
-    
-    // Store and return result
-    return dp[idx] = min(oneStep, twoStep);
+    if (i == 0) return 0;
+
+    // Return stored result
+    if (dp[i] != -1) return dp[i];
+
+    // Jump from i-1
+    int oneJump = frogJumpMemo(i - 1, h, dp) + abs(h[i] - h[i - 1]);
+
+    // Jump from i-2
+    int twoJump = INT_MAX;
+    if (i > 1)
+        twoJump = frogJumpMemo(i - 2, h, dp) + abs(h[i] - h[i - 2]);
+
+    // Store and return
+    return dp[i] = min(oneJump, twoJump);
 }
 
-// Tabulation approach (Bottom-up DP)
-int frogJumpTabulation(int n, vector<int> &height){
-    vector<int> dp(n, 0);
-    dp[0] = 0; // Base case: no energy at first stair
-    if(n > 1) dp[1] = abs(height[1] - height[0]); // Only one way to reach second stair
-    
-    // Fill dp array from left to right
-    for(int i = 2; i < n; i++){
-        int oneStep = dp[i - 1] + abs(height[i] - height[i - 1]);
-        int twoStep = dp[i - 2] + abs(height[i] - height[i - 2]);
-        dp[i] = min(oneStep, twoStep);
+/* ---------------------------------------------------------- */
+/* Approach 3: Tabulation (Bottom-Up DP)
+   TC: O(n)
+   SC: O(n)
+*/
+int frogJumpTab(int n, vector<int> &h) {
+    vector<int> dp(n);
+
+    // Base cases
+    dp[0] = 0;
+    dp[1] = abs(h[1] - h[0]);
+
+    // Build dp iteratively
+    for (int i = 2; i < n; i++) {
+        dp[i] = min(
+            //  whenever there is dp[i-1] or dp[i-2] in the recurrence relation, 
+            // we can space optimise it.
+            dp[i - 1] + abs(h[i] - h[i - 1]),
+            dp[i - 2] + abs(h[i] - h[i - 2])
+        );
     }
-    
+
     return dp[n - 1];
 }
 
-// Space optimization (only need last 2 values)
-int frogJumpSpaceOptimization(int n, vector<int> &height){
+/* ---------------------------------------------------------- */
+/* Approach 4: Space Optimized (Best)
+   TC: O(n)
+   SC: O(1)
+*/
+int frogJumpSpaceOpt(int n, vector<int> &h) {
     if(n == 1) return 0;
-    
-    int prev2 = 0; // dp[0]
-    int prev1 = abs(height[1] - height[0]); // dp[1]
-    
-    for(int i = 2; i < n; i++){
-        int oneStep = prev1 + abs(height[i] - height[i - 1]);
-        int twoStep = prev2 + abs(height[i] - height[i - 2]);
-        int curr = min(oneStep, twoStep);
-        // Update for next iteration
+    int prev2 = 0;                       // dp[0]
+    int prev1 = abs(h[1] - h[0]);        // dp[1]
+    // Iterate using only two variables
+    for (int i = 2; i < n; i++) {
+        int curr = min(
+            prev1 + abs(h[i] - h[i - 1]),
+            prev2 + abs(h[i] - h[i - 2])
+        );
         prev2 = prev1;
         prev1 = curr;
     }
-    
+
     return prev1;
 }
 
-signed main() {
+/* ---------------------------------------------------------- */
+/* Main function for testing */
+int main() {
     vector<int> height = {10, 20, 30, 10};
     int n = height.size();
-    
-    int recursive = frogJump(n - 1, height);
-    
-    vector<int> dp1(n, -1);
-    int memoization = frogJumpMemoization(n - 1, height, dp1);
-    
-    int tabulation = frogJumpTabulation(n, height);
-    int spaceOptimization = frogJumpSpaceOptimization(n, height);
-    
-    cout << "Recursive: " << recursive << endl;
-    cout << "Memoization: " << memoization << endl;
-    cout << "Tabulation: " << tabulation << endl;
-    cout << "Space Optimization: " << spaceOptimization << endl;
-    
+
+    cout << "Recursion        : " << frogJumpRec(n - 1, height) << endl;
+
+    vector<int> dp(n, -1);
+    cout << "Memoization      : " << frogJumpMemo(n - 1, height, dp) << endl;
+
+    cout << "Tabulation       : " << frogJumpTab(n, height) << endl;
+    cout << "Space Optimized  : " << frogJumpSpaceOpt(n, height) << endl;
+
     return 0;
 }
-
