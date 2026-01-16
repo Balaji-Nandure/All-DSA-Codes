@@ -94,45 +94,35 @@ public:
     int minDifference(vector<int>& arr) {
         int n = arr.size();
         int totalSum = accumulate(arr.begin(), arr.end(), 0);
-        int target = totalSum / 2;
-        
-        // dp[i][t]: can we get sum t using first (i+1) items?
-        vector<vector<bool>> dp(n, vector<bool>(target + 1, false));
-        
-        // Base Case: sum 0 can be made with empty subset
-        for (int i = 0; i < n; i++) {
-            dp[i][0] = true;
-        }
-        
-        // Base Case: using only arr[0]
-        if (arr[0] <= target) {
-            dp[0][arr[0]] = true;
-        }
-        
-        // Build table
+        int target = totalSum / 2; // We only care about subset sums up to totalSum/2
+
+        // Build the subset sum DP as in subset sum equal to target.cpp (lines 102-126)
+        // That is, dp[i][j] = can we use items 0..i to make sum j
+
+        // Space Optimized (use only two rows: prev & curr)
+        vector<bool> prev(target + 1, false), curr(target + 1, false);
+        prev[0] = true; // You can always make sum 0 with empty subset
+        if (arr[0] <= target) prev[arr[0]] = true;
         for (int i = 1; i < n; i++) {
-            for (int t = 1; t <= target; t++) {
-                // Include arr[i] if t >= arr[i]
-                bool pick = false;
-                if (t >= arr[i]) {
-                    pick = dp[i-1][t - arr[i]];
-                }
-                // Exclude arr[i]
-                bool notPick = dp[i-1][t];
-                
-                dp[i][t] = pick || notPick;
+            curr[0] = true; // Always can make sum 0
+            for (int j = 1; j <= target; j++) {
+                bool notTake = prev[j];
+                bool take = false;
+                if (arr[i] <= j)
+                    take = prev[j - arr[i]];
+                curr[j] = take || notTake;
             }
+            prev = curr;
         }
-        
-        // Find minimum difference by checking all possible subset sums
+
         int minDiff = INF;
         for (int s1 = 0; s1 <= target; s1++) {
-            if (dp[n-1][s1]) {
+            if (prev[s1]) {
                 int s2 = totalSum - s1;
-                minDiff = min(minDiff, abs(s1 - s2));
+                int diff = abs(s1 - s2);
+                minDiff = min(minDiff, diff);
             }
         }
-        
         return minDiff;
     }
 };
