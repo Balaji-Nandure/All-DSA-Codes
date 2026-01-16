@@ -30,130 +30,93 @@ Day 2: Activity 1 or 2 -> 3 points
 Maximum = 5 + 3 + 3 = 11
 */
 
-// recursive approach
-int ninjaTraining(int day, int lastActivity, vector<vector<int>> &points){
-    // if(day == 0){
-    //     int maxPoints = 0;
-    //     for(int activity = 0; activity < 3; activity++){
-    //         if(activity != lastActivity){
-    //             maxPoints = max(maxPoints, points[0][activity]);
-    //         }
-    //     }
-    //     return maxPoints;
-    // }
-
-    if(day < 0) return 0;
-    
-    int maxPoints = 0;
-    for(int activity = 0; activity < 3; activity++){
-        if(activity != lastActivity){
-            int currentPoints = points[day][activity] + ninjaTraining(day - 1, activity, points);
-            maxPoints = max(maxPoints, currentPoints);
+// Recursive approach
+int f(int d, int l, vector<vector<int>> &p) {
+    if(d < 0) return 0;
+    int res = 0;
+    for(int a = 0; a < 3; a++) {
+        if(a != l) {
+            int tmp = p[d][a] + f(d-1, a, p);
+            res = max(res, tmp);
         }
     }
-    
-    return maxPoints;
+    return res;
 }
 
-// memoization approach
-int ninjaTrainingMemoization(int day, int lastActivity, vector<vector<int>> &points, vector<vector<int>> &dp){
-    // if(day == 0){
-    //     int maxPoints = 0;
-    //     for(int activity = 0; activity < 3; activity++){
-    //         if(activity != lastActivity){
-    //             maxPoints = max(maxPoints, points[0][activity]);
-    //         }
-    //     }
-    //     return maxPoints;
-    // }
-
-    if(day < 0) return 0;
-    if(dp[day][lastActivity] != -1) return dp[day][lastActivity];
-    
-    int maxPoints = 0;
-    for(int activity = 0; activity < 3; activity++){
-        if(activity != lastActivity){
-            int currentPoints = points[day][activity] + ninjaTrainingMemoization(day - 1, activity, points, dp);
-            maxPoints = max(maxPoints, currentPoints);
+// Memoization approach
+int fm(int d, int l, vector<vector<int>> &p, vector<vector<int>> &dp) {
+    if(d < 0) return 0;
+    if(dp[d][l] != -1) return dp[d][l];
+    int res = 0;
+    for(int a = 0; a < 3; a++) {
+        if(a != l) {
+            int tmp = p[d][a] + fm(d-1, a, p, dp);
+            res = max(res, tmp);
         }
     }
-    
-    return dp[day][lastActivity] = maxPoints;
+    return dp[d][l] = res;
 }
 
-// tabulation approach
-int ninjaTrainingTabulation(int n, vector<vector<int>> &points){
-    // dp[day][lastActivity] = max points from day 0 to day, ending with lastActivity
-    vector<vector<int>> dp(n, vector<int>(4, 0));
-    
-    // Base case: day 0
-    dp[0][0] = max(points[0][1], points[0][2]);
-    dp[0][1] = max(points[0][0], points[0][2]);
-    dp[0][2] = max(points[0][0], points[0][1]);
-    dp[0][3] = max({points[0][0], points[0][1], points[0][2]});
-    
-    for(int day = 1; day < n; day++){
-        for(int last = 0; last < 4; last++){
-            dp[day][last] = 0;
-            for(int activity = 0; activity < 3; activity++){
-                if(activity != last){
-                    int currentPoints = points[day][activity] + dp[day - 1][activity];
-                    dp[day][last] = max(dp[day][last], currentPoints);
-                }
-            }
-        }
+int ft(vector<vector<int>>& arr) {
+    int n = arr.size();
+    vector<vector<int>> dp(n, vector<int>(3));
+
+    // base case
+    dp[0][0] = arr[0][0];
+    dp[0][1] = arr[0][1];
+    dp[0][2] = arr[0][2];
+
+    for (int i = 1; i < n; i++) {
+        dp[i][0] = arr[i][0] + max(dp[i-1][1], dp[i-1][2]); // can't repeat 0
+        dp[i][1] = arr[i][1] + max(dp[i-1][0], dp[i-1][2]); // can't repeat 1
+        dp[i][2] = arr[i][2] + max(dp[i-1][0], dp[i-1][1]); // can't repeat 2
     }
-    
-    return dp[n - 1][3]; // lastActivity = 3 means no restriction on last day
+
+    return max({dp[n-1][0], dp[n-1][1], dp[n-1][2]});
 }
 
-// space optimization approach
-int ninjaTrainingSpaceOptimization(int n, vector<vector<int>> &points){
-    // We only need previous day's results
-    vector<int> prev(4, 0);
-    
-    // Base case: day 0
-    prev[0] = max(points[0][1], points[0][2]);
-    prev[1] = max(points[0][0], points[0][2]);
-    prev[2] = max(points[0][0], points[0][1]);
-    prev[3] = max({points[0][0], points[0][1], points[0][2]});
-    
-    for(int day = 1; day < n; day++){
-        vector<int> curr(4, 0);
-        for(int last = 0; last < 4; last++){
-            curr[last] = 0;
-            for(int activity = 0; activity < 3; activity++){
-                if(activity != last){
-                    int currentPoints = points[day][activity] + prev[activity];
-                    curr[last] = max(curr[last], currentPoints);
-                }
-            }
-        }
-        prev = curr;
+int fs(vector<vector<int>>& arr) {
+    int n = arr.size();
+    // prev[i] = max points till previous day ending with activity i
+    vector<int> prev(3);
+
+    // base case (day 0)
+    prev[0] = arr[0][0];
+    prev[1] = arr[0][1];
+    prev[2] = arr[0][2];
+
+    for (int i = 1; i < n; i++) {
+        vector<int> curr(3);
+
+        curr[0] = arr[i][0] + max(prev[1], prev[2]); // do activity 0 today
+        curr[1] = arr[i][1] + max(prev[0], prev[2]); // do activity 1 today
+        curr[2] = arr[i][2] + max(prev[0], prev[1]); // do activity 2 today
+
+        prev = curr; // move to next day
     }
-    
-    return prev[3];
+
+    return max({prev[0], prev[1], prev[2]});
 }
+
 
 signed main() {
-    vector<vector<int>> points = {{1, 2, 5},
-                                   {3, 1, 1},
-                                   {3, 3, 3}};
-    int n = points.size();
-    
-    int recursive = ninjaTraining(n - 1, 3, points); // 3 means no previous activity
-    
-    vector<vector<int>> dp1(n, vector<int>(4, -1));
-    int memoization = ninjaTrainingMemoization(n - 1, 3, points, dp1);
-    
-    int tabulation = ninjaTrainingTabulation(n, points);
-    int spaceOptimization = ninjaTrainingSpaceOptimization(n, points);
-    
-    cout << "Recursive: " << recursive << endl;
-    cout << "Memoization: " << memoization << endl;
-    cout << "Tabulation: " << tabulation << endl;
-    cout << "Space Optimization: " << spaceOptimization << endl;
-    
+    vector<vector<int>> p = {
+        {1,2,5},
+        {3,1,1},
+        {3,3,3}
+    };
+    int n = p.size();
+
+    int res1 = f(n-1, 3, p); // recursive
+    vector<vector<int>> dpm(n, vector<int>(4, -1));
+    int res2 = fm(n-1, 3, p, dpm); // memo
+    int res3 = ft(n, p); // tab
+    int res4 = fs(n, p); // space opt
+
+    cout << "Recursive: " << res1 << endl;
+    cout << "Memoization: " << res2 << endl;
+    cout << "Tabulation: " << res3 << endl;
+    cout << "Space Optimization: " << res4 << endl;
+
     return 0;
 }
-

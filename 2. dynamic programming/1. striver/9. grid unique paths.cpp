@@ -104,7 +104,7 @@ int gridUniquePathsSpaceOptimization(int m, int n){
     
     return prev[n - 1];
 }
-
+ 
 signed main() {
     int m = 3, n = 7;
     
@@ -122,4 +122,4 @@ signed main() {
     cout << "Space Optimization: " << spaceOptimization << endl;
     
     return 0;
-}
+} 

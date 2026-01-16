@@ -1,0 +1,2 @@
+1. always write the out of bound base case first.
+2. if you take INT_MIN or INT_MAX it could go out of bound. therefore always take 1e9

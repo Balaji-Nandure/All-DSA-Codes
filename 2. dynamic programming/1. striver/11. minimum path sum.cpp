@@ -11,8 +11,8 @@ const int INF = LLONG_MAX >> 1;
  * Problem: Minimum Path Sum
  * 
  * LeetCode 64: Minimum Path Sum
- * GeeksforGeeks Practice: https://practice.geeksforgeeks.org/problems/minimum-cost-path/0
- *
+ * GeeksforGeeks Practice: https://leetcode.com/problems/minimum-path-sum/submissions/1886461497/
+ 
  * Given a m x n grid filled with non-negative numbers, find a path from top-left to 
 bottom-right which minimizes the sum of all numbers along its path.
 
@@ -40,7 +40,7 @@ Base cases:
 - dp[i][0] = grid[i][0] + dp[i-1][0] (only from top)
 */
 
-// Recursive approach
+// Recursive approach 
 int minPathSum(int i, int j, vector<vector<int>> &grid){
     // Base case: reached starting cell
     if(i == 0 && j == 0) return grid[0][0];
@@ -73,27 +73,22 @@ int minPathSumMemoization(int i, int j, vector<vector<int>> &grid, vector<vector
 // Tabulation approach (Bottom-up DP)
 int minPathSumTabulation(int m, int n, vector<vector<int>> &grid){
     vector<vector<int>> dp(m, vector<int>(n, 0));
-    
-    // Base case: starting cell
-    dp[0][0] = grid[0][0];
-    
-    // Fill first row: can only come from left
-    for(int j = 1; j < n; j++){
-        dp[0][j] = grid[0][j] + dp[0][j - 1];
-    }
-    
-    // Fill first column: can only come from top
-    for(int i = 1; i < m; i++){
-        dp[i][0] = grid[i][0] + dp[i - 1][0];
-    }
-    
-    // Fill dp table: minSum[i][j] = grid[i][j] + min(minSum[i-1][j], minSum[i][j-1])
-    for(int i = 1; i < m; i++){
-        for(int j = 1; j < n; j++){
-            dp[i][j] = grid[i][j] + min(dp[i - 1][j], dp[i][j - 1]);
+    for(int i = 0; i < m; i++){
+        for(int j = 0; j < n; j++){
+            if(i == 0 && j == 0) {
+                dp[i][j] = grid[i][j];
+            }
+            else if(i == 0) {
+                dp[i][j] = grid[i][j] + dp[i][j - 1];
+            }
+            else if(j == 0) {
+                dp[i][j] = grid[i][j] + dp[i - 1][j];
+            }
+            else {
+                dp[i][j] = grid[i][j] + min(dp[i - 1][j], dp[i][j - 1]);
+            }
         }
     }
-    
     return dp[m - 1][n - 1];
 }
 
