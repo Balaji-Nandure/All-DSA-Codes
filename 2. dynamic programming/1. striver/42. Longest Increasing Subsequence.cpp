@@ -105,7 +105,7 @@ public:
         if (n == 0) return 0;
         
         // dp[i] = length of LIS ending at index i
-        vector<int> dp(n, 1);
+        vector<int> dp(n, 1); // initialize dp array with 1 because each element is a subsequence of length 1
         
         // For each element, check all previous elements
         for (int i = 1; i < n; i++) {
@@ -158,6 +158,7 @@ public:
                 *it = nums[i];
             }
         }
+        // the tail will not contain the LIS, but the length of the LIS.
         
         return tail.size();
     }
