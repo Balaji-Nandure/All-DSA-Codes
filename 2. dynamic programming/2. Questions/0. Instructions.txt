@@ -16,6 +16,7 @@ Act as a DP Coding Expert. For every Dynamic Programming problem I provide, foll
    * Approach 3: Tabulation (Include TC/SC at the function header).
    * Approach 4: Space Optimization (Include TC/SC at the function header).
    * Short, clear inline comments explaining logic inside every function.
+   writte code such than while revising it should be easy to understand
 
 3. CONSTRAINTS:
    * Always provide TC and SC near the function declaration.
