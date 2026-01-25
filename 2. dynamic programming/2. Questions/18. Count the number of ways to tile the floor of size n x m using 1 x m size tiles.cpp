@@ -149,6 +149,41 @@ public:
     }
 };
 
+// Approach 4: Space Optimization (O(m) space)
+class Solution4_SpaceOptimized {
+public:
+    // TC: O(n), SC: O(m) - only track last m values
+    int numberOfWays(int n, int m) {
+        if (n == 0) return 1;
+        if (n < m) return 1;
+        
+        // Use circular array to store last m values
+        vector<int> dp(m, 0);
+        
+        // Base cases
+        dp[0] = 1; // dp[0] = 1 (empty floor)
+        
+        // For rows 1 to m-1
+        for (int i = 1; i < m; i++) {
+            dp[i] = 1; // Only horizontal placement
+        }
+        
+        // For row m onwards
+        for (int i = m; i <= n; i++) {
+            int curr = (dp[(i - 1) % m] + dp[i % m]) % MOD;
+            // Update: dp[i % m] currently holds dp[i-m] (from previous iterations)
+            if (i == m) {
+                curr = 2; // Special case: both horizontal and vertical
+            } else {
+                curr = (dp[(i - 1) % m] + dp[(i - m) % m]) % MOD;
+            }
+            dp[i % m] = curr;
+        }
+        
+        return dp[n % m];
+    }
+};
+
 // Approach 4.1: Cleaner space-optimized solution
 class Solution {
 public:
