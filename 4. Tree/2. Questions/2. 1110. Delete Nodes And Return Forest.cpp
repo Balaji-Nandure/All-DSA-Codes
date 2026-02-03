@@ -17,43 +17,6 @@ struct TreeNode {
     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
-class Solution {
-private:
-    // Returns the node if it should be kept, nullptr if it should be deleted
-    TreeNode* helper(TreeNode* node, bool isRoot, unordered_set<int>& toDeleteSet, vector<TreeNode*>& forest) {
-        if (!node) return nullptr;
-        
-        // Check if current node should be deleted
-        bool shouldDelete = toDeleteSet.count(node->val);
-        
-        // If current node is a root (either original root or becomes root after parent deletion)
-        // and it's not being deleted, add it to the forest
-        if (isRoot && !shouldDelete) {
-            forest.push_back(node);
-        }
-        
-        // Process children
-        // If current node is deleted, its children become potential roots
-        node->left = helper(node->left, shouldDelete, toDeleteSet, forest);
-        node->right = helper(node->right, shouldDelete, toDeleteSet, forest);
-        
-        // Return nullptr if node should be deleted, otherwise return the node
-        return shouldDelete ? nullptr : node;
-    }
-    
-public:
-    vector<TreeNode*> delNodes(TreeNode* root, vector<int>& to_delete) {
-        // Convert to_delete to set for O(1) lookup
-        unordered_set<int> toDeleteSet(to_delete.begin(), to_delete.end());
-        vector<TreeNode*> forest;
-        
-        // Start DFS with root as a potential root
-        helper(root, true, toDeleteSet, forest);
-        
-        return forest;
-    }
-};
-
 // Alternative Approach: Post-order traversal with explicit parent tracking
 class Solution2 {
 private:
@@ -99,3 +62,68 @@ public:
 // Space Complexity: O(n + m) where m is the size of to_delete array (for the set)
 //                   O(h) for recursion stack where h is the height of the tree
 
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+ // Alternative Approach: q (Level-order traversal)
+ class Solution {
+public:
+    vector<TreeNode*> delNodes(TreeNode* root, vector<int>& to_delete) {
+        // Handle empty tree
+        if (!root) {
+            return {};
+        }
+
+        // Convert to_delete array to set for O(1) lookup
+        unordered_set<int> toDelete(to_delete.begin(), to_delete.end());
+        vector<TreeNode*> forest;
+
+        // q queue to traverse the tree level by level
+        queue<TreeNode*> q;
+        q.push(root);
+
+        while (!q.empty()) {
+            auto curr = q.front();
+            q.pop();
+
+            // Process left child
+            if (curr->left) {
+                q.push(curr->left);
+                // If left child should be deleted, disconnect it from parent
+                if (toDelete.find(curr->left->val) != toDelete.end()) {
+                    curr->left = nullptr;
+                }
+            } 
+
+            // Process right child
+            if (curr->right) {
+                q.push(curr->right);
+                // If right child should be deleted, disconnect it from parent
+                if (curr->right && toDelete.find(curr->right->val) != toDelete.end()) {
+                    curr->right = nullptr;
+                }
+            } 
+
+            // If current node should be deleted
+            if (toDelete.find(curr->val) != toDelete.end()) {
+                // Add non-null children to forest (they become new roots)
+                if (curr->left) forest.push_back(curr->left);
+                if (curr->right) forest.push_back(curr->right);
+            }
+        }
+
+        // If root wasn't deleted, add it to the forest
+        if (toDelete.find(root->val) == toDelete.end()) {
+            forest.push_back(root);
+        }
+        return forest;
+    }
+};
