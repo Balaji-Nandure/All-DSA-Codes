@@ -7,27 +7,33 @@ using namespace std;
 const int MOD = 1e9 + 7;
 const int INF = LLONG_MAX >> 1;
 
-void pid(int n) {
-    // Base case
-    if (n == 0) return;
-
-    // Pre-order work → INCREASING PART
-    cout << n << " ";  // print n while going DOWN the stack
-    pid(n - 1);        // this prints 1 to n-1
-
-
-    // Post-order work → DECREASING PART
-    // print n again while coming UP the stack
-    cout << n << " ";
-}
-
 signed main() {
-    // Do some CPU heavy work: Calculate the sum of squares from 1 to a large N in a loop
-    // Infinite CPU-heavy work: keep calculating sum of squares in an endless loop
-    long long sum = 0;
-    while (true) {
-        for (int i = 1; i <= 100000000; ++i) {
-            sum += i * i;
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int tc; 
+    cin >> tc;
+    while (tc--) {
+        int n;
+        cin >> n;
+        vector<int> a(n);
+        for(int i = 0; i < n; i++){
+            cin >> a[i];
         }
+
+        int sum = 0;
+        int i = 0;
+
+        while(i < n){
+            int maxVal = a[i];
+            bool isPositive = a[i] > 0;
+            while(i < n && (a[i] > 0) == isPositive) {
+                maxVal = max(maxVal, a[i]);
+                i++;
+            }
+            sum += maxVal;
+        }
+
+        cout << sum << endl;
     }
 }
