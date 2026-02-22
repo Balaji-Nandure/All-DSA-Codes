@@ -44,22 +44,16 @@ using namespace std;
 
 class Solution {
 public:
-    void moveZerosToEnd(vector<int>& arr) {
+    void pushZerosToEnd(vector<int>& arr) {
+        
         int n = arr.size();
-        int left = 0;      // Pointer for non-zero elements
-        int right = n - 1;   // Pointer for zero elements
+        int pos = 0;   // position for next non-zero
         
-        // Move non-zero elements to the left
-        for (int i = 0; i < n; i++) {
-            if (arr[i] != 0) {
-                arr[left++] = arr[i];
-            }
-        }
-        
-        // Move zeros to the right
-        for (int i = n - 1; i >= 0; i--) {
-            if (arr[i] == 0) {
-                arr[right--] = arr[i];
+        for(int i = 0; i < n; i++) {
+            
+            if(arr[i] != 0) {
+                swap(arr[i], arr[pos]);
+                pos++;
             }
         }
     }
