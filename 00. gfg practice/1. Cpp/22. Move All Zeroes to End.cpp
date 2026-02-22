@@ -49,8 +49,10 @@ public:
         int n = arr.size();
         int pos = 0;   // position for next non-zero
         
+        // Iterate through the array from left to right
         for(int i = 0; i < n; i++) {
             
+            // If the current element is not zero, swap it with the next non-zero element
             if(arr[i] != 0) {
                 swap(arr[i], arr[pos]);
                 pos++;
