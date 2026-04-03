@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Next Smaller Element — Animated</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="gfg-visualizer.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Next Smaller Element</h1>
+    <p class="sub">
+      For each position, find the <strong>first value to the right</strong> that is <strong>strictly smaller</strong>.
+      If none exists, the answer is <span class="mono">-1</span>. Two views: naive scanning (easy mental model),
+      then the <strong>monotonic stack</strong> from your C++ solution (right → left, pop while top ≥ current).
+    </p>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="active" data-mode="scan">1 · Scan right (idea)</button>
+      <button type="button" data-mode="stack">2 · Stack algorithm</button>
+    </div>
+
+    <div class="panel">
+      <div class="row-label">Array</div>
+      <div class="cells" id="arrayRow"></div>
+      <div class="arrow-hint" id="arrowHint"></div>
+
+      <div id="answerBlock">
+        <div class="row-label" style="margin-top:16px">Answer (NSE)</div>
+        <div class="cells" id="answerRow"></div>
+      </div>
+
+      <div id="stackSection" class="hidden" style="margin-top:20px">
+        <div class="grid-2">
+          <div>
+            <div class="row-label">Narration</div>
+            <p class="narration" id="narration"></p>
+          </div>
+          <div>
+            <div class="row-label">Stack (bottom → top)</div>
+            <div class="stack-viz" id="stackCol">
+              <span class="stack-label">empty</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="scanNarration" style="margin-top:16px">
+        <p class="narration" id="narrationScan"></p>
+      </div>
+
+      <div class="controls">
+        <button type="button" id="btnPlay">Play</button>
+        <button type="button" class="secondary" id="btnStep">Step</button>
+        <button type="button" class="secondary" id="btnReset">Reset</button>
+        <label class="speed">
+          <span>Speed</span>
+          <input type="range" id="speed" min="300" max="1600" value="900" />
+        </label>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:var(--accent)"></span> Current index</span>
+        <span><span class="dot" style="background:var(--scan)"></span> Scanning right</span>
+        <span><span class="dot" style="background:var(--ok)"></span> First smaller found</span>
+      </div>
+    </div>
+
+    <p class="sub mono footnote">
+      Example: [4, 8, 5, 2, 25] → [2, 5, 2, -1, -1] · Open this file in a browser.
+    </p>
+  </div>
+
+  <script>
+    const ARR = [4, 8, 5, 2, 25];
+    const N = ARR.length;
+
+    const arrayRow = document.getElementById('arrayRow');
+    const answerRow = document.getElementById('answerRow');
+    const arrowHint = document.getElementById('arrowHint');
+    const narration = document.getElementById('narration');
+    const narrationScan = document.getElementById('narrationScan');
+    const stackCol = document.getElementById('stackCol');
+    const stackSection = document.getElementById('stackSection');
+    const scanNarration = document.getElementById('scanNarration');
+    const btnPlay = document.getElementById('btnPlay');
+    const btnStep = document.getElementById('btnStep');
+    const btnReset = document.getElementById('btnReset');
+    const speedEl = document.getElementById('speed');
+
+    let mode = 'scan';
+    let stepIdx = 0;
+    let playing = false;
+    let timer = null;
+
+    function buildArrayCells() {
+      arrayRow.innerHTML = '';
+      ARR.forEach((v, i) => {
+        const w = document.createElement('div');
+        w.className = 'cell-wrap';
+        const c = document.createElement('div');
+        c.className = 'cell mono';
+        c.dataset.i = i;
+        c.textContent = v;
+        const idx = document.createElement('span');
+        idx.className = 'idx';
+        idx.textContent = 'i=' + i;
+        w.appendChild(idx);
+        w.appendChild(c);
+        arrayRow.appendChild(w);
+      });
+    }
+
+    function buildAnswerCells() {
+      answerRow.innerHTML = '';
+      for (let i = 0; i < N; i++) {
+        const w = document.createElement('div');
+        w.className = 'cell-wrap';
+        const c = document.createElement('div');
+        c.className = 'cell mono';
+        c.dataset.ai = i;
+        c.textContent = '·';
+        c.style.fontSize = '1.5rem';
+        c.style.color = 'var(--muted)';
+        const idx = document.createElement('span');
+        idx.className = 'idx';
+        idx.textContent = 'i=' + i;
+        w.appendChild(idx);
+        w.appendChild(c);
+        answerRow.appendChild(w);
+      }
+    }
+
+    function cellAt(i) {
+      return arrayRow.querySelector(`.cell[data-i="${i}"]`);
+    }
+
+    function ansCellAt(i) {
+      return answerRow.querySelector(`.cell[data-ai="${i}"]`);
+    }
+
+    function clearHighlights() {
+      arrayRow.querySelectorAll('.cell').forEach(c => {
+        c.classList.remove('focus', 'scan', 'found', 'dim');
+      });
+    }
+
+    function renderStack(stack, poppingValue = null) {
+      stackCol.innerHTML = '';
+      if (stack.length === 0) {
+        const lab = document.createElement('span');
+        lab.className = 'stack-label';
+        lab.textContent = 'empty';
+        stackCol.appendChild(lab);
+        return;
+      }
+      stack.forEach((val, si) => {
+        const d = document.createElement('div');
+        d.className = 's-cell mono';
+        d.textContent = val;
+        const isTop = si === stack.length - 1;
+        if (isTop) d.classList.add('top');
+        if (poppingValue !== null && isTop && val === poppingValue) d.classList.add('popping');
+        stackCol.appendChild(d);
+      });
+      const lab = document.createElement('span');
+      lab.className = 'stack-label';
+      lab.textContent = 'top ↑';
+      stackCol.appendChild(lab);
+    }
+
+    /* --- Stack mode steps (matches your right-to-left solution) --- */
+    const stackSteps = [];
+
+    function buildStackSteps() {
+      stackSteps.length = 0;
+      const stack = [];
+      const ans = Array(N).fill(null);
+
+      function snapshot(msg, opts = {}) {
+        stackSteps.push({
+          i: opts.i,
+          stack: [...stack],
+          ans: [...ans],
+          msg,
+          pop: opts.pop ?? null,
+        });
+      }
+
+      for (let i = N - 1; i >= 0; i--) {
+        const v = ARR[i];
+        snapshot(`Index <strong>${i}</strong>, value <strong>${v}</strong>. We walk <strong>right → left</strong>; stack holds candidates for “next smaller on the right”.`, { i });
+
+        while (stack.length && stack[stack.length - 1] >= v) {
+          const top = stack[stack.length - 1];
+          snapshot(`Top is <strong>${top}</strong> and <strong>${top} ≥ ${v}</strong>, so it can never be the next smaller for anything to the left. <strong>Pop</strong>.`, { i, pop: top });
+          stack.pop();
+        }
+
+        if (stack.length === 0) {
+          ans[i] = -1;
+          snapshot(`Stack empty → no smaller value to the right of <strong>${v}</strong>. Set <strong>ans[${i}] = -1</strong>.`, { i });
+        } else {
+          const t = stack[stack.length - 1];
+          ans[i] = t;
+          snapshot(`Top is <strong>${t}</strong> and <strong>${t} &lt; ${v}</strong> → first smaller on the right. Set <strong>ans[${i}] = ${t}</strong>.`, { i });
+        }
+
+        stack.push(v);
+        snapshot(`Push <strong>${v}</strong> onto stack so left indices can use it.`, { i });
+      }
+
+      snapshot(`Done. Result: <span class="mono">[${ans.join(', ')}]</span>`, {});
+    }
+
+    buildStackSteps();
+
+    /* --- Scan mode steps (naive “look right”) --- */
+    const scanSteps = [];
+
+    function buildScanSteps() {
+      scanSteps.length = 0;
+      const ans = Array(N).fill(null);
+
+      for (let i = 0; i < N; i++) {
+        scanSteps.push({
+          type: 'focus',
+          i,
+          j: null,
+          ans: [...ans],
+          msg: `Fix index <strong>${i}</strong> (value <strong>${ARR[i]}</strong>). Scan indices <strong>${i + 1}</strong> … <strong>${N - 1}</strong> for the <strong>first</strong> value strictly smaller than <strong>${ARR[i]}</strong>.`,
+        });
+
+        let found = false;
+        for (let j = i + 1; j < N; j++) {
+          scanSteps.push({
+            type: 'scan',
+            i,
+            j,
+            ans: [...ans],
+            msg: `Compare with index <strong>${j}</strong> (value <strong>${ARR[j]}</strong>).`,
+          });
+
+          if (ARR[j] < ARR[i]) {
+            ans[i] = ARR[j];
+            scanSteps.push({
+              type: 'found',
+              i,
+              j,
+              ans: [...ans],
+              msg: `<strong>${ARR[j]} &lt; ${ARR[i]}</strong> → this is the first smaller on the right. Set <strong>ans[${i}] = ${ARR[j]}</strong>.`,
+            });
+            found = true;
+            break;
+          }
+          scanSteps.push({
+            type: 'reject',
+            i,
+            j,
+            ans: [...ans],
+            msg: `<strong>${ARR[j]}</strong> is not smaller than <strong>${ARR[i]}</strong>; keep scanning.`,
+          });
+        }
+
+        if (!found) {
+          ans[i] = -1;
+          scanSteps.push({
+            type: 'none',
+            i,
+            j: null,
+            ans: [...ans],
+            msg: `Nothing smaller on the right → <strong>ans[${i}] = -1</strong>.`,
+          });
+        }
+      }
+
+      scanSteps.push({
+        type: 'done',
+        i: null,
+        j: null,
+        ans: [...ans],
+        msg: `Naive scan finished — same answers as the stack method: <span class="mono">[${ans.join(', ')}]</span>.`,
+      });
+    }
+
+    buildScanSteps();
+
+    function delay() {
+      const ms = parseInt(speedEl.value, 10);
+      return new Promise(r => setTimeout(r, 2200 - ms));
+    }
+
+    function applyScanStep(s) {
+      clearHighlights();
+      arrowHint.textContent = '';
+
+      if (s.type === 'done') {
+        narrationScan.innerHTML = s.msg;
+        return;
+      }
+
+      narrationScan.innerHTML = s.msg;
+
+      if (s.i !== null) {
+        cellAt(s.i).classList.add('focus');
+      }
+
+      if (s.j !== null) {
+        cellAt(s.j).classList.add(s.type === 'found' ? 'found' : 'scan');
+        if (s.type === 'scan' || s.type === 'reject') {
+          arrowHint.textContent = '→ scan right';
+        }
+        if (s.type === 'found') {
+          arrowHint.textContent = '✓ first smaller';
+        }
+      }
+
+      for (let k = 0; k < N; k++) {
+        if (s.ans[k] !== null) {
+          const el = ansCellAt(k);
+          el.textContent = s.ans[k];
+          el.style.color = 'var(--text)';
+          el.style.fontSize = '1.15rem';
+        }
+      }
+
+      if (s.type === 'focus' && s.i !== null) {
+        for (let k = 0; k < s.i; k++) cellAt(k).classList.add('dim');
+      }
+    }
+
+    function applyStackStep(s) {
+      clearHighlights();
+      arrowHint.textContent = '';
+
+      if (s.i !== undefined && s.i !== null) {
+        cellAt(s.i).classList.add('focus');
+        for (let k = s.i + 1; k < N; k++) cellAt(k).classList.add('dim');
+      } else {
+        arrayRow.querySelectorAll('.cell').forEach(c => c.classList.remove('dim'));
+      }
+
+      narration.innerHTML = s.msg;
+      renderStack(s.stack, s.pop);
+
+      for (let k = 0; k < N; k++) {
+        if (s.ans[k] !== null) {
+          const el = ansCellAt(k);
+          el.textContent = s.ans[k];
+          el.style.color = 'var(--text)';
+          el.style.fontSize = '1.15rem';
+        } else {
+          const el = ansCellAt(k);
+          el.textContent = '·';
+          el.style.color = 'var(--muted)';
+        }
+      }
+    }
+
+    function currentSteps() {
+      return mode === 'scan' ? scanSteps : stackSteps;
+    }
+
+    function render() {
+      const steps = currentSteps();
+      if (stepIdx >= steps.length) stepIdx = steps.length - 1;
+      if (mode === 'scan') {
+        applyScanStep(steps[stepIdx]);
+      } else {
+        applyStackStep(steps[stepIdx]);
+      }
+      btnStep.disabled = stepIdx >= steps.length - 1;
+    }
+
+    function reset() {
+      stop();
+      stepIdx = 0;
+      buildAnswerCells();
+      narration.innerHTML = '';
+      narrationScan.innerHTML = '';
+      renderStack([]);
+      clearHighlights();
+      arrowHint.textContent = '';
+      render();
+    }
+
+    function stop() {
+      playing = false;
+      btnPlay.textContent = 'Play';
+      if (timer) clearInterval(timer);
+      timer = null;
+    }
+
+    function step() {
+      const steps = currentSteps();
+      if (stepIdx < steps.length - 1) {
+        stepIdx++;
+        render();
+      } else {
+        stop();
+      }
+    }
+
+    async function playLoop() {
+      const steps = currentSteps();
+      while (playing && stepIdx < steps.length - 1) {
+        await delay();
+        if (!playing) break;
+        stepIdx++;
+        render();
+      }
+      if (stepIdx >= steps.length - 1) stop();
+    }
+
+    btnPlay.addEventListener('click', () => {
+      if (playing) {
+        stop();
+        return;
+      }
+      playing = true;
+      btnPlay.textContent = 'Pause';
+      if (stepIdx >= currentSteps().length - 1) {
+        stepIdx = 0;
+        buildAnswerCells();
+      }
+      render();
+      playLoop();
+    });
+
+    btnStep.addEventListener('click', () => step());
+
+    btnReset.addEventListener('click', () => reset());
+
+    document.querySelectorAll('.tabs button').forEach(b => {
+      b.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach(x => x.classList.remove('active'));
+        b.classList.add('active');
+        mode = b.dataset.mode;
+        stop();
+        if (mode === 'stack') {
+          stackSection.classList.remove('hidden');
+          scanNarration.classList.add('hidden');
+        } else {
+          stackSection.classList.add('hidden');
+          scanNarration.classList.remove('hidden');
+        }
+        reset();
+      });
+    });
+
+    buildArrayCells();
+    buildAnswerCells();
+    reset();
+  </script>
+</body>
+</html>

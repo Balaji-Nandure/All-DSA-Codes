@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Partitions with Given Difference — Animated</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="gfg-visualizer.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Partitions with Given Difference</h1>
+    <p class="sub">
+      Split the array into two subsets <strong>S1</strong> and <strong>S2</strong> so that
+      <span class="mono">sum(S1) − sum(S2) = diff</span>. That reduces to counting subsets with a fixed sum — classic
+      <strong>0/1 knapsack</strong> DP. Use <span class="mono">tab 1</span> for the algebra, then <span class="mono">tab 2</span> for the DP walkthrough.
+    </p>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="active" data-mode="math">1 · Math → target sum</button>
+      <button type="button" data-mode="dp">2 · DP simulation</button>
+      <button type="button" data-mode="why">3 · Why loop backward?</button>
+    </div>
+
+    <!-- MATH TAB -->
+    <div class="panel" id="panelMath">
+      <span class="step-pill" id="mathPill">Setup</span>
+      <p class="narration" id="mathNarr"></p>
+      <div id="mathExtra"></div>
+      <div class="controls">
+        <button type="button" class="secondary" id="mathPrev">← Back</button>
+        <button type="button" id="mathNext">Next →</button>
+        <button type="button" class="secondary" id="mathReset">Reset</button>
+      </div>
+    </div>
+
+    <!-- DP TAB -->
+    <div class="panel hidden" id="panelDp">
+      <span class="step-pill" id="dpPill">DP</span>
+      <p class="narration" id="dpNarr"></p>
+
+      <div class="row-label">Array (processing order)</div>
+      <div class="cells" id="arrCells"></div>
+
+      <div class="row-label row-label--mt">dp[j] = ways to form sum j</div>
+      <div class="dp-wrap"><div class="dp-row" id="dpHead"></div></div>
+      <div class="dp-wrap"><div class="dp-row" id="dpVals"></div></div>
+
+      <div class="formula-line" id="dpFormula"></div>
+
+      <div class="controls">
+        <button type="button" id="dpPlay">Play</button>
+        <button type="button" class="secondary" id="dpStep">Step</button>
+        <button type="button" class="secondary" id="dpReset">Reset</button>
+        <label class="speed">
+          <span>Speed</span>
+          <input type="range" id="dpSpeed" min="280" max="1800" value="760" />
+        </label>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:var(--accent)"></span> Index j (update)</span>
+        <span><span class="dot" style="background:var(--scan)"></span> Index j − w</span>
+        <span><span class="dot" style="background:var(--ok)"></span> Target column</span>
+      </div>
+    </div>
+
+    <!-- WHY TAB -->
+    <div class="panel hidden" id="panelWhy">
+      <p class="narration">
+        In the <strong>0/1</strong> setting each array value is used <strong>at most once</strong>. The inner loop must run
+        <strong>from high j to low j</strong> so that when you read <span class="mono">dp[j − w]</span>, it still reflects
+        the <em>previous</em> row (without the current element). If you loop forward, the same value can contribute multiple times in one pass — that becomes unbounded knapsack.
+      </p>
+      <div class="code-mini">
+<span class="k">for</span> (<span class="k">int</span> j = target; j &gt;= arr[i]; j--)  <span class="comment" style="color:#6b6578">// correct</span><br/>
+&nbsp;&nbsp;dp[j] += dp[j - arr[i]];<br/>
+<br/>
+<span class="k">for</span> (<span class="k">int</span> j = arr[i]; j &lt;= target; j++)   <span class="comment" style="color:#6b6578">// wrong for 0/1</span><br/>
+&nbsp;&nbsp;dp[j] += dp[j - arr[i]];  <span class="comment" style="color:#6b6578">// reuses same element</span>
+      </div>
+      <p class="sub" style="margin-top:16px;margin-bottom:0">
+        Your <span class="mono">24. Partitions with Given Difference.cpp</span> comment block has a concrete two-element proof — same idea.
+      </p>
+    </div>
+
+    <p class="sub mono footnote">
+      Demo: <span class="mono">arr = [5, 2, 6, 4]</span>, <span class="mono">diff = 3</span> · Open in browser.
+    </p>
+  </div>
+
+  <script>
+    const ARR = [5, 2, 6, 4];
+    const DIFF = 3;
+    const N = ARR.length;
+    const TOTAL = ARR.reduce((a, b) => a + b, 0);
+    const TARGET = (TOTAL + DIFF) / 2;
+    const PARITY_OK = (TOTAL + DIFF) % 2 === 0;
+
+    const mathSteps = [
+      {
+        pill: 'Problem',
+        narr: `You are given <strong>arr</strong> = <span class="mono">[${ARR.join(', ')}]</span> and <strong>diff</strong> = <strong>${DIFF}</strong>. Count ways to split elements into two groups <strong>S1</strong> and <strong>S2</strong> (every element used exactly once) such that <span class="mono">sum(S1) − sum(S2) = ${DIFF}</span>.`,
+        extra: () => `
+          <div class="balance">
+            <div class="pan s1"><h4>S1 (larger group in this example)</h4><div class="chips"><span class="chip">?</span></div></div>
+            <div class="mid">−</div>
+            <div class="pan s2"><h4>S2</h4><div class="chips"><span class="chip">?</span></div></div>
+          </div>
+          <p class="sub" style="margin-top:14px">We will turn this into “how many subsets have sum = T?” for one number <strong>T</strong>.</p>
+        `
+      },
+      {
+        pill: 'Total sum',
+        narr: `Add every element: <span class="mono">${ARR.join(' + ')}</span> = <strong>${TOTAL}</strong>. Call this <strong>S</strong>. Whatever partition you pick, <span class="mono">sum(S1) + sum(S2) = S</span>.`,
+        extra: () => `<div class="eq-block">S = ${TOTAL}</div>`
+      },
+      {
+        pill: 'Algebra',
+        narr: `Let <span class="mono">a = sum(S1)</span> and <span class="mono">b = sum(S2)</span>. You want <span class="mono">a − b = ${DIFF}</span> and <span class="mono">a + b = ${TOTAL}</span>. Add the two lines: <span class="mono">2a = ${TOTAL + DIFF}</span>, so <strong>a = ${TARGET}</strong>. Counting valid partitions = counting subsets of <strong>arr</strong> whose sum is exactly <strong>${TARGET}</strong>.`,
+        extra: () => `
+          <div class="eq-block">
+            a − b = ${DIFF}<br/>
+            a + b = ${TOTAL}<br/>
+            ─────────────<br/>
+            2a = ${TOTAL + DIFF} &nbsp;→&nbsp; <strong>a = ${TARGET}</strong>
+          </div>
+        `
+      },
+      {
+        pill: 'Parity',
+        narr: PARITY_OK
+          ? `Check <span class="mono">(S + diff)</span> is even: <span class="mono">(${TOTAL} + ${DIFF}) = ${TOTAL + DIFF}</span> → integer <span class="mono">${TARGET}</span> exists. If this were odd, no integer <span class="mono">a</span> could work and the answer would be <strong>0</strong>.`
+          : `Here <span class="mono">(S + diff)</span> is odd — impossible. Answer <strong>0</strong>.`,
+        extra: () => `
+          <div class="eq-block">
+            (${TOTAL} + ${DIFF}) mod 2 = ${(TOTAL + DIFF) % 2} ${PARITY_OK ? '✓' : '✗'}
+          </div>
+        `
+      },
+      {
+        pill: 'Next',
+        narr: `Go to <strong>tab 2</strong> and press <strong>Play</strong> or <strong>Step</strong>. You will see the 1D DP array where <span class="mono">dp[j]</span> = number of ways to get sum <span class="mono">j</span> using a subset of the elements processed so far. We only need <span class="mono">dp[${TARGET}]</span> at the end.`,
+        extra: () => ''
+      }
+    ];
+
+    let mathIdx = 0;
+
+    function renderMath() {
+      const s = mathSteps[mathIdx];
+      document.getElementById('mathPill').textContent = s.pill + ' · step ' + (mathIdx + 1) + '/' + mathSteps.length;
+      document.getElementById('mathNarr').innerHTML = s.narr;
+      document.getElementById('mathExtra').innerHTML = typeof s.extra === 'function' ? s.extra() : s.extra;
+      document.getElementById('mathPrev').disabled = mathIdx === 0;
+      document.getElementById('mathNext').disabled = mathIdx === mathSteps.length - 1;
+    }
+
+    document.getElementById('mathPrev').onclick = () => { if (mathIdx > 0) { mathIdx--; renderMath(); } };
+    document.getElementById('mathNext').onclick = () => { if (mathIdx < mathSteps.length - 1) { mathIdx++; renderMath(); } };
+    document.getElementById('mathReset').onclick = () => { mathIdx = 0; renderMath(); };
+
+    /* ---------- DP steps ---------- */
+    function buildDpSteps() {
+      const steps = [];
+      let dp = Array(TARGET + 1).fill(0);
+      dp[0] = 1;
+
+      steps.push({
+        kind: 'init',
+        dp: dp.slice(),
+        i: -1,
+        j: -1,
+        w: 0,
+        narr: `Initialize <span class="mono">dp[0] = 1</span> (empty subset sums to 0). All other <span class="mono">dp[j] = 0</span>. Target sum to count is <strong>${TARGET}</strong>.`,
+        formula: `dp = [1, 0, 0, …, 0] &nbsp;&nbsp;(length ${TARGET + 1})`
+      });
+
+      for (let i = 0; i < N; i++) {
+        const w = ARR[i];
+        for (let j = TARGET; j >= w; j--) {
+          const before = dp[j];
+          const add = dp[j - w];
+          const after = before + add;
+          steps.push({
+            kind: 'update',
+            dpBefore: dp.slice(),
+            dpAfter: null,
+            i,
+            j,
+            w,
+            before,
+            add,
+            after,
+            narr: add === 0 && before === 0
+              ? `Processing <strong>arr[${i}] = ${w}</strong>. Try <span class="mono">j = ${j}</span>: <span class="mono">dp[${j}] += dp[${j - w}]</span> → <span class="mono">${before} + ${add}</span> (still 0 ways so far).`
+              : `Processing <strong>arr[${i}] = ${w}</strong>. Update <span class="mono">j = ${j}</span>: <span class="mono">dp[${j}] = dp[${j}] + dp[${j - w}]</span> → <strong>${before} + ${add} = ${after}</strong>.`,
+            formula: `dp[${j}] += dp[${j - w}]   →   ${before} + ${add} = ${after}`
+          });
+          dp[j] = after;
+          steps[steps.length - 1].dpAfter = dp.slice();
+        }
+      }
+
+      steps.push({
+        kind: 'done',
+        dp: dp.slice(),
+        i: N,
+        j: TARGET,
+        w: 0,
+        narr: `Finished all elements. <span class="mono">dp[${TARGET}] = ${dp[TARGET]}</span> → there are <strong>${dp[TARGET]}</strong> subset(s) with sum ${TARGET}, hence <strong>${dp[TARGET]}</strong> valid partition(s) with difference ${DIFF}.`,
+        formula: `Answer = dp[${TARGET}] = ${dp[TARGET]}`,
+        extra: `
+          <div class="balance" style="margin-top:16px">
+            <div class="pan s1"><h4>S1 · sum ${TARGET}</h4><div class="chips"><span class="chip">6</span><span class="chip">4</span></div></div>
+            <div class="mid">${TARGET} − ${TOTAL - TARGET} = ${DIFF}</div>
+            <div class="pan s2"><h4>S2 · sum ${TOTAL - TARGET}</h4><div class="chips"><span class="chip">5</span><span class="chip">2</span></div></div>
+          </div>
+          <p class="sub" style="margin-top:12px;text-align:center">One concrete split: <span class="mono">{6,4}</span> vs <span class="mono">{5,2}</span>. The DP counted every subset of arr that sums to ${TARGET} — here that is exactly the subsets that can play the role of <strong>S1</strong>.</p>
+        `
+      });
+
+      return steps;
+    }
+
+    const dpSteps = buildDpSteps();
+    let dpIdx = 0;
+    let dpPlaying = false;
+    let dpTimer = null;
+
+    const arrCells = document.getElementById('arrCells');
+    const dpHead = document.getElementById('dpHead');
+    const dpVals = document.getElementById('dpVals');
+    const dpNarr = document.getElementById('dpNarr');
+    const dpFormula = document.getElementById('dpFormula');
+    const dpPlay = document.getElementById('dpPlay');
+    const dpStepBtn = document.getElementById('dpStep');
+    const dpResetBtn = document.getElementById('dpReset');
+    const dpSpeed = document.getElementById('dpSpeed');
+
+    function buildDpHeader() {
+      dpHead.innerHTML = '';
+      dpVals.innerHTML = '';
+      for (let j = 0; j <= TARGET; j++) {
+        const h = document.createElement('div');
+        h.className = 'dp-cell';
+        h.textContent = 'j=' + j;
+        dpHead.appendChild(h);
+
+        const v = document.createElement('div');
+        v.className = 'dp-val';
+        v.dataset.j = j;
+        dpVals.appendChild(v);
+      }
+    }
+
+    function paintArray(highlightI) {
+      arrCells.innerHTML = '';
+      ARR.forEach((v, idx) => {
+        const w = document.createElement('div');
+        w.className = 'cell-wrap';
+        const idxEl = document.createElement('span');
+        idxEl.className = 'idx';
+        idxEl.textContent = '[' + idx + ']';
+        const c = document.createElement('div');
+        c.className = 'cell mono';
+        if (highlightI < 0) c.classList.add('future');
+        else if (idx < highlightI) c.classList.add('done');
+        else if (idx === highlightI) c.classList.add('hot');
+        else c.classList.add('future');
+        c.textContent = v;
+        w.appendChild(idxEl);
+        w.appendChild(c);
+        arrCells.appendChild(w);
+      });
+    }
+
+    function setDpCells(dp, jFocus, jmFocus) {
+      for (let j = 0; j <= TARGET; j++) {
+        const el = dpVals.querySelector(`[data-j="${j}"]`);
+        el.textContent = dp[j];
+        el.className = 'dp-val';
+        if (j === TARGET) el.classList.add('target-sum');
+        if (j === jFocus) el.classList.add('col-j');
+        if (jmFocus >= 0 && j === jmFocus) el.classList.add('col-jm');
+      }
+    }
+
+    function renderDp() {
+      const s = dpSteps[dpIdx];
+      document.getElementById('dpPill').textContent =
+        s.kind === 'done' ? 'Done · ' + (dpIdx + 1) + '/' + dpSteps.length : 'DP · step ' + (dpIdx + 1) + '/' + dpSteps.length;
+
+      dpNarr.innerHTML = s.narr;
+      let extraHtml = '';
+      if (s.kind === 'done' && s.extra) {
+        extraHtml = s.extra;
+      }
+      const existingExtra = document.getElementById('dpDoneExtra');
+      if (existingExtra) existingExtra.remove();
+      if (extraHtml) {
+        const div = document.createElement('div');
+        div.id = 'dpDoneExtra';
+        div.innerHTML = extraHtml;
+        dpNarr.parentNode.insertBefore(div, dpNarr.nextSibling);
+      }
+
+      if (s.kind === 'init') {
+        paintArray(-1);
+        setDpCells(s.dp, -1, -1);
+        dpFormula.textContent = s.formula;
+      } else if (s.kind === 'update') {
+        paintArray(s.i);
+        const d = s.dpAfter || s.dpBefore;
+        setDpCells(d, s.j, s.j - s.w);
+        dpFormula.innerHTML = '<em>' + s.formula + '</em>';
+        const jEl = dpVals.querySelector(`[data-j="${s.j}"]`);
+        if (jEl) jEl.classList.add('just-updated');
+      } else if (s.kind === 'done') {
+        paintArray(N - 1);
+        arrCells.querySelectorAll('.cell').forEach(c => {
+          c.classList.remove('hot', 'future');
+          c.classList.add('done');
+        });
+        setDpCells(s.dp, TARGET, -1);
+        dpFormula.innerHTML = '<em>' + s.formula + '</em>';
+      }
+
+      dpStepBtn.disabled = dpIdx >= dpSteps.length - 1;
+      dpPlay.textContent = dpPlaying ? 'Pause' : 'Play';
+    }
+
+    function dpDelay() {
+      const ms = parseInt(dpSpeed.value, 10);
+      return new Promise(r => setTimeout(r, 2000 - ms));
+    }
+
+    async function dpPlayLoop() {
+      while (dpPlaying && dpIdx < dpSteps.length - 1) {
+        await dpDelay();
+        if (!dpPlaying) break;
+        dpIdx++;
+        renderDp();
+      }
+      if (dpIdx >= dpSteps.length - 1) {
+        dpPlaying = false;
+        dpPlay.textContent = 'Play';
+      }
+    }
+
+    dpPlay.onclick = () => {
+      if (dpPlaying) {
+        dpPlaying = false;
+        dpPlay.textContent = 'Play';
+        return;
+      }
+      dpPlaying = true;
+      dpPlay.textContent = 'Pause';
+      if (dpIdx >= dpSteps.length - 1) {
+        dpIdx = 0;
+      }
+      renderDp();
+      dpPlayLoop();
+    };
+
+    dpStepBtn.onclick = () => {
+      dpPlaying = false;
+      dpPlay.textContent = 'Play';
+      if (dpIdx < dpSteps.length - 1) {
+        dpIdx++;
+        renderDp();
+      }
+    };
+
+    dpResetBtn.onclick = () => {
+      dpPlaying = false;
+      dpPlay.textContent = 'Play';
+      dpIdx = 0;
+      const ex = document.getElementById('dpDoneExtra');
+      if (ex) ex.remove();
+      renderDp();
+    };
+
+    /* Tabs */
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const mode = btn.dataset.mode;
+        document.getElementById('panelMath').classList.toggle('hidden', mode !== 'math');
+        document.getElementById('panelDp').classList.toggle('hidden', mode !== 'dp');
+        document.getElementById('panelWhy').classList.toggle('hidden', mode !== 'why');
+      });
+    });
+
+    buildDpHeader();
+    renderMath();
+    dpIdx = 0;
+    renderDp();
+  </script>
+</body>
+</html>

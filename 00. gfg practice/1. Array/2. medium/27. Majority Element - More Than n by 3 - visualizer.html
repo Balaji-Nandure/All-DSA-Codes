@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Majority &gt; n/3 — Animated (Boyer–Moore)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="gfg-visualizer.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>Majority element — more than ⌊n/3⌋</h1>
+    <p class="sub">
+      Find every value that appears <strong>strictly more than</strong> <span class="mono">⌊n/3⌋</span> times.
+      Output must be <strong>sorted</strong>. Same flow as <span class="mono">27. Majority Element - More Than n by 3.cpp</span>:
+      <strong>two-slot voting</strong>, then <strong>full-array verification</strong>.
+    </p>
+
+    <div class="demo-pick">
+      <span>Demo array:</span>
+      <select id="demoSel" class="viz-select" aria-label="Choose example array">
+        <option value="two">Two answers — [2, 2, 3, 1, 3, 2, 1, 1] → [1, 2]</option>
+        <option value="one">One answer — [-5, 3, -5] → [-5]</option>
+        <option value="none">No answer — [3, 2, 2, 4, 1, 4] → []</option>
+      </select>
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button type="button" class="active" data-t="learn">1 · What are we counting?</button>
+      <button type="button" data-t="vote">2 · Voting pass (candidates)</button>
+      <button type="button" data-t="check">3 · Verify &amp; sort</button>
+      <button type="button" data-t="why">4 · Why <span class="mono">c &gt; 0</span> first?</button>
+    </div>
+
+    <div class="panel" id="tabLearn">
+      <span class="step-pill" id="learnPill">Concept</span>
+      <p class="narration" id="learnNarr"></p>
+      <div id="learnExtra"></div>
+      <div class="controls">
+        <button type="button" class="secondary" id="learnPrev">← Back</button>
+        <button type="button" id="learnNext">Next →</button>
+        <button type="button" class="secondary" id="learnReset">Reset</button>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="tabVote">
+      <span class="step-pill" id="votePill">Voting</span>
+      <p class="narration" id="voteNarr"></p>
+      <div class="row-label">Array</div>
+      <div class="cells" id="voteArr"></div>
+      <div class="slots">
+        <div class="slot slot-a" id="slot1">
+          <h4>Slot 1 (candidate a)</h4>
+          <div class="big mono" id="s1v">—</div>
+          <div class="subt" id="s1c">count = 0 → inactive</div>
+        </div>
+        <div class="slot slot-b" id="slot2">
+          <h4>Slot 2 (candidate b)</h4>
+          <div class="big mono" id="s2v">—</div>
+          <div class="subt" id="s2c">count = 0 → inactive</div>
+        </div>
+      </div>
+      <div class="codebox" id="codeBranch"></div>
+      <div class="controls">
+        <button type="button" id="vPlay">Play</button>
+        <button type="button" class="secondary" id="vStep">Step</button>
+        <button type="button" class="secondary" id="vReset">Reset</button>
+        <label class="speed"><span>Speed</span><input type="range" id="vSpeed" min="320" max="2000" value="720" /></label>
+      </div>
+      <div class="legend">
+        <span><span class="dot" style="background:var(--accent)"></span> Current element</span>
+        <span><span class="dot" style="background:var(--scan)"></span> Slot 2 lane</span>
+        <span><span class="dot" style="background:var(--ok)"></span> Confirmed / keep</span>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="tabCheck">
+      <span class="step-pill" id="chkPill">Verify</span>
+      <p class="narration" id="chkNarr"></p>
+      <div class="row-label">Array (highlight = value being counted)</div>
+      <div class="cells" id="chkArr"></div>
+      <div class="bar" id="chkBar"></div>
+      <div class="out-chips" id="chkOut"></div>
+      <div class="controls">
+        <button type="button" id="cPlay">Play</button>
+        <button type="button" class="secondary" id="cStep">Step</button>
+        <button type="button" class="secondary" id="cReset">Reset</button>
+        <label class="speed"><span>Speed</span><input type="range" id="cSpeed" min="320" max="2000" value="650" /></label>
+      </div>
+    </div>
+
+    <div class="panel hidden" id="tabWhy">
+      <p class="narration">
+        Test <span class="mono hl-m">c1 &gt; 0</span> and <span class="mono hl-m">c2 &gt; 0</span> <strong>before</strong>
+        <span class="mono">x == cand1</span>. A slot with count 0 is <strong>empty</strong>, even if <span class="mono">cand1</span> still holds an old int (e.g. <span class="mono">0</span>).
+        Comparing <span class="mono">x == cand1</span> first would treat that stale value as a live candidate.
+      </p>
+      <div class="code-mini">
+<span class="kw">for</span> (<span class="kw">int</span> x : arr) {<br/>
+&nbsp;&nbsp;<span class="kw">if</span> (c1 &gt; 0 &amp;&amp; x == cand1) … &nbsp;<span class="comment">// correct order</span><br/>
+}
+      </div>
+      <p class="sub" style="margin-top:16px;margin-bottom:0">Matches your <span class="mono">.cpp</span> comments.</p>
+    </div>
+
+    <p class="sub mono footnote">Open in a browser · Shared styles: <span class="mono">gfg-visualizer.css</span></p>
+  </div>
+
+  <script>
+    const DEMOS = {
+      two: { arr: [2, 2, 3, 1, 3, 2, 1, 1] },
+      one: { arr: [-5, 3, -5] },
+      none: { arr: [3, 2, 2, 4, 1, 4] }
+    };
+
+    let demoKey = 'two';
+    let arr = DEMOS[demoKey].arr.slice();
+
+    function nArr() { return arr.length; }
+    function floorN3() { return Math.floor(nArr() / 3); }
+    function needExplain() {
+      const n = nArr();
+      const f = floorN3();
+      return `n = ${n}, ⌊n/3⌋ = ${f}. Need count <strong>&gt; ${f}</strong> (≥ <strong>${f + 1}</strong> copies).`;
+    }
+
+    function buildLearnSlides() {
+      const a = arr.join(', ');
+      return [
+        {
+          pill: 'Goal',
+          narr: `List values appearing <strong>more than ⌊n/3⌋</strong> times; return sorted. Demo <span class="mono">[${a}]</span>. ${needExplain()}`,
+          extra: `<div class="eq-block">Strict inequality: count <strong>&gt;</strong> ⌊n/3⌋, not ≥.</div>`
+        },
+        {
+          pill: 'At most two',
+          narr: `Three distinct values cannot each appear &gt; n/3 times — total would exceed n. So <strong>two candidate slots</strong> suffice.`,
+          extra: `<div class="triples"><div class="trip"><span class="t">a</span><span class="t">b</span><span class="t">c</span></div></div>`
+        },
+        {
+          pill: 'Two passes',
+          narr: `<strong>Pass 1:</strong> Boyer–Moore with two buckets (match / fill empty / cancel). <strong>Pass 2:</strong> count each candidate in the full array; keep if count &gt; ⌊n/3⌋; <strong>sort</strong>.`,
+          extra: ''
+        },
+        {
+          pill: 'Try it',
+          narr: `Use <strong>tab 2</strong> (Play/Step), then <strong>tab 3</strong> for verification.`,
+          extra: ''
+        }
+      ];
+    }
+
+    let learnSlides = buildLearnSlides();
+    let learnIdx = 0;
+
+    function renderLearn() {
+      learnSlides = buildLearnSlides();
+      if (learnIdx >= learnSlides.length) learnIdx = learnSlides.length - 1;
+      const s = learnSlides[learnIdx];
+      document.getElementById('learnPill').textContent = s.pill + ' · ' + (learnIdx + 1) + '/' + learnSlides.length;
+      document.getElementById('learnNarr').innerHTML = s.narr;
+      document.getElementById('learnExtra').innerHTML = s.extra;
+      document.getElementById('learnPrev').disabled = learnIdx === 0;
+      document.getElementById('learnNext').disabled = learnIdx === learnSlides.length - 1;
+    }
+
+    document.getElementById('learnPrev').onclick = () => { if (learnIdx > 0) { learnIdx--; renderLearn(); } };
+    document.getElementById('learnNext').onclick = () => { if (learnIdx < learnSlides.length - 1) { learnIdx++; renderLearn(); } };
+    document.getElementById('learnReset').onclick = () => { learnIdx = 0; renderLearn(); };
+
+    function simulateVote(a) {
+      let c1 = 0, c2 = 0, cand1 = 0, cand2 = 0;
+      const steps = [];
+      for (let i = 0; i < a.length; i++) {
+        const x = a[i];
+        let rule = '';
+        let codeLine = 0;
+        if (c1 > 0 && x === cand1) {
+          c1++;
+          rule = 'Matches <strong>slot 1</strong> (active). <span class="hl-m">count1++</span>.';
+          codeLine = 1;
+        } else if (c2 > 0 && x === cand2) {
+          c2++;
+          rule = 'Matches <strong>slot 2</strong>. <span class="hl-m">count2++</span>.';
+          codeLine = 2;
+        } else if (c1 === 0) {
+          cand1 = x;
+          c1 = 1;
+          rule = '<strong>Slot 1 empty</strong> — take <span class="mono">x</span> as candidate 1.';
+          codeLine = 3;
+        } else if (c2 === 0) {
+          cand2 = x;
+          c2 = 1;
+          rule = '<strong>Slot 2 empty</strong> — take <span class="mono">x</span> as candidate 2.';
+          codeLine = 4;
+        } else {
+          c1--;
+          c2--;
+          rule = 'Neither match, both full → <strong>cancel</strong> one from each (three-way discard).';
+          codeLine = 5;
+        }
+        steps.push({ i, x, rule, codeLine, after: { c1, c2, cand1, cand2 } });
+      }
+      return { steps, c1, c2, cand1, cand2 };
+    }
+
+    function codeHTML(line) {
+      const lines = [
+        '<span class="kw">if</span> (c1 > 0 && x == cand1) c1++;',
+        '<span class="kw">else if</span> (c2 > 0 && x == cand2) c2++;',
+        '<span class="kw">else if</span> (c1 == 0) { cand1 = x; c1 = 1; }',
+        '<span class="kw">else if</span> (c2 == 0) { cand2 = x; c2 = 1; }',
+        '<span class="kw">else</span> { c1--; c2--; }'
+      ];
+      return lines.map((t, idx) => (idx + 1 === line ? `<span class="hi">${t}</span>` : t)).join('<br/>');
+    }
+
+    let voteSim = simulateVote(arr);
+    let voteSteps = voteSim.steps;
+    let vIdx = 0;
+    let vPlayOn = false;
+
+    function paintVoteArray(idx) {
+      const el = document.getElementById('voteArr');
+      el.innerHTML = '';
+      arr.forEach((v, j) => {
+        const w = document.createElement('div');
+        w.className = 'cw';
+        const ix = document.createElement('span');
+        ix.className = 'ix';
+        ix.textContent = String(j);
+        const c = document.createElement('div');
+        c.className = 'cell mono';
+        if (j < idx) c.classList.add('past');
+        else if (j === idx) c.classList.add('here');
+        else c.classList.add('future');
+        c.textContent = v;
+        w.appendChild(ix);
+        w.appendChild(c);
+        el.appendChild(w);
+      });
+    }
+
+    function paintSlots(st, flash) {
+      const s1 = document.getElementById('slot1');
+      const s2 = document.getElementById('slot2');
+      s1.classList.toggle('inactive', st.c1 <= 0);
+      s2.classList.toggle('inactive', st.c2 <= 0);
+      document.getElementById('s1v').textContent = st.c1 > 0 ? st.cand1 : '—';
+      document.getElementById('s2v').textContent = st.c2 > 0 ? st.cand2 : '—';
+      document.getElementById('s1c').textContent = st.c1 > 0 ? `count = ${st.c1} (active)` : 'count = 0 → inactive';
+      document.getElementById('s2c').textContent = st.c2 > 0 ? `count = ${st.c2} (active)` : 'count = 0 → inactive';
+      s1.classList.remove('flash');
+      s2.classList.remove('flash');
+      if (flash === 1) { void s1.offsetWidth; s1.classList.add('flash'); }
+      if (flash === 2) { void s2.offsetWidth; s2.classList.add('flash'); }
+      if (flash === 12) { void s1.offsetWidth; void s2.offsetWidth; s1.classList.add('flash'); s2.classList.add('flash'); }
+    }
+
+    function renderVote() {
+      voteSim = simulateVote(arr);
+      voteSteps = voteSim.steps;
+      const doneIdx = voteSteps.length;
+      if (vIdx > doneIdx) vIdx = doneIdx;
+      if (vIdx < 0) vIdx = 0;
+      const atEnd = vIdx >= doneIdx;
+      document.getElementById('vStep').disabled = atEnd;
+
+      if (atEnd) {
+        document.getElementById('votePill').textContent = 'Voting · done';
+        document.getElementById('voteNarr').innerHTML =
+          `<strong>Pass 1 done.</strong> Candidates: <span class="mono hl-m">${voteSim.cand1}</span>, <span class="mono">${voteSim.cand2}</span>.
+          Residual slot counts are <em>not</em> true frequencies — <strong>tab 3</strong> counts the whole array.`;
+        paintVoteArray(arr.length - 1);
+        document.getElementById('voteArr').querySelectorAll('.cell').forEach(el => {
+          el.classList.remove('here', 'future');
+          el.classList.add('past');
+        });
+        document.getElementById('codeBranch').innerHTML = '<span style="color:var(--muted)">// verify next</span>';
+        paintSlots({ c1: voteSim.c1, c2: voteSim.c2, cand1: voteSim.cand1, cand2: voteSim.cand2 }, 0);
+      } else {
+        const cur = voteSteps[vIdx];
+        document.getElementById('votePill').textContent = `Voting · ${cur.i + 1}/${arr.length}`;
+        document.getElementById('voteNarr').innerHTML = `<span class="mono">x = ${cur.x}</span> @ ${cur.i}. ${cur.rule}`;
+        paintVoteArray(cur.i);
+        document.getElementById('codeBranch').innerHTML = codeHTML(cur.codeLine);
+        let flash = 12;
+        if (cur.codeLine <= 2) flash = cur.codeLine;
+        else if (cur.codeLine === 3) flash = 1;
+        else if (cur.codeLine === 4) flash = 2;
+        paintSlots(cur.after, flash);
+      }
+    }
+
+    function vDelay() {
+      const ms = parseInt(document.getElementById('vSpeed').value, 10);
+      return new Promise(r => setTimeout(r, 2100 - Math.min(ms, 1900)));
+    }
+
+    async function vLoop() {
+      const doneIdx = voteSteps.length;
+      while (vPlayOn && vIdx < doneIdx) {
+        await vDelay();
+        if (!vPlayOn) break;
+        vIdx++;
+        renderVote();
+      }
+      if (vIdx >= doneIdx) {
+        vPlayOn = false;
+        document.getElementById('vPlay').textContent = 'Play';
+      }
+    }
+
+    document.getElementById('vPlay').onclick = () => {
+      if (vPlayOn) {
+        vPlayOn = false;
+        document.getElementById('vPlay').textContent = 'Play';
+        return;
+      }
+      vPlayOn = true;
+      document.getElementById('vPlay').textContent = 'Pause';
+      if (vIdx >= voteSteps.length) vIdx = 0;
+      renderVote();
+      vLoop();
+    };
+    document.getElementById('vStep').onclick = () => {
+      vPlayOn = false;
+      document.getElementById('vPlay').textContent = 'Play';
+      if (vIdx < voteSteps.length) {
+        vIdx++;
+        renderVote();
+      }
+    };
+    document.getElementById('vReset').onclick = () => {
+      vPlayOn = false;
+      document.getElementById('vPlay').textContent = 'Play';
+      vIdx = 0;
+      renderVote();
+    };
+
+    function buildCheckSteps(a, vs) {
+      const n = a.length;
+      const need = Math.floor(n / 3);
+      let cnt1 = 0, cnt2 = 0;
+      for (const x of a) {
+        if (x === vs.cand1) cnt1++;
+        else if (x === vs.cand2) cnt2++;
+      }
+      const out = [];
+      if (cnt1 > need) out.push(vs.cand1);
+      if (vs.cand2 !== vs.cand1 && cnt2 > need) out.push(vs.cand2);
+      out.sort((p, q) => p - q);
+
+      const steps = [];
+      steps.push({
+        narr: `Candidates from voting: <span class="mono hl-m">${vs.cand1}</span>, <span class="mono">${vs.cand2}</span>. Now count occurrences in the <strong>entire</strong> array.`,
+        bar: `Threshold: <strong>&gt; ⌊n/3⌋ = ${need}</strong> (need ≥ ${need + 1}).`,
+        highlight: null,
+        out: null
+      });
+      steps.push({
+        narr: `Frequency of <span class="mono hl-m">${vs.cand1}</span> = <strong>${cnt1}</strong>.`,
+        bar: `${cnt1} &gt; ${need} ? ${cnt1 > need ? '<span class="tag-ok">YES</span> — keep' : '<span class="tag-bad">NO</span> — drop'}.`,
+        highlight: vs.cand1,
+        out: null
+      });
+      steps.push({
+        narr: `Frequency of <span class="mono">${vs.cand2}</span> = <strong>${cnt2}</strong>${vs.cand2 === vs.cand1 ? ' (same cand — second push guarded in code)' : ''}.`,
+        bar: vs.cand2 !== vs.cand1
+          ? `${cnt2} &gt; ${need} ? ${cnt2 > need ? '<span class="tag-ok">YES</span> — keep' : '<span class="tag-bad">NO</span> — drop'}.`
+          : 'Single distinct candidate case.',
+        highlight: vs.cand2,
+        out: null
+      });
+      steps.push({
+        narr: `Sorted output: <span class="mono hl-m">[${out.join(', ')}]</span>.`,
+        bar: `Answer: <strong>[${out.join(', ')}]</strong>`,
+        highlight: null,
+        out: out.slice()
+      });
+      return { steps, cnt1, cnt2, need, out };
+    }
+
+    let chkPack = buildCheckSteps(arr, voteSim);
+    let chkSteps = chkPack.steps;
+    let cIdx = 0;
+    let cPlayOn = false;
+
+    function paintChkArray(highlightVal) {
+      const el = document.getElementById('chkArr');
+      el.innerHTML = '';
+      arr.forEach((v, j) => {
+        const w = document.createElement('div');
+        w.className = 'cw';
+        const ix = document.createElement('span');
+        ix.className = 'ix';
+        ix.textContent = String(j);
+        const c = document.createElement('div');
+        c.className = 'cell mono';
+        if (highlightVal !== null && v === highlightVal) {
+          c.classList.add('found');
+        }
+        c.textContent = v;
+        w.appendChild(ix);
+        w.appendChild(c);
+        el.appendChild(w);
+      });
+    }
+
+    function renderCheck() {
+      voteSim = simulateVote(arr);
+      chkPack = buildCheckSteps(arr, voteSim);
+      chkSteps = chkPack.steps;
+      if (cIdx >= chkSteps.length) cIdx = chkSteps.length - 1;
+      const s = chkSteps[cIdx];
+      document.getElementById('chkPill').textContent = 'Verify · ' + (cIdx + 1) + '/' + chkSteps.length;
+      document.getElementById('chkNarr').innerHTML = s.narr;
+      document.getElementById('chkBar').innerHTML = s.bar;
+      paintChkArray(s.highlight);
+      const oc = document.getElementById('chkOut');
+      oc.innerHTML = '';
+      if (s.out !== null && s.out !== undefined) {
+        if (s.out.length === 0) {
+          const e = document.createElement('div');
+          e.className = 'chip empty mono';
+          e.textContent = '[]';
+          oc.appendChild(e);
+        } else {
+          s.out.forEach(v => {
+            const e = document.createElement('div');
+            e.className = 'chip out mono';
+            e.textContent = String(v);
+            oc.appendChild(e);
+          });
+        }
+      }
+      document.getElementById('cStep').disabled = cIdx >= chkSteps.length - 1;
+    }
+
+    function cDelay() {
+      const ms = parseInt(document.getElementById('cSpeed').value, 10);
+      return new Promise(r => setTimeout(r, 2100 - Math.min(ms, 1900)));
+    }
+
+    async function cLoop() {
+      while (cPlayOn && cIdx < chkSteps.length - 1) {
+        await cDelay();
+        if (!cPlayOn) break;
+        cIdx++;
+        renderCheck();
+      }
+      if (cIdx >= chkSteps.length - 1) {
+        cPlayOn = false;
+        document.getElementById('cPlay').textContent = 'Play';
+      }
+    }
+
+    document.getElementById('cPlay').onclick = () => {
+      if (cPlayOn) {
+        cPlayOn = false;
+        document.getElementById('cPlay').textContent = 'Play';
+        return;
+      }
+      cPlayOn = true;
+      document.getElementById('cPlay').textContent = 'Pause';
+      if (cIdx >= chkSteps.length - 1) cIdx = 0;
+      renderCheck();
+      cLoop();
+    };
+    document.getElementById('cStep').onclick = () => {
+      cPlayOn = false;
+      document.getElementById('cPlay').textContent = 'Play';
+      if (cIdx < chkSteps.length - 1) {
+        cIdx++;
+        renderCheck();
+      }
+    };
+    document.getElementById('cReset').onclick = () => {
+      cPlayOn = false;
+      document.getElementById('cPlay').textContent = 'Play';
+      cIdx = 0;
+      renderCheck();
+    };
+
+    document.querySelectorAll('.tabs button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const t = btn.dataset.t;
+        document.getElementById('tabLearn').classList.toggle('hidden', t !== 'learn');
+        document.getElementById('tabVote').classList.toggle('hidden', t !== 'vote');
+        document.getElementById('tabCheck').classList.toggle('hidden', t !== 'check');
+        document.getElementById('tabWhy').classList.toggle('hidden', t !== 'why');
+      });
+    });
+
+    document.getElementById('demoSel').value = demoKey;
+    document.getElementById('demoSel').onchange = (e) => {
+      demoKey = e.target.value;
+      arr = DEMOS[demoKey].arr.slice();
+      learnIdx = 0;
+      vIdx = 0;
+      cIdx = 0;
+      vPlayOn = cPlayOn = false;
+      document.getElementById('vPlay').textContent = 'Play';
+      document.getElementById('cPlay').textContent = 'Play';
+      renderLearn();
+      renderVote();
+      renderCheck();
+    };
+
+    renderLearn();
+    renderVote();
+    renderCheck();
+  </script>
+</body>
+</html>
