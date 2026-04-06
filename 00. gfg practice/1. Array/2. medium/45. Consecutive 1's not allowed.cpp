@@ -1,428 +1,331 @@
 /*
 ================================================================================
-PROBLEM: Consecutive 1's not allowed (GFG - Medium - DP)
+PROBLEM: Consecutive 1's Not Allowed (GFG)
 ================================================================================
 
-PROBLEM STATEMENT:
-Given a positive integer n, count all possible distinct binary strings of 
-length n such that there are NO CONSECUTIVE 1's in any string.
+Given length n, count number of binary strings of length n
+such that there are NO CONSECUTIVE 1s.
 
-Examples:
-1. n = 1
-   Output: 2
-   Strings: "0", "1"
-
-2. n = 2
-   Output: 3
-   Strings: "00", "01", "10" (NOT "11" because it has consecutive 1's)
-
-3. n = 3
-   Output: 5
-   Strings: "000", "001", "010", "100", "101"
-   (NOT: "011", "110", "111" - all have consecutive 1's)
-
-Constraints:
-- 1 ≤ n ≤ 44
+Example:
+n = 3
+Valid strings: 000, 001, 010, 100, 101 → Answer = 5
 
 ================================================================================
-MATHEMATICAL INSIGHT:
+INTUITION:
 ================================================================================
 
-At position i, we have 2 choices:
-1. Place 0 → previous position can be anything
-   → Count = all valid strings of length (i-1)
-   
-2. Place 1 → previous position MUST be 0
-   → Count = all valid strings of length (i-2) (to ensure 0 before this 1)
+At each position we can place:
+- '0' → always allowed
+- '1' → only allowed if previous was NOT 1
 
-Therefore:
-dp[i] = dp[i-1] + dp[i-2]
-
-This is FIBONACCI-LIKE recurrence!
-
-Base Cases:
-- n=1: "0" or "1" → 2 strings (both valid)
-- n=2: "00", "01", "10" → 3 strings
-
-Verification:
-- dp[1] = 2 (base case)
-- dp[2] = 3 (base case)
-- dp[3] = dp[2] + dp[1] = 3 + 2 = 5 ✓
-- dp[4] = dp[3] + dp[2] = 5 + 3 = 8 ✓
+So this is DP with RESTRICTION on previous element.
 
 ================================================================================
-COMPARISON OF APPROACHES:
+STATE DEFINITION:
 ================================================================================
 
-Approach     | Time      | Space         | When to use
-Recursion    | O(2^N)    | O(N)          | Learning only
-Memoization  | O(N)      | O(N) + stack  | Interview
-Tabulation   | O(N)      | O(N)          | Standard choice
-Space Opt    | O(N)      | O(1)          | BEST ✓
+dp[i][last]
+- i = current position (0 to n)
+- last = previous bit value (0 or 1)
+
+RECURRENCE:
+
+If last = 0:
+    we can place 0 or 1
+    → f(i,0) = f(i+1,0) + f(i+1,1)
+
+If last = 1:
+    we can place only 0
+    → f(i,1) = f(i+1,0)
+
+BASE CASE:
+    If i == n → return 1 (one valid string formed)
+
+================================================================================
+IMPORTANT OBSERVATION: FIBONACCI PATTERN
+================================================================================
+
+This simplifies to Fibonacci recurrence:
+
+dp[n] = dp[n-1] + dp[n-2]
+
+Because:
+- Strings ending in 0 = all valid strings of length n-1
+- Strings ending in 1 = all valid strings of length n-2 (with 0 before this 1)
+
+Sequence: 2, 3, 5, 8, 13, 21, 34, 55, ...
+
+================================================================================
+APPROACH COMPLEXITY:
+================================================================================
+
+Approach       | Time    | Space       | When to use
+Recursion      | O(2^N)  | O(N)        | Learning only, n ≤ 20
+Memoization    | O(N)    | O(N) stack  | Interview, recursive approach
+Tabulation     | O(N)    | O(N)        | Standard DP choice
+Space Opt      | O(N)    | O(1)        | BEST ✓ Production code
 
 ================================================================================
 */
 
 #include <iostream>
 #include <vector>
-#include <map>
 using namespace std;
 
 
 // ============================================================
-// APPROACH 1: RECURSION (Brute Force)
+// APPROACH 1: RECURSION
 // Time: O(2^N), Space: O(N) recursion stack
 // ============================================================
 /*
 HOW IT WORKS:
-At each position i (starting from 0):
-- Option 1: Place '0' → recurse to position i+1 (no restriction)
-- Option 2: Place '1' → recurse to position i+1, but mark last as '1'
-           (next position CANNOT be '1' to avoid consecutive 1's)
+At position i, based on previous bit (last):
+- If last = 0: can place 0 or 1 → explore both
+- If last = 1: can only place 0 → explore only 0
 
-Base case: When i == n, we've formed a valid string → count = 1
+Base: i == n → return 1 (one valid string)
 
 WHY THIS WORKS:
-- Explores all possible binary strings
-- Ensures no consecutive 1's during construction
-- Every string that reaches length n is valid
+- Explores all possibilities
+- Ensures no consecutive 1s during building
 
-COMPLEXITY:
-- Time: O(2^N) - at each position, up to 2 choices (but less due to constraint)
-- Space: O(N) - recursion call stack depth
-
-WHEN TO USE:
-- Understanding the pattern
-- Very small n (n ≤ 20)
-- Interview: explain intuition
+DATA FLOW:
+Position 0 (last=0)
+├─ Place 0 → Position 1 (last=0) → continues...
+└─ Place 1 → Position 1 (last=1) → can only place 0 next
 
 
-DRY RUN: n = 3
+DRY RUN: n = 2
 
-solveRec(0, false):  [at position 0, last was not 1]
-├─ Place '0' → solveRec(1, false)
-│  ├─ Place '0' → solveRec(2, false)
-│  │  ├─ Place '0' → solveRec(3, false) → return 1 ✓ "000"
-│  │  └─ Place '1' → solveRec(3, true) → return 1 ✓ "001"
-│  └─ Place '1' → solveRec(2, true)
-│     └─ Only '0' allowed → solveRec(3, false) → return 1 ✓ "010"
-└─ Place '1' → solveRec(1, true)
-   └─ Only '0' allowed → solveRec(2, false)
-      ├─ Place '0' → solveRec(3, false) → return 1 ✓ "100"
-      └─ Place '1' → solveRec(3, true) → return 1 ✓ "101"
+solveRec(0, 0, 2):
+├─ Place 0 → solveRec(1, 0, 2)
+│  ├─ Place 0 → solveRec(2, 0, 2) = 1 ✓ "00"
+│  └─ Place 1 → solveRec(2, 1, 2) = 1 ✓ "01"
+│  → Total = 2
+└─ Place 1 → solveRec(1, 1, 2)
+   └─ Place 0 → solveRec(2, 0, 2) = 1 ✓ "10"
+   → Total = 1
 
-Total: 1 + 1 + 1 + 1 + 1 = 5 ✓
+Answer: 2 + 1 = 3 ✓
 */
 
-class Solution1 {
-private:
-    long long solveRec(int pos, bool lastIs1, int n) {
-        // Base case: reached the end of string
-        if(pos == n)
-            return 1;  // One valid string formed
-        
-        long long count = 0;
-        
-        // Option 1: Always can place 0
-        count += solveRec(pos + 1, false, n);
-        
-        // Option 2: Can place 1 only if last position was NOT 1
-        if(!lastIs1) {
-            count += solveRec(pos + 1, true, n);
-        }
-        
-        return count;
-    }
-    
-public:
-    long long countStrings(int n) {
-        return solveRec(0, false, n);
-    }
-};
-
-
 // ============================================================
-// APPROACH 2: MEMOIZATION (Top-Down DP)
+// APPROACH 2: MEMOIZATION
 // Time: O(N), Space: O(N) + recursion stack
 // ============================================================
 /*
 HOW IT WORKS:
-Same as recursion, but cache results using a map.
+Same as recursion but cache results in 2D DP table.
 
-State: (pos, lastIs1)
-- pos: current position (0 to n)
-- lastIs1: whether last character was 1 (true/false)
-
-With memoization:
-- Each (pos, lastIs1) pair computed only ONCE
-- Subsequent calls return cached result immediately
+State: dp[i][last]
+- Each (i, last) state computed only ONCE
+- Total states: O(N) × 2 = O(N)
 
 WHY THIS WORKS:
-- Eliminates exponential recomputation
-- (pos, lastIs1) has only O(N) × 2 = O(N) possible states
-- Each state computed once in O(1) → Total O(N)
+- Avoids exponential recomputation
+- (i, 0) and (i, 1) each computed once
 
-COMPLEXITY:
-- Time: O(N) - each state computed once
-- Space: O(N) - memo storage + recursion stack
+Cache benefitDRY RUN: n = 2
 
-WHEN TO USE:
-- When recursion is natural to express
-- Interviews: show caching technique
-- Constraint: recursive depth (here fine for n ≤ 44)
+solveM(0, 0, 2):
+├─ (0,0) not in cache
+├─ Place 0 → solveM(1, 0, 2):
+│  ├─ (1,0) not in cache
+│  ├─ solveM(2, 0, 2) = 1
+│  ├─ solveM(2, 1, 2) = 1
+│  ├─ cache[(1,0)] = 2
+├─ Place 1 → solveM(1, 1, 2):
+│  ├─ (1,1) not in cache
+│  ├─ solveM(2, 0, 2) = 1 (base case, not cached)
+│  ├─ cache[(1,1)] = 1
+├─ cache[(0,0)] = 3
 
-
-DRY RUN: n = 3
-
-solveM(0, false):
-├─ memo[(0,false)] doesn't exist
-├─ Place '0' → solveM(1, false)
-│  ├─ solveM(1, false):
-│  │  ├─ Place '0' → solveM(2, false)
-│  │  │  ├─ Place '0' → solveM(3, false) = 1 (base case)
-│  │  │  └─ Place '1' → solveM(3, true) = 1 (base case)
-│  │  │  → memo[(2,false)] = 2
-│  │  └─ Place '1' → solveM(2, true)
-│  │     └─ Place '0' → solveM(3, false) = 1
-│  │     → memo[(2,true)] = 1
-│  │  → memo[(1,false)] = 3
-└─ Place '1' → solveM(1, true)
-   └─ solveM(1, true):
-      └─ Place '0' → solveM(2, false)
-         → memo[(2,false)] = 2 (already cached!)
-      → memo[(1,true)] = 2
-
-memo[(0,false)] = 3 + 2 = 5 ✓
-
-Notice: memo[(2,false)] was accessed twice but computed only ONCE!
+Answer: 3 ✓
 */
 
-class Solution2 {
-private:
-    map<pair<int,bool>, long long> memo;
-    
-    long long solveMemo(int pos, bool lastIs1, int n) {
-        // Base case
-        if(pos == n)
-            return 1;
-        
-        // Check if already computed
-        pair<int,bool> state = {pos, lastIs1};
-        if(memo.find(state) != memo.end())
-            return memo[state];
-        
-        long long count = 0;
-        
-        // Option 1: Place 0
-        count += solveMemo(pos + 1, false, n);
-        
-        // Option 2: Place 1 only if last was not 1
-        if(!lastIs1) {
-            count += solveMemo(pos + 1, true, n);
-        }
-        
-        // Cache and return
-        return memo[state] = count;
-    }
-    
-public:
-    long long countStrings(int n) {
-        memo.clear();
-        return solveMemo(0, false, n);
-    }
-};
-
-
 // ============================================================
-// APPROACH 3: TABULATION (Bottom-Up DP)
+// APPROACH 3: TABULATION
 // Time: O(N), Space: O(N)
 // ============================================================
 /*
 HOW IT WORKS:
-Build DP table bottom-up using simple Fibonacci observation:
+Build DP table backward from position n to 0.
 
-Define:
-- dp[i] = count of valid strings of length i
+dp[i][0] = dp[i+1][0] + dp[i+1][1]  (can place 0 then either bit)
+dp[i][1] = dp[i+1][0]               (can place 0 only)
 
-Recurrence:
-- dp[i] = dp[i-1] + dp[i-2]
+Base: dp[n][0] = dp[n][1] = 1
 
-Why?
-- Strings of length i can end with 0 or 1
-- If end with 0: any valid string of length i-1 works → dp[i-1]
-- If end with 1: previous must be 0, so i-1 must end with validated
-  string where position i-2 can be 0 or 1 → dp[i-2]
+WHY THIS WORKS:
+- Build from known base cases
+- Iterative, no recursion overhead
 
-COMPLEXITY:
-- Time: O(N) - single loop from 1 to n
-- Space: O(N) - DP array of size n+1
+DP Table for n=2:
 
-WHEN TO USE:
-- Standard DP choice
-- No recursion overhead
-- Clear iterative logic
+Position  | last=0 | last=1
+----------|--------|--------
+n=2       |   1    |   1    (base)
+n=1       |   2    |   1    (dp[1][0] = 1+1, dp[1][1] = 1)
+n=0       |   3    |   2    (dp[0][0] = 2+1, dp[0][1] = 2)
 
-
-DRY RUN: n = 3
-
-Initialization:
-dp[1] = 2  (base: "0", "1")
-dp[2] = 3  (base: "00", "01", "10")
-
-Fill table:
-dp[3] = dp[2] + dp[1] = 3 + 2 = 5
-
-Table visualization:
-Position  1    2    3
-Count     2    3    5
-Meaning:  2    3    5 valid strings
-
-
-For n = 5:
-dp[1] = 2
-dp[2] = 3
-dp[3] = dp[2] + dp[1] = 3 + 2 = 5
-dp[4] = dp[3] + dp[2] = 5 + 3 = 8
-dp[5] = dp[4] + dp[3] = 8 + 5 = 13 ✓
+Answer: dp[0][0] = 3 ✓
 */
 
-class Solution3 {
-public:
-    long long countStrings(int n) {
-        // Base cases
-        if(n == 1) return 2;
-        if(n == 2) return 3;
-        
-        // DP array: dp[i] = count of valid strings of length i
-        vector<long long> dp(n + 1);
-        
-        // Base cases
-        dp[1] = 2;  // "0", "1"
-        dp[2] = 3;  // "00", "01", "10"
-        
-        // Fill the table
-        for(int i = 3; i <= n; i++) {
-            dp[i] = dp[i-1] + dp[i-2];
-        }
-        
-        return dp[n];
-    }
-};
-
-
 // ============================================================
-// APPROACH 4: SPACE OPTIMIZED (Best Solution)
+// APPROACH 4: SPACE OPTIMIZED
 // Time: O(N), Space: O(1)
 // ============================================================
 /*
 HOW IT WORKS:
-Use the Fibonacci recurrence but only track last 2 values:
-dp[i] = dp[i-1] + dp[i-2]
+Observe FIBONACCI pattern:
 
-Instead of storing entire array, use:
-- prev2 = dp[i-2]
-- prev1 = dp[i-1]
-- current = dp[i] = prev1 + prev2
+dp[n] = dp[n-1] + dp[n-2]
 
-After each iteration:
-- prev2 = prev1
-- prev1 = current
+because:
+- Valid strings of length n ending with 0
+  = all valid strings of length n-1
+- Valid strings of length n ending with 1
+  = all valid strings of length n-2 (with mandatory 0 before 1)
+
+Use only prev1 and prev2 variables:
+
+dp[1] = 2   → "0", "1"
+dp[2] = 3   → "00", "01", "10"
+dp[3] = 5   = dp[2] + dp[1] = 3 + 2
+dp[4] = 8   = dp[3] + dp[2] = 5 + 3
 
 WHY THIS WORKS:
-- We only need the last two values to compute the next
-- No need for entire DP array
+- Only need last 2 values
 - Sliding window approach
+- Minimal space
 
-COMPLEXITY:
-- Time: O(N) - single loop
-- Space: O(1) - only 2 variables
-
-
-DRY RUN: n = 5
-
-Initial:
-prev2 = 2 (dp[1])
-prev1 = 3 (dp[2])
-
-i = 3:
-current = prev1 + prev2 = 3 + 2 = 5
-prev2 = 3, prev1 = 5
-
-i = 4:
-current = prev1 + prev2 = 5 + 3 = 8
-prev2 = 5, prev1 = 8
-
-i = 5:
-current = prev1 + prev2 = 8 + 5 = 13
-prev2 = 8, prev1 = 13
-
-Return: 13 ✓
-
-Memory saved: O(N) → O(1)
+Sequence: 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+This is Fibonacci with base = 2, 3!
 */
+
 
 class Solution {
 public:
-    long long countStrings(int n) {
+    
+    // ============================================================
+    // RECURSION
+    // ============================================================
+    int solveRec(int i, int last, int n) {
+        if(i == n) return 1;  // Base case: reached end
+        
+        if(last == 1) {
+            // Previous was 1 → can only place 0
+            return solveRec(i + 1, 0, n);
+        }
+        else {
+            // Previous was 0 → can place 0 or 1
+            return solveRec(i + 1, 0, n) + solveRec(i + 1, 1, n);
+        }
+    }
+    
+    
+    // ============================================================
+    // MEMOIZATION
+    // ============================================================
+    int solveMemo(int i, int last, int n, vector<vector<int>>& dp) {
+        if(i == n) return 1;
+        
+        // Check cache
+        if(dp[i][last] != -1)
+            return dp[i][last];
+        
+        if(last == 1) {
+            return dp[i][last] = solveMemo(i + 1, 0, n, dp);
+        }
+        else {
+            return dp[i][last] = solveMemo(i + 1, 0, n, dp)
+                               + solveMemo(i + 1, 1, n, dp);
+        }
+    }
+    
+    
+    // ============================================================
+    // TABULATION
+    // ============================================================
+    int solveTab(int n) {
+        vector<vector<int>> dp(n + 1, vector<int>(2, 0));
+        
         // Base cases
-        if(n == 1) return 2;
-        if(n == 2) return 3;
+        dp[n][0] = dp[n][1] = 1;
         
-        // Space optimized: only track last 2 values
-        long long prev2 = 2;   // dp[1]
-        long long prev1 = 3;   // dp[2]
+        // Fill table backward from n-1 to 0
+        for(int i = n - 1; i >= 0; i--) {
+            dp[i][1] = dp[i + 1][0];                    // If last=1, can place 0
+            dp[i][0] = dp[i + 1][0] + dp[i + 1][1];   // If last=0, can place 0 or 1
+        }
         
-        // Compute from position 3 to n
+        return dp[0][0];  // Starting from position 0 with last=0
+    }
+    
+    
+    // ============================================================
+    // SPACE OPTIMIZED (FIBONACCI)
+    // ============================================================
+    int solveSpace(int n) {
+        if(n == 1) return 2;      // "0", "1"
+        if(n == 2) return 3;      // "00", "01", "10"
+        
+        int prev2 = 2;  // dp[1]
+        int prev1 = 3;  // dp[2]
+        
         for(int i = 3; i <= n; i++) {
-            long long current = prev1 + prev2;
+            int curr = prev1 + prev2;
             prev2 = prev1;
-            prev1 = current;
+            prev1 = curr;
         }
         
         return prev1;
+    }
+    
+    
+    // ============================================================
+    // MAIN FUNCTION - Choose approach
+    // ============================================================
+    int countStrings(int n) {
+        // Recursion (SLOW - only for learning, n ≤ 20)
+        // return solveRec(0, 0, n);
+        
+        // Memoization (Good for interviews, n ≤ 44)
+        // vector<vector<int>> dp(n, vector<int>(2, -1));
+        // return solveMemo(0, 0, n, dp);
+        
+        // Tabulation (Standard choice, n ≤ 44)
+        // return solveTab(n);
+        
+        // Space Optimized (BEST - use this)
+        return solveSpace(n);
     }
 };
 
 
 /*
 ================================================================================
-EDGE CASES:
+DRY RUNS:
 ================================================================================
 
-1. n = 1:
-   Output: 2
-   Strings: "0", "1"
-   Both valid (no consecutive 1's in single character)
+n = 1:
+All approaches → 2 ✓
+Strings: "0", "1"
 
-2. n = 2:
-   Output: 3
-   Valid: "00", "01", "10"
-   Invalid: "11" (consecutive 1's)
+n = 2:
+All approaches → 3 ✓
+Strings: "00", "01", "10"
 
-3. n = 44:
-   Output: 1134903170
-   Large n, need long long to avoid overflow
+n = 3:
+All approaches → 5 ✓
+Strings: "000", "001", "010", "100", "101"
 
-================================================================================
-TEST CASES:
-================================================================================
-
-Test 1: n = 1
-All approaches: 2 ✓
-
-Test 2: n = 2
-All approaches: 3 ✓
-
-Test 3: n = 3
-All approaches: 5 ✓
-
-Test 4: n = 4
+n = 4:
 Expected: 8 (Fibonacci: 5 + 3)
-All approaches: 8 ✓
+Strings: 8 valid strings
 
-Test 5: n = 5
+n = 5:
 Expected: 13 (Fibonacci: 8 + 5)
-All approaches: 13 ✓
 
 ================================================================================
 PATTERN RECOGNITION:
@@ -430,41 +333,39 @@ PATTERN RECOGNITION:
 
 This problem exhibits FIBONACCI PATTERN:
 
-Output sequence: 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
+Output Sequence: 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, ...
 
-Notice:
-- Each term = sum of previous 2 terms
-- F(n) = F(n-1) + F(n-2)
-- Classic DP recurrence
+Formula: dp[n] = dp[n-1] + dp[n-2]
 
 Other problems with same pattern:
-- Climb stairs (1 or 2 steps)
-- House robber (pick non-adjacent)
-- Max sum non-adjacent
-- Jump game variations
+✓ Climbing stairs (1 or 2 steps)
+✓ House robber (pick non-adjacent)
+✓ Max sum without adjacent
+✓ Jump game variations
 
-KEY INSIGHT: Recognize Fibonacci-like patterns in DP!
+KEY INSIGHT: Recognize Fibonacci patterns in DP!
 
 ================================================================================
-APPROACH COMPARISON:
+COMPLEXITY COMPARISON:
 ================================================================================
 
 Approach 1 (Recursion):
 ✓ Easy to understand
 ✗ Exponential time - too slow for n > 20
-✗ Recursion depth limit
+✗ Recursion depth limit issues
+
 
 Approach 2 (Memoization):
 ✓ Top-down thinking
 ✓ Recursive elegance with caching
-✗ Recursion depth (okay for n ≤ 44)
-✗ Slightly more complex
+✓ Works for n ≤ 44
+
 
 Approach 3 (Tabulation):
-✓ Standard iterative DP
-✓ No recursion overhead
+✓ Iterative, no recursion overhead
 ✓ Clear bottom-up building
 ✗ O(N) space used
+
 
 Approach 4 (Space Optimized): ✓ BEST
 ✓ All advantages of Approach 3
@@ -472,28 +373,45 @@ Approach 4 (Space Optimized): ✓ BEST
 ✓ Production code choice
 ✓ Interview follow-up: "Can we optimize space?"
 
-RECOMMENDATION: Use Solution4 (Space Optimized) for final answer
-                But know all 4 for complete understanding!
-
 ================================================================================
-SPECIAL NOTES:
+WHY FIBONACCI WORKS:
 ================================================================================
 
-1. Why long long?
-   - n can be up to 44
-   - F(44) ≈ 1.13 × 10^9 > INT_MAX (2.14 × 10^9)
-   - Safe to use long long to avoid overflow
+At position i, consider the LAST bit:
 
-2. Why Fibonacci works here?
-   - At each position, only care about constraint from previous
-   - Either place 0 (any previous state) or 1 (only if prev was 0)
-   - Leads to: dp[i] = dp[i-1] + dp[i-2]
+Strings ending with 0:
+  - Can append 0 to ANY valid string of length i-1
+  - Count = dp[i-1]
 
-3. Interview discussion points:
-   - Recognize the Fibonacci recurrence
-   - Start with recursion, then optimize
-   - Discuss space-time tradeoffs
-   - Mention overflow for large n
+Strings ending with 1:
+  - Must have 0 before it
+  - So comes from valid strings of length i-2, then append "01"
+  - Count = dp[i-2]
+
+Total: dp[i] = dp[i-1] + dp[i-2]
+
+================================================================================
+INTERVIEW DISCUSSION POINTS:
+================================================================================
+
+1. Recognize the Fibonacci recurrence:
+   - Problem: "No consecutive X"
+   - Solution: Usually leads to Fibonacci
+
+2. Start with recursion, then optimize:
+   Recursion → Memoization → Tabulation → Space Optimization
+
+3. Discuss space-time tradeoffs:
+   "Can we use less space?" → Yes, O(1) space optimized version
+
+4. Edge cases:
+   - n = 1 → 2
+   - n = 44 → ~1 billion (use long long to avoid overflow)
+
+5. Alternative formulation:
+   - dp[i][0] = number of valid strings of length i ending with 0
+   - dp[i][1] = number of valid strings of length i ending with 1
+   - Then: dp[n] = dp[n][0] + dp[n][1]
 
 ================================================================================
 */
