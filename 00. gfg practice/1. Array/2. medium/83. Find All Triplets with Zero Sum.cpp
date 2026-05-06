@@ -30,19 +30,20 @@ Approach (Hashing + Fix Two Elements):
 Since problem asks for INDICES (not values), we need to preserve original positions.
 
 1. Fix first index i
-2. Use hashmap for elements after i
+2. Use hashmap storing ALL indices for each value after i
 3. For every j:
    needed = -(arr[i] + arr[j])
 4. If needed exists:
-   form triplet: [i, storedIndex, j]
-5. Sort triplet internally
+   form triplet for ALL matching indices: [i, eachStoredIndex, j]
+5. Sort each triplet internally
 6. Use set to avoid duplicates
 
 Why it works:
 - Brute force would be O(n^3)
 - Using hashing reduces to O(n^2)
-- Hashmap preserves original indices
+- Hashmap with vector<int> stores ALL occurrences of each value
 - Set prevents duplicate triplets
+- Critical: same value at different indices creates different valid triplets
 
 Time Complexity: O(n^2)
 Space Complexity: O(n)
@@ -57,48 +58,38 @@ public:
         
         int n = arr.size();
         
-        set<vector<int>> uniqueTriplets;
+        set<vector<int>> st;
         
-        // Fix first index
         for (int i = 0; i < n - 2; i++) {
             
-            unordered_map<int, int> mp;
+            unordered_map<int, vector<int>> mp;
             
-            // Find remaining two
             for (int j = i + 1; j < n; j++) {
                 
-                int needed = -(arr[i] + arr[j]);
+                int need = -(arr[i] + arr[j]);
                 
-                // If complement exists
-                if (mp.count(needed)) {
+                // All matching indices
+                if (mp.count(need)) {
                     
-                    vector<int> triplet = {
-                        i,
-                        mp[needed],
-                        j
-                    };
-                    
-                    sort(triplet.begin(), triplet.end());
-                    
-                    uniqueTriplets.insert(triplet);
+                    for (int idx : mp[need]) {
+                        
+                        vector<int> temp = {
+                            i,
+                            idx,
+                            j
+                        };
+                        
+                        sort(temp.begin(), temp.end());
+                        
+                        st.insert(temp);
+                    }
                 }
                 
-                // Store current element with index
-                mp[arr[j]] = j;
+                // Store ALL occurrences
+                mp[arr[j]].push_back(j);
             }
         }
         
-        // Convert set → vector
-        vector<vector<int>> ans(
-            uniqueTriplets.begin(),
-            uniqueTriplets.end()
-        );
-        
-        // If no triplets
-        if (ans.empty()) {
-            return {{}};
-        }
-        
-        return ans;
+        return vector<vector<int>>(st.begin(), st.end());
     }
 };
