@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encoding Trick Visual Demo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen p-6 font-sans">
+
+  <div class="max-w-5xl mx-auto">
+
+    <div class="bg-white rounded-3xl shadow-xl p-8">
+
+      <h1 class="text-4xl font-bold mb-4 text-center">
+        Array Encoding Trick Visualization
+      </h1>
+
+      <p class="text-lg text-slate-700 mb-6 text-center">
+        Learn how we store TWO numbers inside ONE array cell using:
+      </p>
+
+      <div class="bg-slate-900 text-green-400 rounded-2xl p-4 text-center text-xl font-mono mb-8 overflow-x-auto">
+        arr[i] = oldValue + newValue × BASE
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-6 mb-8">
+
+        <div class="bg-blue-50 rounded-2xl p-6 border border-blue-200">
+          <h2 class="text-2xl font-bold mb-3">Original Array</h2>
+          <div id="originalArray" class="flex flex-wrap gap-3"></div>
+        </div>
+
+        <div class="bg-green-50 rounded-2xl p-6 border border-green-200">
+          <h2 class="text-2xl font-bold mb-3">Final Shuffled Array</h2>
+          <div id="finalArray" class="flex flex-wrap gap-3"></div>
+        </div>
+
+      </div>
+
+      <div class="flex justify-center mb-8">
+        <button
+          onclick="nextStep()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-2xl text-xl font-bold shadow-lg transition"
+        >
+          Next Step
+        </button>
+      </div>
+
+      <div class="bg-yellow-50 border border-yellow-300 rounded-2xl p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-3">Current Explanation</h2>
+        <p id="explanation" class="text-lg leading-relaxed"></p>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl p-6 border border-slate-300">
+        <h2 class="text-2xl font-bold mb-5">Array State</h2>
+
+        <div id="arrayState" class="flex flex-wrap gap-4 mb-6"></div>
+
+        <div id="mathBox" class="bg-slate-900 text-green-400 p-5 rounded-2xl font-mono text-lg whitespace-pre-line"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+<style>
+.cell {
+  transition: all 0.6s ease;
+  position: relative;
+}
+
+.pointer {
+  position: absolute;
+  top: -45px;
+  left: 50%;
+  transform: translateX(-50%);
+  animation: bounce 1s infinite;
+}
+
+@keyframes bounce {
+  0%,100% { transform: translateX(-50%) translateY(0px); }
+  50% { transform: translateX(-50%) translateY(-10px); }
+}
+
+.glow {
+  box-shadow: 0 0 25px rgba(59,130,246,0.8);
+  transform: scale(1.12);
+}
+
+.moveAnim {
+  animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+}
+</style>
+
+<script>
+
+const BASE = 1001;
+
+const original = [1, 2, 3, 4, 5, 6];
+
+let arr = [...original];
+
+const finalExpected = [1,4,2,5,3,6];
+
+let step = 0;
+
+const steps = [
+
+  {
+    explanation:
+      "Imagine every box is a magical school bag 🎒. We can hide TWO numbers inside ONE bag using a smart trick.",
+    math:
+`Magic Formula:
+oldValue + newValue × BASE
+
+This lets us save memory like magicians!`
+  },
+  {
+    explanation:
+      "We start with the array. First half is a-values. Second half is b-values.",
+    math:
+`First Half : [1, 2, 3]
+Second Half: [4, 5, 6]
+
+Goal:
+[1,4,2,5,3,6]`
+  },
+
+  {
+    explanation:
+      "We store TWO numbers inside one cell using: oldValue + newValue × BASE",
+    math:
+`Formula:
+arr[i] = oldValue + newValue × BASE
+
+BASE = 1001
+
+Why?
+Because every original value is smaller than 1001.`
+  },
+
+  {
+    action: () => {
+      arr[0] += (arr[0] % BASE) * BASE;
+    },
+    explanation:
+      "Position 0 should finally contain 1. We encode it inside the same cell.",
+    math:
+`arr[0] = 1 + (1 × 1001)
+       = 1002`
+  },
+
+  {
+    action: () => {
+      arr[1] += (arr[3] % BASE) * BASE;
+    },
+    explanation:
+      "Position 1 should finally contain 4. We encode 4 into arr[1].",
+    math:
+`arr[1] = 2 + (4 × 1001)
+       = 4006`
+  },
+
+  {
+    action: () => {
+      arr[2] += (arr[1] % BASE) * BASE;
+    },
+    explanation:
+      "IMPORTANT: arr[1] is already encoded! So we use % BASE to recover original value 2.",
+    math:
+`arr[1] currently = 4006
+
+4006 % 1001 = 2
+
+So:
+arr[2] = 3 + (2 × 1001)
+       = 2005`
+  },
+
+  {
+    action: () => {
+      arr[3] += (arr[4] % BASE) * BASE;
+    },
+    explanation:
+      "Now we encode 5 into position 3.",
+    math:
+`arr[3] = 4 + (5 × 1001)
+       = 5009`
+  },
+
+  {
+    action: () => {
+      arr[4] += (arr[2] % BASE) * BASE;
+    },
+    explanation:
+      "Again arr[2] is already encoded, so % BASE extracts original value 3.",
+    math:
+`arr[2] = 2005
+
+2005 % 1001 = 3
+
+arr[4] = 5 + (3 × 1001)
+       = 3008`
+  },
+
+  {
+    action: () => {
+      arr[5] += (arr[5] % BASE) * BASE;
+    },
+    explanation:
+      "Finally encode 6 into the last position.",
+    math:
+`arr[5] = 6 + (6 × 1001)
+       = 6012`
+  },
+
+  {
+    explanation:
+      "Now every cell contains BOTH old and new values together.",
+    math:
+`Current Encoded Array:
+[1002, 4006, 2005, 5009, 3008, 6012]`
+  },
+
+  {
+    action: () => {
+      for(let i = 0; i < arr.length; i++) {
+        arr[i] = Math.floor(arr[i] / BASE);
+      }
+    },
+    explanation:
+      "To recover the FINAL shuffled array, divide every cell by BASE.",
+    math:
+`newValue = arr[i] / BASE
+
+1002 / 1001 = 1
+4006 / 1001 = 4
+2005 / 1001 = 2
+...
+
+Final Array:
+[1,4,2,5,3,6]`
+  }
+];
+
+function renderArray(containerId, array, color) {
+
+  const container = document.getElementById(containerId);
+
+  container.innerHTML = "";
+
+  array.forEach((num, idx) => {
+
+    const box = document.createElement("div");
+
+    box.className = `cell ${color} text-white w-20 h-20 rounded-2xl flex items-center justify-center text-xl font-bold shadow-lg`;
+
+    let pointerHTML = "";
+
+    if(step === 2 && idx === 0)
+      pointerHTML = `<div class="pointer text-4xl">👇</div>`;
+
+    if(step === 3 && idx === 1)
+      pointerHTML = `<div class="pointer text-4xl">👇</div>`;
+
+    if(step === 4 && idx === 1)
+      pointerHTML = `<div class="pointer text-4xl">👀</div>`;
+
+    if(step === 6 && idx === 2)
+      pointerHTML = `<div class="pointer text-4xl">👀</div>`;
+
+    box.innerHTML = `
+      ${pointerHTML}
+
+      <div class="text-center">
+        <div class="text-2xl">${num}</div>
+        <div class="text-xs mt-1">index ${idx}</div>
+      </div>
+    `;
+
+    if(
+      (step === 2 && idx === 0) ||
+      (step === 3 && idx === 1) ||
+      (step === 4 && idx === 1) ||
+      (step === 6 && idx === 2)
+    ) {
+      box.classList.add("glow");
+      box.classList.add("moveAnim");
+    }
+
+    container.appendChild(box);
+  });
+}
+
+function render() {
+
+  renderArray("originalArray", original, "bg-blue-500");
+
+  renderArray("finalArray", finalExpected, "bg-green-500");
+
+  renderArray("arrayState", arr, "bg-purple-600");
+
+  document.getElementById("explanation").innerText =
+    steps[step].explanation;
+
+  document.getElementById("mathBox").innerText =
+    steps[step].math;
+}
+
+function nextStep() {
+
+  if(step >= steps.length - 1)
+    return;
+
+  step++;
+
+  if(steps[step].action) {
+    steps[step].action();
+  }
+
+  render();
+}
+
+render();
+
+</script>
+
+</body>
+</html>
