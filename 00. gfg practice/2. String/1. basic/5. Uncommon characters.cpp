@@ -91,26 +91,28 @@ public:
 
     string uncommonChars(string s1, string s2) {
 
-        int freq[26] = {0};
+        bool presentInS1[26] = {false};
+        bool presentInS2[26] = {false};
 
-        // Count characters in first string
+        // Mark characters present in first string
         for(char c : s1) {
 
-            freq[c - 'a']++;
+            presentInS1[c - 'a'] = true;
         }
 
-        // Count characters in second string
+        // Mark characters present in second string
         for(char c : s2) {
 
-            freq[c - 'a']++;
+            presentInS2[c - 'a'] = true;
         }
 
         string result = "";
 
-        // Collect uncommon characters (frequency == 1)
+        // Collect uncommon characters (present in exactly one string)
         for(int i = 0; i < 26; i++) {
 
-            if(freq[i] == 1) {
+            if((presentInS1[i] && !presentInS2[i]) || 
+               (!presentInS1[i] && presentInS2[i])) {
 
                 result.push_back('a' + i);
             }
