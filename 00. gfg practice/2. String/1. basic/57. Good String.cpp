@@ -32,24 +32,14 @@ Space Complexity: O(1)
 #include <bits/stdc++.h>
 using namespace std;
 
-class Solution {
-public:
-
-    // TC: O(N)
-    // SC: O(1)
-
-    string isGoodString(string s) {
-
-        for(int i = 1; i < (int)s.size(); i++) {
-
-            int diff = abs(s[i] - s[i - 1]);
-            int cyclicDistance = min(diff, 26 - diff);
-
-            if(cyclicDistance != 1) {
-                return "NO";
-            }
-        }
-
-        return "YES";
+string isGoodString(string s) {
+    // code here.
+    int n = s.size();
+    for(int i = 1; i < n; i++){
+        int diff = abs(s[i] - s[i - 1]);
+        if(diff == 25) continue;
+        if(diff != 1) return "NO";
     }
-};
+    
+    return "YES";
+}
