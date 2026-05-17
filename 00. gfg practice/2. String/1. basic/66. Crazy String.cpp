@@ -32,43 +32,18 @@ using namespace std;
 
 class Solution {
 public:
-
-    char toLowerCase(char ch) {
-        if(ch >= 'A' && ch <= 'Z') {
-            return char(ch - 'A' + 'a');
-        }
-        return ch;
-    }
-
-    char toUpperCase(char ch) {
-        if(ch >= 'a' && ch <= 'z') {
-            return char(ch - 'a' + 'A');
-        }
-        return ch;
-    }
-
     // TC: O(n)
     // SC: O(1)
     string getCrazy(string S) {
+        if (S.empty()) return S;
+        
+        bool firstIsLower = islower(S[0]);
 
-        bool firstIsLower = (S[0] >= 'a' && S[0] <= 'z');
-
-        for(int i = 1; i < (int)S.size(); i++) {
-
-            bool sameParityAsZero = (i % 2 == 0);
-
-            if(firstIsLower) {
-                if(sameParityAsZero) {
-                    S[i] = toLowerCase(S[i]);
-                } else {
-                    S[i] = toUpperCase(S[i]);
-                }
+        for(int i = 1; i < S.size(); i++) {
+            if (firstIsLower == (i % 2 == 0)) {
+                S[i] = tolower(S[i]);
             } else {
-                if(sameParityAsZero) {
-                    S[i] = toUpperCase(S[i]);
-                } else {
-                    S[i] = toLowerCase(S[i]);
-                }
+                S[i] = toupper(S[i]);
             }
         }
 
