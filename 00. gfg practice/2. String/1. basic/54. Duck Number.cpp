@@ -39,6 +39,12 @@ public:
 
     string checkDuck(string num) {
 
+        if(num.empty()) {
+            return "NO";
+        }
+
+        // Leading zero is not allowed for Duck numbers, and "0" itself is not
+        // a positive number.
         if(num[0] == '0') {
             return "NO";
         }
