@@ -1,6 +1,34 @@
 /*
-    Problem Name: Reversing the columns of a Matrix
-    Difficulty: Easy
+GeeksforGeeks: Reversing the columns of a Matrix
+Difficulty: Easy
+
+Problem:
+Given a matrix of size n x m, reverse the order of its columns in-place so that the last column becomes the first, the second-last becomes the second, and so on.
+
+Example 1:
+Input: n = 4, m = 3, matrix[][] = [[1, 2, 3], [5, 6, 7], [11, 10, 9], [13, 14, 15]]
+Output: [[3, 2, 1], [7, 6, 5], [9, 10, 11], [15, 14, 13]]
+Explanation: Array after exchanging columns:
+              [[3, 2, 1],
+               [7, 6, 5],
+               [9, 10, 11],
+               [15, 14, 13]]
+
+Core Idea:
+Since we are reversing the columns of the matrix in-place, we can simply iterate through each row of the matrix and reverse the elements of that row using a two-pointer approach (swapping the first and last elements, then moving inwards).
+
+Approach:
+1. Iterate over each row `i` from 0 to `n-1`.
+2. For each row, use two pointers `left = 0` and `right = m - 1`.
+3. Swap `matrix[i][left]` and `matrix[i][right]`.
+4. Increment `left` and decrement `right` until `left >= right`.
+5. The matrix is modified in-place.
+
+Time Complexity : O(N * M) — We iterate through half of the columns for each row, visiting every element exactly once.
+Space Complexity: O(1) — We are modifying the matrix in-place without using any extra space.
+
+GFG Link:
+https://www.geeksforgeeks.org/problems/reversing-the-columns-of-a-matrix-1587115621/1
 */
 
 #include <iostream>
@@ -27,18 +55,12 @@ public:
                 left++;
                 right--;
             }
-            
-            // Note: Alternatively, we can use the built-in reverse function:
-            // reverse(matrix[i].begin(), matrix[i].end());
         }
     }
 };
 
 /*
-Time Complexity: O(n * m), where n is the number of rows and m is the number of columns. We iterate through half of the columns for each row.
-Space Complexity: O(1), as we are modifying the matrix in-place without using any extra space.
-
-Dry Run:
+Dry Run — Example 1:
 Input: 
 n = 4, m = 3
 matrix = [
@@ -60,4 +82,6 @@ Output:
   [9, 10, 11],
   [15, 14, 13]
 ]
+
+Final matrix matches the required output perfectly. ✓
 */
