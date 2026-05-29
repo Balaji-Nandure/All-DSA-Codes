@@ -89,16 +89,14 @@ struct Node {
 
 class Solution {
 private:
-    int totalTilt;
-    
-    int solve(Node* root) {
+    int solve(Node* root, int& totalTilt) {
         if (!root) {
             return 0;
         }
         
         // Post-order traversal: calculate left and right subtree sums first
-        int leftSum = solve(root->left);
-        int rightSum = solve(root->right);
+        int leftSum = solve(root->left, totalTilt);
+        int rightSum = solve(root->right, totalTilt);
         
         // The tilt of the current node is the absolute difference 
         // between the left and right subtree sums
@@ -110,8 +108,8 @@ private:
 
 public:
     int tiltTree(Node* root) {
-        totalTilt = 0;
-        solve(root);
+        int totalTilt = 0;
+        solve(root, totalTilt);
         return totalTilt;
     }
 };
