@@ -47,23 +47,32 @@ using namespace std;
 class Solution {
 public:
     string rremove(string s) {
-        int n = s.length();
         string temp = "";
+        int n = s.length();
+        int i = 0;
+        bool hasDuplicates = false;
         
-        for (int i = 0; i < n; i++) {
-            // Keep a character only if it is different from both its left and right neighbors
-            if ((i == 0 || s[i] != s[i - 1]) && (i == n - 1 || s[i] != s[i + 1])) {
+        while (i < n) {
+            // Check if the current character is part of a duplicate group
+            if (i < n - 1 && s[i] == s[i + 1]) {
+                hasDuplicates = true;
+                char dupChar = s[i];
+                // Skip all adjacent occurrences of this duplicate character
+                while (i < n && s[i] == dupChar) {
+                    i++;
+                }
+            } else {
                 temp += s[i];
+                i++;
             }
         }
         
-        // If no duplicates were removed, we have the final string
-        if (temp.length() == s.length()) {
-            return temp;
+        // If we found and removed any duplicates, recurse on the remaining string
+        if (hasDuplicates) {
+            return rremove(temp);
         }
         
-        // Otherwise, recursively remove duplicates from the newly formed string
-        return rremove(temp);
+        return temp;
     }
 };
 
