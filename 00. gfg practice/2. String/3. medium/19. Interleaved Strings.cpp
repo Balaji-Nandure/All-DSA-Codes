@@ -56,35 +56,192 @@ GFG Link: https://www.geeksforgeeks.org/problems/interleaved-strings/1
 
 using namespace std;
 
-class Solution {
-public:
-  bool isInterleave(string s1, string s2, string s3) {
-    int n = s1.length();
-    int m = s2.length();
-    
-    // Length of s3 must be exactly the sum of lengths of s1 and s2
-    if (n + m != s3.length()) {
-        return false;
-    }
-    
-    // dp[i][j] stores whether s3[0...i+j-1] is interleaved from s1[0...i-1] and s2[0...j-1]
-    vector<vector<bool>> dp(n + 1, vector<bool>(m + 1, false));
-    
-    dp[0][0] = true;
-    
-    for (int i = 0; i <= n; i++) {
-        for (int j = 0; j <= m; j++) {
-            if (i > 0 && s1[i - 1] == s3[i + j - 1]) {
-                dp[i][j] = dp[i][j] || dp[i - 1][j];
-            }
-            if (j > 0 && s2[j - 1] == s3[i + j - 1]) {
-                dp[i][j] = dp[i][j] || dp[i][j - 1];
+// 1. Recursive Approach (Exponential Time)
+// TC: O(2^(N+M)) in worst case, SC: O(N+M) recursion stack space
+class InterleaveRecursive {
+private:
+    bool solve(int i, int j, const string& s1, const string& s2, const string& s3) {
+        // Base Case: if we have reached the end of both strings, match is successful
+        if (i == s1.length() && j == s2.length()) {
+            return true;
+        }
+
+        // Try to match current character of s3 with s1 (short-circuiting check)
+        if (i < s1.length() && s1[i] == s3[i + j] ) {
+            if(solve(i+1,j,s1,s2,s3)){
+                return true;
             }
         }
+        // Try to match current character of s3 with s2 (short-circuiting check)
+        if (j < s2.length() && s2[j] == s3[i + j] ) {
+            if(solve(i,j+1,s1 ,s2,s3)){
+                return true;
+            }
+        }
+
+        return false;
     }
-    
-    return dp[n][m];
-  }
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        if (s1.length() + s2.length() != s3.length()) {
+            return false;
+        }
+        return solve(0, 0, s1, s2, s3);
+    }
+};
+
+// 2. Memoization (Top-Down DP)
+// TC: O(N * M), SC: O(N * M) dp state table + O(N + M) recursion stack space
+class InterleaveMemoization {
+private:
+    bool solve(int i, int j, const string& s1, const string& s2, const string& s3, vector<vector<int>>& dp) {
+        // Base Case
+        if (i == s1.length() && j == s2.length()) {
+            return true;
+        }
+        
+        // Return cached result
+        if (dp[i][j] != -1) {
+            return dp[i][j];
+        }
+
+        // Try to match with s1
+        if (i < s1.length() && s1[i] == s3[i + j]) {
+            if (solve(i + 1, j, s1, s2, s3, dp)) {
+                return dp[i][j] = true;
+            }
+        }
+        // Try to match with s2
+        if (j < s2.length() && s2[j] == s3[i + j]) {
+            if (solve(i, j + 1, s1, s2, s3, dp)) {
+                return dp[i][j] = true;
+            }
+        }
+
+        return dp[i][j] = false;
+    }
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        int n = s1.length();
+        int m = s2.length();
+        
+        if (n + m != s3.length()) {
+            return false;
+        }
+        
+        vector<vector<int>> dp(n + 1, vector<int>(m + 1, -1));
+        return solve(0, 0, s1, s2, s3, dp);
+    }
+};
+
+// 3. Tabulation (Bottom-Up DP)
+// TC: O(N * M), SC: O(N * M) dp table
+// Let's learn Tabulation step-by-step! 
+// Remember the 3 Golden Steps to convert any recursive DP into Tabulation:
+// Step 1: Create the DP Table/Array.
+// Step 2: Analyze & Initialize the Base Case.
+// Step 3: Run the loops (bottom-up) and write down the state transition.
+class InterleaveTabulation {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        int n = s1.length();
+        int m = s2.length();
+        
+        // Fast Check: If combined length doesn't match s3, it can't be interleaved!
+        if (n + m != s3.length()) {
+            return false;
+        }
+        
+        /* 
+         * Step 1: Create the DP Array.
+         * dp[i][j] will store: "Can s3's prefix of length (i + j) be formed by 
+         * interleaving s1's prefix of length i and s2's prefix of length j?"
+         * Size is (n + 1) x (m + 1) because prefix lengths range from 0 to n and 0 to m.
+         * Initialize all cells as false.
+         */
+        vector<vector<bool>> dp(n + 1, vector<bool>(m + 1, false));
+        
+        /* 
+         * Step 2: Initialize the Base Case.
+         * dp[0][0] = true. Why? Because an empty s1 (length 0) and empty s2 (length 0) 
+         * can form an empty s3 (length 0). It's a valid match!
+         */
+        dp[0][0] = true;
+        
+        /* 
+         * Step 3: Write the loops & logic.
+         * We iterate bottom-up from length i = 0 to n and j = 0 to m.
+         * For each state dp[i][j], we have two choices to check:
+         * 
+         * Choice 1: Can we match the current character of s3 (at index i+j-1) 
+         * using the last character of s1's prefix (which is s1[i-1])?
+         * - Condition: We must have used at least 1 character of s1 (i > 0) AND s1[i-1] == s3[i+j-1].
+         * - If yes, then the result for dp[i][j] depends on whether we could interleave 
+         *   the remaining characters previously, which is dp[i-1][j].
+         * 
+         * Choice 2: Can we match the current character of s3 (at index i+j-1) 
+         * using the last character of s2's prefix (which is s2[j-1])?
+         * - Condition: We must have used at least 1 character of s2 (j > 0) AND s2[j-1] == s3[i+j-1].
+         * - If yes, then the result for dp[i][j] depends on whether we could interleave 
+         *   the remaining characters previously, which is dp[i][j-1].
+         */
+        for (int i = 0; i <= n; i++) {
+            for (int j = 0; j <= m; j++) {
+                // If we are at (0,0), it's already set to true, so skip overriding it
+                if (i == 0 && j == 0) continue;
+                
+                // Check Choice 1 (matching s1's character)
+                if (i > 0 && s1[i - 1] == s3[i + j - 1]) {
+                    dp[i][j] = dp[i][j] || dp[i - 1][j];
+                }
+                
+                // Check Choice 2 (matching s2's character)
+                if (j > 0 && s2[j - 1] == s3[i + j - 1]) {
+                    dp[i][j] = dp[i][j] || dp[i][j - 1];
+                }
+            }
+        }
+        
+        // Final Answer: Can s1 of length n and s2 of length m form s3 of length n+m?
+        return dp[n][m];
+    }
+};
+
+// 4. Space Optimized (Bottom-Up DP with O(M) space)
+// TC: O(N * M), SC: O(M) space optimization
+class Solution {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        int n = s1.length();
+        int m = s2.length();
+        
+        if (n + m != s3.length()) {
+            return false;
+        }
+        
+        vector<bool> prev(m + 1, false);
+        prev[0] = true; // dp[0][0] = true
+        
+        // Base case for row 0: matching only s2 with s3 (since s1 prefix is empty)
+        for (int j = 1; j <= m; j++) {
+            prev[j] = prev[j - 1] && (s2[j - 1] == s3[j - 1]);
+        }
+        
+        for (int i = 1; i <= n; i++) {
+            vector<bool> curr(m + 1, false);
+            // Base case for col 0: matching only s1 with s3 (since s2 prefix is empty)
+            curr[0] = prev[0] && (s1[i - 1] == s3[i - 1]);
+            
+            for (int j = 1; j <= m; j++) {
+                bool matchS1 = (s1[i - 1] == s3[i + j - 1]) && prev[j];
+                bool matchS2 = (s2[j - 1] == s3[i + j - 1]) && curr[j - 1];
+                curr[j] = matchS1 || matchS2;
+            }
+            prev = curr;
+        }
+        
+        return prev[m];
+    }
 };
 
 /*
