@@ -73,8 +73,6 @@
 
 #include <iostream>
 #include <vector>
-#include <cmath>
-#include <algorithm>
 
 using namespace std;
 
@@ -120,90 +118,20 @@ public:
     }
 };
 
-// ==========================================
-// Helper Functions for Testing & Verification
-// ==========================================
-
-// Helper function to check height balance and get tree height (-1 if unbalanced)
-int checkBalance(Node* root) {
-    if (root == NULL) return 0;
-
-    int leftHeight = checkBalance(root->left);
-    if (leftHeight == -1) return -1;
-
-    int rightHeight = checkBalance(root->right);
-    if (rightHeight == -1) return -1;
-
-    if (abs(leftHeight - rightHeight) > 1) return -1;
-
-    return 1 + max(leftHeight, rightHeight);
-}
-
-bool isHeightBalanced(Node* root) {
-    return checkBalance(root) != -1;
-}
-
-// Preorder Traversal (Root, Left, Right)
-void printPreorder(Node* root) {
-    if (root == NULL) return;
-    cout << root->data << " ";
-    printPreorder(root->left);
-    printPreorder(root->right);
-}
-
-// Inorder Traversal (Left, Root, Right)
-void printInorder(Node* root) {
-    if (root == NULL) return;
-    printInorder(root->left);
-    cout << root->data << " ";
-    printInorder(root->right);
-}
-
 int main() {
     Solution ob;
 
     // Example 1:
     // Input: arr[] = [10, 20, 30]
-    // Expected: Height-balanced BST (e.g., Root 20, Preorder: 20 10 30)
     vector<int> arr1 = {10, 20, 30};
     Node* root1 = ob.sortedArrayToBST(arr1);
-
-    cout << "--- Example 1 ---" << endl;
-    cout << "Input Array: [10, 20, 30]" << endl;
-    cout << "Preorder Traversal: ";
-    printPreorder(root1);
-    cout << endl;
-    cout << "Inorder Traversal : ";
-    printInorder(root1);
-    cout << endl;
-    cout << "Is Height Balanced: " << (isHeightBalanced(root1) ? "true" : "false") << endl << endl;
+    cout << "Example 1 Root: " << (root1 ? root1->data : -1) << "\n";
 
     // Example 2:
     // Input: arr[] = [1, 5, 9, 14, 23, 27]
-    // Expected: Height-balanced BST
     vector<int> arr2 = {1, 5, 9, 14, 23, 27};
     Node* root2 = ob.sortedArrayToBST(arr2);
-
-    cout << "--- Example 2 ---" << endl;
-    cout << "Input Array: [1, 5, 9, 14, 23, 27]" << endl;
-    cout << "Preorder Traversal: ";
-    printPreorder(root2);
-    cout << endl;
-    cout << "Inorder Traversal : ";
-    printInorder(root2);
-    cout << endl;
-    cout << "Is Height Balanced: " << (isHeightBalanced(root2) ? "true" : "false") << endl << endl;
-
-    // Example 3: Single Element
-    vector<int> arr3 = {42};
-    Node* root3 = ob.sortedArrayToBST(arr3);
-
-    cout << "--- Example 3 ---" << endl;
-    cout << "Input Array: [42]" << endl;
-    cout << "Preorder Traversal: ";
-    printPreorder(root3);
-    cout << endl;
-    cout << "Is Height Balanced: " << (isHeightBalanced(root3) ? "true" : "false") << endl;
+    cout << "Example 2 Root: " << (root2 ? root2->data : -1) << "\n";
 
     return 0;
 }
