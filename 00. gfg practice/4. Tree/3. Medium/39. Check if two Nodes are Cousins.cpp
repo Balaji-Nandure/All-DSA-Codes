@@ -95,7 +95,7 @@ class Solution {
 public:
     // GFG Signature
     bool isCousins(Node* root, int a, int b) {
-        if (!root) return false;
+        if (!root || a == b) return false;
 
         queue<Node*> q;
         q.push(root);
