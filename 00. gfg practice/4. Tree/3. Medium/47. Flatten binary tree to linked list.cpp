@@ -20,65 +20,47 @@
     Output: 1 -> 2 -> 3 -> 4 -> 5 -> 6 (all left = NULL)
     Explanation: Preorder traversal is 1, 2, 3, 4, 5, 6.
 
-    Input:
-            1
-           / \
-          3   4
-             /
-            2
-             \
-              5
-    Output: 1 -> 3 -> 4 -> 2 -> 5 (all left = NULL)
-
     Constraints:
     1 <= number of nodes in binary tree <= 10^5
     1 <= data of nodes <= 10^5
 
-    Expected Complexities:
-    Time Complexity: O(N), each node is processed at most twice.
-    Space Complexity: O(1) Auxiliary Space (Pure In-Place Morris Traversal!).
+    ----------------------------------------------------------------------------------------
+    APPROACH 1: Reverse Preorder Recursion (Right -> Left -> Root) [O(N) Time, O(H) Space]
+    ----------------------------------------------------------------------------------------
+    INTUITION:
+    - Preorder is [Root -> Left -> Right].
+    - If we traverse in REVERSE Preorder [Right -> Left -> Root]:
+      * By the time we process `root`, the `Right` subtree and `Left` subtree have ALREADY
+        been flattened into a linked list!
+      * We maintain a `prev` pointer passed BY REFERENCE (`Node*& prev`) to track the head of
+        the already flattened list without using global/class state.
+      * We link `root->right = prev`, set `root->left = NULL`, and update `prev = root`.
 
-    Love Babbar Style Approach:
-    Morris Traversal (In-Place Pointer Threading):
+    ----------------------------------------------------------------------------------------
+    APPROACH 2: Morris Traversal (In-Place Pointer Threading) [O(N) Time, O(1) Space]
+    ----------------------------------------------------------------------------------------
+    INTUITION:
+    - For any node `root` with a non-null `root->left`:
+      1. Find `cur` = rightmost node in `root`'s left subtree.
+      2. Attach `cur->right = root->right` (stitch right subtree to end of left subtree).
+      3. Shift `root->right = root->left` (make left child the new right child).
+      4. Set `root->left = NULL`.
+      5. Advance `root = root->right`.
 
-    1. INTUITION:
-       - In Preorder traversal (Root -> Left -> Right):
-         * The LEFT subtree must come directly after the Root.
-         * The RIGHT subtree must come directly after the RIGHTMOST node of the Left subtree!
-       - Therefore, for any node `curr` with a non-null `curr->left`:
-         1. Find `prev` = rightmost node in `curr`'s left subtree.
-         2. Attach `prev->right = curr->right` (stitch right subtree to end of left subtree).
-         3. Shift `curr->right = curr->left` (make left child the new right child).
-         4. Set `curr->left = NULL`.
-         5. Move `curr = curr->right`.
-
-    2. ALGORITHM:
-       - `curr = root`
-       - While (`curr != NULL`):
-         * If `curr->left != NULL`:
-           - `Node* prev = curr->left;`
-           - While (`prev->right != NULL`): `prev = prev->right;`
-           - `prev->right = curr->right;`
-           - `curr->right = curr->left;`
-           - `curr->left = NULL;`
-         * `curr = curr->right;`
-
-    Dry Run:
+    Dry Run (Recursive Approach):
               1
             /   \
            2     5
           / \     \
          3   4     6
 
-    - curr = 1: curr->left = 2.
-      prev = 2 -> moves to 4 (rightmost of left subtree).
-      Attach 4->right = 5.
-      1->right = 2, 1->left = NULL.
-    - curr = 2: curr->left = 3.
-      prev = 3 (rightmost of left subtree).
-      Attach 3->right = 4.
-      2->right = 3, 2->left = NULL.
-    - Resulting tree: 1 -> 2 -> 3 -> 4 -> 5 -> 6 (all left = NULL) ✓
+    - flatten(6): prev = 6
+    - flatten(5): 5->right = 6, 5->left = NULL, prev = 5
+    - flatten(4): 4->right = 5, 4->left = NULL, prev = 4
+    - flatten(3): 3->right = 4, 3->left = NULL, prev = 3
+    - flatten(2): 2->right = 3, 2->left = NULL, prev = 2
+    - flatten(1): 1->right = 2, 1->left = NULL, prev = 1
+    Resulting list: 1 -> 2 -> 3 -> 4 -> 5 -> 6 ✓
 */
 
 #include <iostream>
@@ -97,32 +79,54 @@ struct Node {
     }
 };
 
-class Solution {
+// =========================================================================
+// APPROACH 1: Recursive Reverse Preorder (Pass-by-Reference prev pointer)
+// =========================================================================
+class SolutionRecursive {
+private:
+    void solve(Node* root, Node*& prev) {
+        if (root == NULL) return;
+
+        // Step 1: Recursively process RIGHT subtree first
+        solve(root->right, prev);
+
+        // Step 2: Recursively process LEFT subtree second
+        solve(root->left, prev);
+
+        // Step 3: Attach current node to head of flattened list
+        root->right = prev;
+        root->left = NULL;
+
+        // Step 4: Update prev pointer to current root
+        prev = root;
+    }
+
 public:
-    // GFG Signature - Morris Flattening O(1) Space
-    void flatten(Node *root) {
-        Node* curr = root;
+    void flatten(Node* root) {
+        Node* prev = NULL; // Local variable passed by reference
+        solve(root, prev);
+    }
+};
 
-        while (curr != NULL) {
-            if (curr->left != NULL) {
-                // Find the rightmost node of the left subtree
-                Node* prev = curr->left;
-                while (prev->right != NULL) {
-                    prev = prev->right;
-                }
+// =========================================================================
+// APPROACH 2: Morris Traversal Iterative (O(1) Auxiliary Space)
+// =========================================================================
+class SolutionMorris {
+public:
+    void flatten(Node* root) {
+        while (root) {
+            if (root->left) {
+                Node* cur = root->left;
 
-                // Connect the rightmost node of left subtree to curr's right subtree
-                prev->right = curr->right;
+                while (cur->right)
+                    cur = cur->right;
 
-                // Move left subtree to right
-                curr->right = curr->left;
-
-                // Set left pointer to NULL
-                curr->left = NULL;
+                cur->right = root->right;
+                root->right = root->left;
+                root->left = NULL;
             }
 
-            // Move to next node along the right pointer
-            curr = curr->right;
+            root = root->right;
         }
     }
 };
@@ -141,44 +145,35 @@ void printFlattenedList(Node* root) {
 }
 
 int main() {
-    Solution ob;
+    // Test Approach 1: Recursive Reverse Preorder
+    {
+        Node* root1 = new Node(1);
+        root1->left = new Node(2);
+        root1->right = new Node(5);
+        root1->left->left = new Node(3);
+        root1->left->right = new Node(4);
+        root1->right->right = new Node(6);
 
-    // Example 1:
-    //          1
-    //        /   \
-    //       2     5
-    //      / \     \
-    //     3   4     6
-    // Expected Output: 1 2 3 4 5 6
-    Node* root1 = new Node(1);
-    root1->left = new Node(2);
-    root1->right = new Node(5);
-    root1->left->left = new Node(3);
-    root1->left->right = new Node(4);
-    root1->right->right = new Node(6);
+        SolutionRecursive ob1;
+        ob1.flatten(root1);
+        cout << "Recursive Solution Output: ";
+        printFlattenedList(root1); // Expected: 1 2 3 4 5 6
+    }
 
-    ob.flatten(root1);
-    cout << "Example 1 Flattened List: ";
-    printFlattenedList(root1);
+    // Test Approach 2: Iterative Morris Traversal
+    {
+        Node* root2 = new Node(1);
+        root2->left = new Node(2);
+        root2->right = new Node(5);
+        root2->left->left = new Node(3);
+        root2->left->right = new Node(4);
+        root2->right->right = new Node(6);
 
-    // Example 2:
-    //        1
-    //       / \
-    //      3   4
-    //         /
-    //        2
-    //         \
-    //          5
-    // Expected Output: 1 3 4 2 5
-    Node* root2 = new Node(1);
-    root2->left = new Node(3);
-    root2->right = new Node(4);
-    root2->right->left = new Node(2);
-    root2->right->left->right = new Node(5);
-
-    ob.flatten(root2);
-    cout << "Example 2 Flattened List: ";
-    printFlattenedList(root2);
+        SolutionMorris ob2;
+        ob2.flatten(root2);
+        cout << "Morris Iterative Output : ";
+        printFlattenedList(root2); // Expected: 1 2 3 4 5 6
+    }
 
     return 0;
 }
