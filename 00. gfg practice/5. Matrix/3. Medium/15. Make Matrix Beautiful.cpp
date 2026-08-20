@@ -31,19 +31,17 @@
     Time Complexity: O(N^2), visiting each cell once.
     Space Complexity: O(N), for storing row and column sums.
 
-    Approach 1: Mathematical Sum Formula (Optimal - Striver & Love Babbar)
-    Approach 2: Greedy Cell-by-Cell Simulation (Striver & Love Babbar)
+    Love Babbar / Striver Approach:
+    Max Row/Col Sum Difference Accumulation (Single-Pass Matrix Sum + Row Difference Accumulation)
 
     INTUITION & STRATEGY:
-    1. Target Sum Determination:
-       - Since elements can ONLY be incremented (+1), the target sum for every row and column must be
-         at least the MAXIMUM row sum or column sum in the initial matrix.
-       - Let `maxSum` = max( max(rowSums), max(colSums) ).
-    2. Mathematical Proof for Total Operations:
-       - The target sum for every row (and column) is `maxSum`.
-       - Since there are `n` rows, the total sum of all elements in the final beautiful matrix will be `n * maxSum`.
-       - Therefore, the minimum number of increment operations required is:
-         `Min Operations = (n * maxSum) - totalMatrixSum`
+    1. Traverse the matrix cell by cell to compute:
+       - `row[i]`: sum of elements in row `i`
+       - `col[j]`: sum of elements in column `j`
+       - `maxSum`: maximum sum seen among all rows and columns.
+    2. Since every row must reach `maxSum`, the number of operations needed for row `i` is `maxSum - row[i]`.
+    3. Accumulate `ans += (maxSum - row[i])` for all `i` from `0` to `n - 1`.
+    4. Return `ans`.
 */
 
 #include <iostream>
@@ -52,104 +50,55 @@
 
 using namespace std;
 
-// ============================================================================
-// Approach 1: Mathematical Sum Formula (Optimal O(N^2) - Striver & Love Babbar)
-// ============================================================================
-class SolutionMath {
-public:
-    int findMinOperation(vector<vector<int>>& mat) {
-        int n = mat.size();
-
-        vector<int> rowSum(n, 0);
-        vector<int> colSum(n, 0);
-        int totalSum = 0;
-
-        // Step 1: Calculate sum of each row, column, and total matrix sum
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                rowSum[i] += mat[i][j];
-                colSum[j] += mat[i][j];
-                totalSum += mat[i][j];
-            }
-        }
-
-        // Step 2: Find maximum sum among all rows and columns
-        int maxSum = 0;
-        for (int i = 0; i < n; i++) {
-            maxSum = max(maxSum, rowSum[i]);
-            maxSum = max(maxSum, colSum[i]);
-        }
-
-        // Step 3: Operations required = (n * maxSum) - totalSum
-        return (n * maxSum) - totalSum;
-    }
-};
-
-// ============================================================================
-// Approach 2: Greedy Cell-by-Cell Simulation (O(N^2) - Striver & Love Babbar)
-// ============================================================================
-class SolutionGreedy {
-public:
-    int findMinOperation(vector<vector<int>>& mat) {
-        int n = mat.size();
-
-        vector<int> rowSum(n, 0);
-        vector<int> colSum(n, 0);
-
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
-                rowSum[i] += mat[i][j];
-                colSum[j] += mat[i][j];
-            }
-        }
-
-        int maxSum = 0;
-        for (int i = 0; i < n; i++) {
-            maxSum = max(maxSum, rowSum[i]);
-            maxSum = max(maxSum, colSum[i]);
-        }
-
-        // Greedily increment cell (i, j) by min(maxSum - rowSum[i], maxSum - colSum[j])
-        int countOps = 0;
-        int i = 0, j = 0;
-
-        while (i < n && j < n) {
-            int diff = min(maxSum - rowSum[i], maxSum - colSum[j]);
-            rowSum[i] += diff;
-            colSum[j] += diff;
-            countOps += diff;
-
-            if (rowSum[i] == maxSum) i++;
-            if (colSum[j] == maxSum) j++;
-        }
-
-        return countOps;
-    }
-};
-
-// Default Solution Class for GFG Submission
 class Solution {
 public:
-    int findMinOperation(vector<vector<int>>& mat) {
-        SolutionMath solver;
-        return solver.findMinOperation(mat);
+    int findMinOperation(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        int maxSum = 0;
+
+        vector<int> row(n, 0);
+        vector<int> col(n, 0);
+
+        // Step 1: Calculate row sums, col sums, and track maximum sum
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                row[i] += matrix[i][j];
+                maxSum = max(row[i], maxSum);
+
+                col[j] += matrix[i][j];
+                maxSum = max(col[j], maxSum);
+            }
+        }
+
+        int ans = 0;
+
+        // Step 2: Accumulate difference between maxSum and row[i] for each row
+        for (int i = 0; i < n; i++) {
+            row[i] = maxSum - row[i];
+            col[i] = maxSum - col[i];
+
+            ans += row[i];
+        }
+
+        return ans;
     }
 
-    int findMinOperation(vector<vector<int>>& mat, int n) {
-        return findMinOperation(mat);
+    // Overload for (n, matrix) signature
+    int findMinOperation(int n, vector<vector<int>>& matrix) {
+        return findMinOperation(matrix);
     }
 };
 
 int main() {
+    Solution ob;
+
     // Example 1:
     // Expected Output: 4
     vector<vector<int>> mat1 = {
         {1, 2},
         {3, 4}
     };
-
-    SolutionMath mathSolver;
-    cout << "Example 1 Min Operations (Math Formula): " << mathSolver.findMinOperation(mat1) << "\n";
+    cout << "Example 1 Min Operations: " << ob.findMinOperation(mat1) << "\n";
 
     // Example 2:
     // Expected Output: 6
@@ -158,9 +107,7 @@ int main() {
         {4, 2, 3},
         {3, 2, 1}
     };
-
-    SolutionGreedy greedySolver;
-    cout << "Example 2 Min Operations (Greedy Simulation): " << greedySolver.findMinOperation(mat2) << "\n";
+    cout << "Example 2 Min Operations: " << ob.findMinOperation(mat2) << "\n";
 
     return 0;
 }
