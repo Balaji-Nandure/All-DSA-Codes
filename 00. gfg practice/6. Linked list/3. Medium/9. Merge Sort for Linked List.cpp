@@ -103,12 +103,26 @@ public:
 // ============================================================================
 class SolutionMergeSort {
 private:
-    // Helper function to find middle of linked list
+    // ========================================================================
+    // IMPORTANT DSA NOTE ON SLOW & FAST POINTER INITIALIZATION:
+    // ========================================================================
+    // 1. `slow = head`, `fast = head->next` (First Middle Node in even lengths):
+    //    - CRITICAL for Merge Sort!
+    //    - For 2 nodes (e.g. 1 -> 2): `slow` lands on node 1 (first middle).
+    //      Splits list cleanly into: Left (1 -> null) and Right (2 -> null).
+    //    - Avoids Infinite Recursion Stack Overflow!
+    //
+    // 2. `slow = head`, `fast = head` (Second Middle Node in even lengths):
+    //    - Used in Palindrome check or standard Middle element finding.
+    //    - For 2 nodes (e.g. 1 -> 2): `slow` lands on node 2 (second middle).
+    //      If used in Merge Sort, `mid->next` splitting fails for 2 nodes,
+    //      causing infinite recursion loop.
+    // ========================================================================
     Node* getMiddle(Node* head) {
         if (head == nullptr) return head;
 
         Node* slow = head;
-        Node* fast = head->next; // Ensures left half gets first middle node in even lengths
+        Node* fast = head->next; // First middle node for even lengths
 
         while (fast != nullptr && fast->next != nullptr) {
             slow = slow->next;
@@ -118,10 +132,10 @@ private:
         return slow;
     }
 
-    // Helper function to merge two sorted linked lists
+    // Helper function to merge two sorted linked lists using new Node(-1)
     Node* merge(Node* left, Node* right) {
-        Node dummy(-1);
-        Node* temp = &dummy;
+        Node* dummy = new Node(-1); // Heap allocation (User Preferred Style)
+        Node* temp = dummy;
 
         while (left != nullptr && right != nullptr) {
             if (left->data <= right->data) {
@@ -140,7 +154,9 @@ private:
             temp->next = right;
         }
 
-        return dummy.next;
+        Node* result = dummy->next;
+        delete dummy; // Clean up heap dummy node
+        return result;
     }
 
 public:
