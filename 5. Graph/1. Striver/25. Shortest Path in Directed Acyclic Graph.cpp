@@ -58,9 +58,20 @@ Constraints:
 using namespace std;
 
 class Solution {
+private:
+    void topoSort(int node, vector<vector<pair<int, int>>>& adj, vector<int>& vis, stack<int>& st) {
+        vis[node] = 1;
+        for (auto [nei, wt] : adj[node]) {
+            if (!vis[nei]) {
+                topoSort(nei, adj, vis, st);
+            }
+        }
+        st.push(node);
+    }
+
 public:
     vector<int> shortestPath(int N, int M, vector<vector<int>>& edges) {
-        // Step 1: Build adjacency list: u -> {v, weight}
+        // Step 1: Build adjacency list
         vector<vector<pair<int, int>>> adj(N);
         for (auto& e : edges) {
             adj[e[0]].push_back({e[1], e[2]});
@@ -69,48 +80,30 @@ public:
         // Step 2: Topological sort using DFS
         vector<int> vis(N, 0);
         stack<int> st;
-
-        function<void(int)> dfs = [&](int node) {
-            vis[node] = 1;
-            for (auto [nei, wt] : adj[node]) {
-                if (!vis[nei]) {
-                    dfs(nei);
-                }
-            }
-            st.push(node);
-        };
-
         for (int i = 0; i < N; i++) {
             if (!vis[i]) {
-                dfs(i);
+                topoSort(i, adj, vis, st);
             }
         }
 
-        // Step 3: Initialize distances with infinity
-        const int INF = 1e9;
-        vector<int> dist(N, INF);
-        dist[0] = 0; // Distance to source is 0
+        // Step 3: Relax edges in topological order
+        vector<int> dist(N, 1e9);
+        dist[0] = 0;
 
-        // Step 4: Relax edges in topological order
         while (!st.empty()) {
             int node = st.top();
             st.pop();
 
-            // If this node is not reachable from source, skip
-            if (dist[node] == INF) continue;
-
-            for (auto [nei, wt] : adj[node]) {
-                if (dist[node] + wt < dist[nei]) {
-                    dist[nei] = dist[node] + wt;
+            if (dist[node] != 1e9) {
+                for (auto [nei, wt] : adj[node]) {
+                    dist[nei] = min(dist[nei], dist[node] + wt);
                 }
             }
         }
 
-        // Step 5: Mark unreachable vertices as -1
-        for (int i = 0; i < N; i++) {
-            if (dist[i] == INF) {
-                dist[i] = -1;
-            }
+        // Step 4: Convert unreachable nodes to -1
+        for (int& d : dist) {
+            if (d == 1e9) d = -1;
         }
 
         return dist;
