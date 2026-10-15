@@ -63,7 +63,23 @@ class Solution {
 public:
     // Function to find the shortest distance of all vertices from the source vertex src.
     vector<int> dijkstra(int V, vector<vector<pair<int, int>>>& adj, int src) {
-        // Min-heap storing {distance, node}
+        // -------------------------------------------------------------------------
+        // DATA STRUCTURE CHOICE EXPLANATION:
+        // 1. Why `priority_queue` (min-heap) instead of `queue`?
+        //    - In graphs with non-uniform edge weights, a path with fewer edges may have a 
+        //      much higher total weight than a path with more edges.
+        //    - A FIFO queue would explore by edge count, NOT by cheapest distance.
+        //    - A min-heap ensures we ALWAYS expand the globally closest unvisited node first.
+        //
+        // 2. Why `greater<pair<int, int>>`?
+        //    - By default, C++ `priority_queue` is a MAX-HEAP (pops the largest element).
+        //    - `greater<...>` flips it into a MIN-HEAP (pops the smallest element).
+        //
+        // 3. Why store `{distance, node}` instead of `{node, distance}`?
+        //    - In C++, `std::pair` comparison compares the first element first (`d`).
+        //    - Putting `distance` first ensures the min-heap automatically sorts by minimum
+        //      distance without writing a custom comparator class!
+        // -------------------------------------------------------------------------
         priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
 
         // Initialize distances to infinity

@@ -90,7 +90,20 @@ public:
         vector<vector<int>> dist(n, vector<int>(m, INF));
         dist[0][0] = 0;
 
-        // Min-heap storing {effort, {row, col}}
+        // -------------------------------------------------------------------------
+        // DATA STRUCTURE CHOICE EXPLANATION:
+        // 1. Why `priority_queue` (min-heap) instead of `queue`?
+        //    - Unlike the Binary Maze where all steps cost 1, here the effort difference
+        //      between adjacent cells varies arbitrarily (e.g. 0, 5, 2, 8...).
+        //    - A simple FIFO queue CANNOT guarantee exploring the minimum effort path first.
+        //    - A min-heap (`greater<...>`) ensures we greedily expand the path with the smallest
+        //      maximum effort first, preserving the optimal substructure of Dijkstra.
+        //
+        // 2. Why `pair<int, pair<int, int>>` storing `{effort, {row, col}}`?
+        //    - `effort` is placed FIRST in the outer pair so C++'s default `pair` comparison
+        //      automatically sorts by minimum effort without needing a custom comparator!
+        //    - `{row, col}` represents the grid coordinates of the node.
+        // -------------------------------------------------------------------------
         priority_queue<pair<int, pair<int, int>>,
                        vector<pair<int, pair<int, int>>>,
                        greater<pair<int, pair<int, int>>>> pq;

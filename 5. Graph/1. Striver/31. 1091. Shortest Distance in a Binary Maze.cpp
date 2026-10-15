@@ -85,7 +85,18 @@ public:
         vector<vector<int>> dist(n, vector<int>(m, INF));
         dist[source.first][source.second] = 0;
 
-        // BFS queue stores {distance, {row, col}}
+        // -------------------------------------------------------------------------
+        // DATA STRUCTURE CHOICE EXPLANATION:
+        // 1. Why `queue` instead of `priority_queue`?
+        //    - In this binary maze, every step from a cell to its 4 neighbors has an EQUAL cost of 1.
+        //    - When edge weights are uniform (+1), a FIFO `queue` inherently explores in strictly
+        //      non-decreasing order of distance (level 0 -> level 1 -> level 2...).
+        //    - A `priority_queue` would add an unnecessary O(log(N*M)) overhead without any benefit!
+        //
+        // 2. Why `pair<int, pair<int, int>>` storing `{distance, {row, col}}`?
+        //    - `distance` (outer int): Accumulated steps from source.
+        //    - `{row, col}` (inner pair): Coordinates of the current cell in the grid.
+        // -------------------------------------------------------------------------
         queue<pair<int, pair<int, int>>> q;
         q.push({0, {source.first, source.second}});
 
