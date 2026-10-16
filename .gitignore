@@ -1,3 +1,20 @@
 output/
 *.exe 
 .vscode/
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# PDF files (ignore all generated PDF outputs)
+*.pdf
+**/*.pdf
+
+# Temporary render files and previews
+temp_*.html
+tools/pdf_generator/temp_*.html
+tools/pdf_generator/preview/
+tools/pdf_generator/book_preview/
